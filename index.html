@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="app-container">
 
   <!-- Header -->
@@ -37,8 +36,8 @@
         <tr>
           <th>Nom</th>
           <th>Catégorie</th>
-          <th>Prix de vente</th>
-          <th>Prix de revient</th>
+          <th>Prix vente</th>
+          <th>Prix revient</th>
           <th>Quantité</th>
           <th>Image</th>
         </tr>
@@ -60,8 +59,13 @@
   </div>
 
   <div class="tab-content" id="ventes" style="display:none;">
+    <select id="select-sale-product"></select>
+    <input type="number" id="sale-price" placeholder="Prix de vente" required>
+    <input type="number" id="sale-quantity" placeholder="Quantité" required>
+    <button id="add-sale">Ajouter Vente</button>
+
     <input type="date" id="sales-date">
-    <button id="filter-sales">Afficher</button>
+    <button id="filter-sales">Filtrer</button>
     <table id="sales-table">
       <thead>
         <tr>
@@ -98,7 +102,6 @@
   </div>
 
 </div>
-
 <script src="script.js"></script>
 </body>
 </html>

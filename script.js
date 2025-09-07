@@ -18,6 +18,7 @@ let clients = [];
 
 const addForm = document.getElementById("add-product-form");
 const productTable = document.querySelector("#product-table tbody");
+const selectSaleProduct = document.getElementById("select-sale-product");
 
 addForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -46,6 +47,7 @@ addForm.addEventListener("submit", (e) => {
 
 function renderProducts(){
   productTable.innerHTML = "";
+  selectSaleProduct.innerHTML = "";
   products.forEach((p, index)=>{
     productTable.innerHTML += `<tr>
       <td>${p.name}</td>
@@ -53,8 +55,9 @@ function renderProducts(){
       <td>${p.price}</td>
       <td>${p.cost}</td>
       <td>${p.quantity}</td>
-      <td>${p.image ? `<img src="${p.image}" width="50">` : ""}</td>
+      <td>${p.image ? `<img src="${p.image}">` : ""}</td>
     </tr>`;
+    selectSaleProduct.innerHTML += `<option value="${index}">${p.name}</option>`;
   });
 }
 
@@ -67,24 +70,27 @@ document.getElementById("search-product").addEventListener("input", (e)=>{
   });
 });
 
-// ===== Language =====
-const langSelect = document.getElementById("language-select");
-const translations = {
-  fr: { "Produits": "Produits", "Ajouter": "Ajouter", "Ventes":"Ventes", "Clients":"Clients","Exporter":"Exporter" },
-  ar: { "Produits":"المنتجات", "Ajouter":"إضافة", "Ventes":"المبيعات", "Clients":"العملاء","Exporter":"تصدير" },
-  en: { "Produits":"Products", "Ajouter":"Add", "Ventes":"Sales", "Clients":"Clients","Exporter":"Export" }
-};
-
-langSelect.addEventListener("change", ()=>{
-  const lang = langSelect.value;
-  tabs.forEach(tab=>{
-    tab.textContent = translations[lang][tab.dataset.tab];
-  });
-});
-
 // ===== Sales =====
 const salesTable = document.querySelector("#sales-table tbody");
 const salesTotalEl = document.getElementById("sales-total");
+
+document.getElementById("add-sale").addEventListener("click", ()=>{
+  const prodIndex = parseInt(selectSaleProduct.value);
+  const quantity = parseInt(document.getElementById("sale-quantity").value);
+  const price = parseFloat(document.getElementById("sale-price").value);
+  const date = new Date().toISOString().split('T')[0];
+  const product = products[prodIndex];
+
+  if(quantity > product.quantity){
+    alert("Stock insuffisant !");
+    return;
+  }
+
+  product.quantity -= quantity;
+  sales.push({ name: product.name, price, quantity, date });
+  renderProducts();
+  renderSales(date);
+});
 
 document.getElementById("filter-sales").addEventListener("click", ()=>{
   const date = document.getElementById("sales-date").value;
@@ -94,7 +100,7 @@ document.getElementById("filter-sales").addEventListener("click", ()=>{
 function renderSales(date){
   salesTable.innerHTML = "";
   let total = 0;
-  sales.filter(s=>s.date===date).forEach(s=>{
+  sales.filter(s=>!date || s.date===date).forEach(s=>{
     const totalPrice = s.price * s.quantity;
     total += totalPrice;
     salesTable.innerHTML += `<tr>
@@ -116,33 +122,17 @@ document.getElementById("print-sales").addEventListener("click", ()=>{
   newWin.print();
 });
 
-// ===== Export CSV =====
-document.getElementById("export-csv").addEventListener("click", ()=>{
-  let csv = "Nom,Catégorie,Prix,Coût,Quantité\n";
-  products.forEach(p=>{
-    csv += `${p.name},${p.category},${p.price},${p.cost},${p.quantity}\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "products.csv";
-  link.click();
-});
+// ===== Language =====
+const langSelect = document.getElementById("language-select");
+const translations = {
+  fr: { "produits":"Produits","ajouter":"Ajouter","ventes":"Ventes","clients":"Clients","export":"Exporter" },
+  ar: { "produits":"المنتجات","ajouter":"إضافة","ventes":"المبيعات","clients":"العملاء","export":"تصدير" },
+  en: { "produits":"Products","ajouter":"Add","ventes":"Sales","clients":"Clients","export":"Export" }
+};
 
-// ===== Import CSV =====
-document.getElementById("import-file").addEventListener("change", (e)=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    const lines = reader.result.split("\n").slice(1);
-    lines.forEach(line=>{
-      if(line.trim()!==""){
-        const [name, category, price, cost, quantity] = line.split(",");
-        products.push({ name, category, price:parseFloat(price), cost:parseFloat(cost), quantity:parseInt(quantity), image:"" });
-      }
-    });
-    renderProducts();
-  };
-  reader.readAsText(file);
+langSelect.addEventListener("change", ()=>{
+  const lang = langSelect.value;
+  tabs.forEach(tab=>{
+    tab.textContent = translations[lang][tab.dataset.tab];
+  });
 });

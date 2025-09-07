@@ -93,3 +93,5 @@ button:hover {
   .tab { font-size: 1em; }
   input, button, select { font-size: 1em; }
 }
+
+img { max-width: 50px; height: auto; }
