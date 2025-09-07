@@ -1,125 +1,186 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Excellence Abidjan</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header>
-    <h1>Excellence Abidjan</h1>
-    <button id="languageToggle">AR/FR</button>
+<header class="topbar">
+  <div class="title">Excellence Abidjan</div>
+  <div class="controls">
+    <select id="langSelect" title="Language">
+      <option value="fr">FR</option>
+      <option value="en">EN</option>
+      <option value="ar">AR</option>
+    </select>
+  </div>
 </header>
 
-<div class="tabs">
-    <button class="tab-btn active" data-tab="tab1">Produits</button>
-    <button class="tab-btn" data-tab="tab2">Stock & Ventes</button>
-    <button class="tab-btn" data-tab="tab3">Export / Partage</button>
-</div>
+<nav class="tabs" role="navigation">
+  <button class="tab-btn active" data-tab="tab-products" id="btn-products">Produits</button>
+  <button class="tab-btn" data-tab="tab-stock" id="btn-stock">Stock & Ventes</button>
+  <button class="tab-btn" data-tab="tab-clients" id="btn-clients">Clients</button>
+  <button class="tab-btn" data-tab="tab-export" id="btn-export">Export / Paramètres</button>
+</nav>
 
-<div class="tab-content">
-    <!-- Tab 1: Products -->
-    <div class="tab active" id="tab1">
-        <section>
-            <h2>Ajouter un produit</h2>
-            <form id="productForm">
-                <input type="text" id="productName" placeholder="Nom du produit" required>
-                <input type="number" id="productPrice" placeholder="Prix de vente (CFA)" required>
-                <input type="number" id="productCost" placeholder="Prix de revient (CFA)" required>
-                <input type="number" id="productStock" placeholder="Stock initial" required>
-                <input type="number" id="productDiscount" placeholder="Ristourne (%)">
-                <input type="text" id="productSupplier" placeholder="Nom du fournisseur">
-                <input type="file" id="productImage" accept="image/*">
-                <button type="button" id="takePhotoBtn">📷 Prendre une photo</button>
-                <button type="submit">Ajouter produit</button>
-            </form>
-        </section>
-
-        <section>
-            <div class="search-section">
-                <input type="text" id="searchInput" placeholder="Rechercher produit...">
-            </div>
-            <table class="product-table">
-                <thead>
-                    <tr>
-                        <th>Image</th>
-                        <th>Nom</th>
-                        <th>Prix</th>
-                        <th>Coût</th>
-                        <th>Stock</th>
-                        <th>Ristourne</th>
-                        <th>Fournisseur</th>
-                        <th>Valeur Stock</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="productTableBody"></tbody>
-            </table>
-        </section>
+<main class="tab-content">
+  <!-- PRODUCTS TAB -->
+  <section class="tab active" id="tab-products" aria-labelledby="btn-products">
+    <div class="card">
+      <h3 id="lbl-add-product">Ajouter un produit</h3>
+      <form id="productForm" class="form-grid">
+        <input id="prodName" placeholder="Nom du produit" required />
+        <input id="prodCategory" placeholder="Catégorie" />
+        <input id="prodSupplier" placeholder="Fournisseur" />
+        <input id="prodPrice" type="number" placeholder="Prix vente (CFA)" required />
+        <input id="prodCost" type="number" placeholder="Prix de revient (CFA)" required />
+        <input id="prodStock" type="number" placeholder="Stock initial" required />
+        <input id="prodDiscount" type="number" placeholder="Ristourne (%)" />
+        <input id="prodImageFile" type="file" accept="image/*" capture="environment" />
+        <div class="small-note">Ou choisissez une image / utilisez la caméra mobile</div>
+        <div class="form-actions">
+          <button id="saveProductBtn" type="submit">Ajouter</button>
+          <button id="resetProductBtn" type="button" class="ghost">Annuler</button>
+        </div>
+      </form>
     </div>
 
-    <!-- Tab 2: Stock & Sales -->
-    <div class="tab" id="tab2">
-        <!-- Dashboard -->
-        <section id="dashboard">
-            <h2>Tableau de bord</h2>
-            <div class="dashboard-cards">
-                <div class="card">Total Ventes: <span id="totalSalesCFA">0 CFA</span></div>
-                <div class="card">Valeur Stock: <span id="totalStockCFA">0 CFA</span></div>
-                <div class="card">Top Produits: <span id="topProducts">-</span></div>
-                <div class="card">Alertes Stock: <span id="lowStock">-</span></div>
-            </div>
-        </section>
+    <div class="card">
+      <div class="toolbar">
+        <input id="searchBox" placeholder="Recherche (nom, fournisseur, catégorie)" />
+        <select id="filterCategory"><option value="">Toutes catégories</option></select>
+        <input id="minPrice" type="number" placeholder="Min prix" />
+        <input id="maxPrice" type="number" placeholder="Max prix" />
+        <button id="clearFilters" class="ghost">Réinitialiser</button>
+      </div>
 
-        <section>
-            <h2>Gestion du stock et ventes</h2>
-            <select id="stockProductSelect"></select>
-            <input type="number" id="stockQuantity" placeholder="Quantité">
-            <input type="number" id="soldPriceInput" placeholder="Prix vendu (si vente)">
-            <button id="addStock">Ajouter Stock</button>
-            <button id="sellStock">Vendre</button>
-        </section>
+      <div class="table-wrap" id="productsArea">
+        <table id="productsTable" class="striped">
+          <thead>
+            <tr>
+              <th>Img</th><th>Nom</th><th>Categorie</th><th>Fournisseur</th><th>Prix</th><th>Coût</th><th>Stock</th><th>Rist.</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-        <section>
-            <h2>Ventes par date</h2>
-            <input type="date" id="filterDate">
-            <button id="filterBtn">Filtrer</button>
-            <table class="sales-table">
-                <thead>
-                    <tr>
-                        <th>Produit</th>
-                        <th>Type</th>
-                        <th>Quantité</th>
-                        <th>Prix</th>
-                        <th>Date</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody id="salesTableBody"></tbody>
-            </table>
-            <div class="stats">Total du jour: <span id="dailyTotal">0 CFA</span></div>
-            <button id="printSalesBtn">🖨️ Imprimer</button>
-        </section>
+  <!-- STOCK & SALES TAB -->
+  <section class="tab" id="tab-stock" aria-labelledby="btn-stock">
+    <div class="card" id="dashboardCard">
+      <h3>Tableau de bord</h3>
+      <div class="dash-grid">
+        <div class="dash-item">Total ventes: <span id="dashTotalSales">0 CFA</span></div>
+        <div class="dash-item">Valeur stock: <span id="dashStockValue">0 CFA</span></div>
+        <div class="dash-item">Top Ventes: <span id="dashTop">-</span></div>
+        <div class="dash-item">Alertes stock: <span id="dashLow">-</span></div>
+      </div>
     </div>
 
-    <!-- Tab 3: Export / Share -->
-    <div class="tab" id="tab3">
-        <section>
-            <h2>Exporter / Partager</h2>
-            <button id="exportCSVBtn">Exporter CSV</button>
-            <button id="exportExcelBtn">Exporter Excel</button>
-            <input type="file" id="importCSVFile" style="display:none">
-            <button id="importCSVBtn">Importer CSV</button>
-            <button id="shareWhatsAppBtn">Partager WhatsApp</button>
-        </section>
+    <div class="card">
+      <h3>Gestion stock & vente</h3>
+      <div class="form-grid">
+        <select id="moveProductSelect"></select>
+        <input id="moveQty" type="number" placeholder="Quantité" />
+        <input id="moveType" type="text" placeholder="Type (Entrée/Vente)" list="movetypes" />
+        <datalist id="movetypes"><option>Entrée</option><option>Vente</option></datalist>
+        <input id="movePrice" type="number" placeholder="Prix vendu (optionnel)" />
+        <select id="moveClientSelect"><option value="">Client (optionnel)</option></select>
+        <div class="form-actions">
+          <button id="doStockAdd">Enregistrer</button>
+          <button id="doStockSale" class="danger">Vendre</button>
+        </div>
+      </div>
+      <div class="note">Utilisez "Entrée" pour ajouter stock, "Vente" pour retirer stock — pour vente, saisissez le prix (ou prix produit).</div>
     </div>
-</div>
 
-<div class="fab" id="fabAddProduct">+</div>
+    <div class="card">
+      <h3>Ventes & entrées par date</h3>
+      <div class="toolbar">
+        <input id="salesDateFilter" type="date" />
+        <button id="applyDateFilter">Afficher</button>
+        <button id="printReport" class="ghost">Imprimer le rapport</button>
+      </div>
+      <div class="table-wrap">
+        <table id="salesTable" class="striped">
+          <thead><tr><th>Date</th><th>Produit</th><th>Type</th><th>Qty</th><th>Prix U.</th><th>Total</th><th>Client</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="stats-line">Total sélection: <strong id="reportTotal">0 CFA</strong></div>
+    </div>
+  </section>
 
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <!-- CLIENTS TAB -->
+  <section class="tab" id="tab-clients" aria-labelledby="btn-clients">
+    <div class="card">
+      <h3>Clients & comptes</h3>
+      <form id="clientForm" class="form-grid">
+        <input id="clientName" placeholder="Nom client" required />
+        <input id="clientPhone" placeholder="Téléphone" />
+        <input id="clientEmail" placeholder="Email" />
+        <input id="clientNote" placeholder="Note (adresse, info)" />
+        <div class="form-actions">
+          <button id="saveClientBtn" type="submit">Ajouter client</button>
+          <button id="resetClientBtn" type="button" class="ghost">Réinitialiser</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Clients et créances</h3>
+      <div class="toolbar">
+        <input id="clientSearch" placeholder="Rechercher client..." />
+      </div>
+      <div class="table-wrap">
+        <table id="clientsTable" class="striped">
+          <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Crédit dû</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Ventes à crédit (non payées)</h3>
+      <div class="table-wrap">
+        <table id="unpaidTable" class="striped">
+          <thead><tr><th>Date</th><th>Client</th><th>Produit</th><th>Qty</th><th>Prix</th><th>Total</th><th>Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPORT & SETTINGS TAB -->
+  <section class="tab" id="tab-export" aria-labelledby="btn-export">
+    <div class="card">
+      <h3>Export / Import</h3>
+      <div class="form-grid">
+        <button id="exportProductsCSV">Exporter Produits CSV</button>
+        <button id="exportLogCSV">Exporter Mouvements CSV</button>
+        <button id="exportExcel">Exporter Excel</button>
+        <input id="importProductsFile" type="file" accept=".csv" />
+        <button id="importProductsBtn">Importer Produits CSV</button>
+      </div>
+      <div class="note">CSV format for products: name,category,supplier,price,cost,stock,discount</div>
+    </div>
+
+    <div class="card">
+      <h3>Partage Rapide</h3>
+      <div class="form-grid">
+        <button id="shareProductsBtn">Partager produits (WhatsApp)</button>
+        <button id="shareReportBtn">Partager rapport du jour</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<button class="fab" id="fab">+</button>
+
 <script src="script.js"></script>
 </body>
 </html>

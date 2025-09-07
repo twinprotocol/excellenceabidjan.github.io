@@ -1,367 +1,398 @@
-// --- Variables ---
-let products = JSON.parse(localStorage.getItem('products')) || [];
-let stockLog = JSON.parse(localStorage.getItem('stockLog')) || [];
-let cameraData = null;
+/* ---------- Data models in localStorage ----------
+   products = [{id,name,category,supplier,price,cost,stock,discount,image}]
+   stockLog = [{date,productId,productName,type,qty,price,clientId}]
+   clients = [{id,name,phone,email,note}]
+--------------------------------------------------*/
 
-// Elements
-const productForm = document.getElementById('productForm');
-const productTableBody = document.getElementById('productTableBody');
-const searchInput = document.getElementById('searchInput');
-const stockProductSelect = document.getElementById('stockProductSelect');
-const stockQuantity = document.getElementById('stockQuantity');
-const soldPriceInput = document.getElementById('soldPriceInput');
-const addStockBtn = document.getElementById('addStock');
-const sellStockBtn = document.getElementById('sellStock');
-const filterDate = document.getElementById('filterDate');
-const filterBtn = document.getElementById('filterBtn');
-const salesTableBody = document.getElementById('salesTableBody');
-const printSalesBtn = document.getElementById('printSalesBtn');
-const takePhotoBtn = document.getElementById('takePhotoBtn');
-const fabAddProduct = document.getElementById('fabAddProduct');
-const exportCSVBtn = document.getElementById('exportCSVBtn');
-const exportExcelBtn = document.getElementById('exportExcelBtn');
-const importCSVBtn = document.getElementById('importCSVBtn');
-const importCSVFile = document.getElementById('importCSVFile');
-const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
+const $$ = sel => document.querySelector(sel);
+const $$$ = sel => document.querySelectorAll(sel);
 
-// --- Tabs ---
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-        document.getElementById(btn.dataset.tab).classList.add('active');
-    });
+let products = JSON.parse(localStorage.getItem('ea_products')||'[]');
+let stockLog = JSON.parse(localStorage.getItem('ea_stockLog')||'[]');
+let clients = JSON.parse(localStorage.getItem('ea_clients')||'[]');
+
+let editingProductIndex = -1;
+
+// --- elements
+const langSelect = $$('#langSelect');
+const tabBtns = $$$('.tab-btn');
+const tabs = $$$('.tab');
+
+const prodForm = $$('#productForm');
+const prodName = $$('#prodName'), prodCategory = $$('#prodCategory'), prodSupplier = $$('#prodSupplier');
+const prodPrice = $$('#prodPrice'), prodCost = $$('#prodCost'), prodStock = $$('#prodStock'), prodDiscount = $$('#prodDiscount');
+const prodImageFile = $$('#prodImageFile');
+const saveProductBtn = $$('#saveProductBtn'), resetProductBtn = $$('#resetProductBtn');
+
+const searchBox = $$('#searchBox'), filterCategory = $$('#filterCategory'), minPrice = $$('#minPrice'), maxPrice = $$('#maxPrice'), clearFilters = $$('#clearFilters');
+const productsTableBody = $$('#productsTable tbody');
+
+const moveProductSelect = $$('#moveProductSelect'), moveQty = $$('#moveQty'), moveType = $$('#moveType'), movePrice = $$('#movePrice'), moveClientSelect = $$('#moveClientSelect');
+const doStockAdd = $$('#doStockAdd'), doStockSale = $$('#doStockSale');
+
+const salesDateFilter = $$('#salesDateFilter'), applyDateFilter = $$('#applyDateFilter'), salesTableBody = $$('#salesTable tbody'), reportTotal = $$('#reportTotal');
+const printReportBtn = $$('#printReport');
+
+const clientForm = $$('#clientForm'), clientName = $$('#clientName'), clientPhone = $$('#clientPhone'), clientEmail = $$('#clientEmail'), clientNote = $$('#clientNote');
+const clientsTableBody = $$('#clientsTable tbody'), unpaidTableBody = $$('#unpaidTable tbody'), clientSearch = $$('#clientSearch');
+
+const exportProductsCSV = $$('#exportProductsCSV'), exportLogCSV = $$('#exportLogCSV'), exportExcel = $$('#exportExcel');
+const importProductsFile = $$('#importProductsFile'), importProductsBtn = $$('#importProductsBtn');
+const shareProductsBtn = $$('#shareProductsBtn'), shareReportBtn = $$('#shareReportBtn');
+
+const fab = $$('#fab');
+
+// --- Utilities
+const uid = ()=>'id'+Math.random().toString(36).slice(2,9);
+const saveAll = ()=>{ localStorage.setItem('ea_products',JSON.stringify(products)); localStorage.setItem('ea_stockLog',JSON.stringify(stockLog)); localStorage.setItem('ea_clients',JSON.stringify(clients)); refreshAll(); }
+const formatCFA = n => Number(n||0).toLocaleString() + ' CFA';
+const todayISO = ()=> (new Date()).toISOString().slice(0,10);
+
+// --- Tabs logic
+tabBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=> {
+    tabBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    tabs.forEach(t=>t.classList.remove('active'));
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
 });
 
-// --- FAB Scroll ---
-fabAddProduct.addEventListener('click', ()=>{
-    document.querySelector('.tab-btn[data-tab="tab1"]').click();
-    productForm.scrollIntoView({behavior:'smooth'});
-});
+// fab -> open products
+fab.addEventListener('click', ()=> { $$('#btn-products').click(); prodName.focus(); window.scrollTo({top:0,behavior:'smooth'}); });
 
-// --- Camera ---
-takePhotoBtn.addEventListener('click', async ()=>{
-    try{
-        const stream=await navigator.mediaDevices.getUserMedia({video:true});
-        const track=stream.getVideoTracks()[0];
-        const imageCapture=new ImageCapture(track);
-        const bitmap=await imageCapture.takePhoto();
-        const canvas=document.createElement('canvas');
-        canvas.width=bitmap.width; canvas.height=bitmap.height;
-        const ctx=canvas.getContext('2d');
-        ctx.drawImage(bitmap,0,0);
-        cameraData=canvas.toDataURL('image/png');
-        track.stop();
-        alert('Photo capturée !');
-    }catch(e){ alert('Erreur caméra: '+e.message);}
-});
-
-// --- Products ---
-function renderProducts(filter=''){
-    productTableBody.innerHTML='';
-    products.forEach((p,i)=>{
-        if(!p.name.toLowerCase().includes(filter.toLowerCase())) return;
-        const row=document.createElement('tr');
-        row.innerHTML=`
-            <td>${p.image?'<img src="'+p.image+'">':''}</td>
-            <td>${p.name}</td>
-            <td>${p.price}</td>
-            <td>${p.cost}</td>
-            <td>${p.stock}</td>
-            <td>${p.discount||0}%</td>
-            <td>${p.supplier||''}</td>
-            <td>${p.stock*p.cost} CFA</td>
-            <td><button onclick="deleteProduct(${i})">Supprimer</button></td>
-        `;
-        productTableBody.appendChild(row);
-    });
-    stockProductSelect.innerHTML='';
-    products.forEach((p,i)=>{
-        const opt=document.createElement('option'); opt.value=i; opt.textContent=p.name; stockProductSelect.appendChild(opt);
-    });
-}
-
-function deleteProduct(i){ products.splice(i,1); saveProducts(); }
-
-function saveProducts(){ localStorage.setItem('products',JSON.stringify(products)); renderProducts(searchInput.value); }
-
-// Add product
-productForm.addEventListener('submit', e=>{
-    e.preventDefault();
-    const name=document.getElementById('productName').value;
-    const price=Number(document.getElementById('productPrice').value);
-    const cost=Number(document.getElementById('productCost').value);
-    const stock=Number(document.getElementById('productStock').value);
-    const discount=Number(document.getElementById('productDiscount').value);
-    const supplier=document.getElementById('productSupplier').value;
-    const image=cameraData || (document.getElementById('productImage').files[0]?URL.createObjectURL(document.getElementById('productImage').files[0]):'');
-    products.push({name,price,cost,stock,discount,supplier,image});
-    cameraData=null; productForm.reset();
-    saveProducts();
-});
-
-// --- Search ---
-searchInput.addEventListener('input', ()=>renderProducts(searchInput.value));
-
-// --- Stock / Sell ---
-addStockBtn.addEventListener('click', ()=>{
-    const i=Number(stockProductSelect.value), qty=Number(stockQuantity.value);
-    if(isNaN(qty)||qty<=0){ alert('Quantité invalide'); return;}
-    products[i].stock+=qty; saveProducts();
-});
-
-sellStockBtn.addEventListener('click', ()=>{
-    const i=Number(stockProductSelect.value), qty=Number(stockQuantity.value), price=Number(soldPriceInput.value);
-    if(isNaN(qty)||qty<=0||isNaN(price)||price<=0){ alert('Quantité ou prix invalide'); return;}
-    if(products[i].stock<qty){ alert('Stock insuffisant'); return;}
-    products[i].stock-=qty;
-    stockLog.push({name:products[i].name,type:'vente',qty,price,date:new Date().toISOString().split('T')[0]});
-    localStorage.setItem('stockLog',JSON.stringify(stockLog));
-    saveProducts(); renderSales(filterDate.value);
-});
-
-// --- Render sales by date ---
-function renderSales(date=''){
-    salesTableBody.innerHTML='';
-    let total=0;
-    stockLog.forEach(s=>{
-        if(date && s.date!==date) return;
-        const row=document.createElement('tr');
-        row.innerHTML=`<td>${s.name}</td><td>${s.type}</td><td>${s.qty}</td><td>${s.price}</td><td>${s.date}</td><td>${s.qty*s.price}</td>`;
-        salesTableBody.appendChild(row);
-        total+=s.qty*s.price;
-    });
-    document.getElementById('dailyTotal').textContent=total+' CFA';
-}
-
-filterBtn.addEventListener('click', ()=>{ renderSales(filterDate.value); });
-
-// --- Print (only current table) ---
-printSalesBtn.addEventListener('click', ()=>{
-    const printContent=document.querySelector('.tab.active').innerHTML;
-    const w=window.open(); w.document.write('<html><head><title>Rapport</title><style>table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:5px;text-align:center;}h2{margin-bottom:10px;}</style></head><body>'+printContent+'</body></html>');
-    w.document.close(); w.print();
-});
-
-// --- Export CSV ---
-exportCSVBtn.addEventListener('click', ()=>{
-    let csv='Nom,Type,Quantité,Prix,Date,Total\n';
-    stockLog.forEach(s=>{ csv+=`${s.name},${s.type},${s.qty},${s.price},${s.date},${s.qty*s.price}\n`; });
-    const blob=new Blob([csv],{type:'text/csv'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download='stock_log.csv'; a.click(); URL.revokeObjectURL(url);
-});
-
-// --- Export Excel ---
-exportExcelBtn.addEventListener('click', ()=>{
-    const ws=XLSX.utils.json_to_sheet(stockLog);
-    const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'StockLog');
-    XLSX.writeFile(wb,'stock_log.xlsx');
-});
-
-// --- Import CSV ---
-importCSVBtn.addEventListener('click', ()=>importCSVFile.click());
-importCSVFile.addEventListener('change', e=>{
-    const file=e.target.files[0]; if(!file) return;
-    const reader=new FileReader();
-    reader.onload=function(evt){
-        const lines=evt.target.result.split('\n'); lines.shift();
-        lines.forEach(l=>{
-            const [name,type,qty,price,date]=l.split(',');
-            if(name) stockLog.push({name,type,qty:Number(qty),price:Number(price),date});
-        });
-        localStorage.setItem('stockLog',JSON.stringify(stockLog));
-        renderSales(filterDate.value);
-    };
-    reader.readAsText(file);
-});
-
-// --- WhatsApp Share ---
-shareWhatsAppBtn.addEventListener('click', ()=>{
-    let text='Rapport Stock & Ventes:%0A';
-    stockLog.forEach(s=>{
-        text+=`${s.date}: ${s.name} ${s.type} ${s.qty} x ${s.price} = ${s.qty*s.price} CFA%0A`;
-    });
-    window.open('https://wa.me/?text='+text,'_blank');
-});
-
-// --- Initial render ---
-renderProducts(); renderSales();
-function updateDashboard(){
-    // Total sales
-    let totalSales=0;
-    stockLog.forEach(s=>{ totalSales+=s.qty*s.price; });
-    document.getElementById('totalSalesCFA').textContent=totalSales+' CFA';
-
-    // Total stock value
-    let totalStockValue=0;
-    products.forEach(p=>{ totalStockValue+=p.stock*p.cost; });
-    document.getElementById('totalStockCFA').textContent=totalStockValue+' CFA';
-
-    // Top products (by quantity sold)
-    let top={}; stockLog.forEach(s=>{
-        if(s.type==='vente') top[s.name]=(top[s.name]||0)+s.qty;
-    });
-    let topProductsArr=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,3);
-    document.getElementById('topProducts').textContent=topProductsArr.map(t=>t[0]+'('+t[1]+')').join(', ') || '-';
-
-    // Low stock alerts (<5 items)
-    let low=products.filter(p=>p.stock<5).map(p=>p.name).join(', ');
-    document.getElementById('lowStock').textContent=low || '-';
-}
-
-// Call dashboard update after every change
-function refreshAll(){
-    renderProducts(searchInput.value);
-    renderSales(filterDate.value);
-    updateDashboard();
-}
-
-// Replace all saveProducts calls with refreshAll
-function saveProducts(){ localStorage.setItem('products',JSON.stringify(products)); refreshAll(); }
-
-// Call initially
-refreshAll();
-// --- Camera / Upload ---
-takePhotoBtn.addEventListener('click', async () => {
-    // Crée un input de type file temporaire pour caméra
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment'; // ouvre la caméra si possible
-    input.onchange = () => {
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                cameraData = e.target.result; // base64 image
-                alert('Photo capturée !');
-            }
-            reader.readAsDataURL(file);
-        }
-    };
-    input.click();
-});
+// Language
 const translations = {
-    fr: {
-        "tab1": "Produits",
-        "tab2": "Stock & Ventes",
-        "tab3": "Export / Partage",
-        "productFormTitle": "Ajouter un produit",
-        "productName": "Nom du produit",
-        "productPrice": "Prix de vente (CFA)",
-        "productCost": "Prix de revient (CFA)",
-        "productStock": "Stock initial",
-        "productDiscount": "Ristourne (%)",
-        "productSupplier": "Nom du fournisseur",
-        "takePhotoBtn": "📷 Prendre une photo",
-        "addProductBtn": "Ajouter produit",
-        "searchInput": "Rechercher produit...",
-        "dashboardTitle": "Tableau de bord",
-        "totalSales": "Total Ventes",
-        "totalStock": "Valeur Stock",
-        "topProducts": "Top Produits",
-        "lowStock": "Alertes Stock",
-        "manageStock": "Gestion du stock et ventes",
-        "stockQuantity": "Quantité",
-        "soldPriceInput": "Prix vendu (si vente)",
-        "addStockBtn": "Ajouter Stock",
-        "sellStockBtn": "Vendre",
-        "salesByDate": "Ventes par date",
-        "filterBtn": "Filtrer",
-        "dailyTotal": "Total du jour",
-        "printBtn": "🖨️ Imprimer",
-        "exportCSVBtn": "Exporter CSV",
-        "exportExcelBtn": "Exporter Excel",
-        "importCSVBtn": "Importer CSV",
-        "shareWhatsAppBtn": "Partager WhatsApp"
-    },
-    ar: {
-        "tab1": "المنتجات",
-        "tab2": "المخزون والمبيعات",
-        "tab3": "تصدير / مشاركة",
-        "productFormTitle": "إضافة منتج",
-        "productName": "اسم المنتج",
-        "productPrice": "سعر البيع (CFA)",
-        "productCost": "سعر التكلفة (CFA)",
-        "productStock": "المخزون الأولي",
-        "productDiscount": "الخصم (%)",
-        "productSupplier": "اسم المورد",
-        "takePhotoBtn": "📷 التقط صورة",
-        "addProductBtn": "إضافة المنتج",
-        "searchInput": "بحث عن المنتج...",
-        "dashboardTitle": "لوحة التحكم",
-        "totalSales": "إجمالي المبيعات",
-        "totalStock": "قيمة المخزون",
-        "topProducts": "أفضل المنتجات",
-        "lowStock": "تنبيهات المخزون",
-        "manageStock": "إدارة المخزون والمبيعات",
-        "stockQuantity": "الكمية",
-        "soldPriceInput": "سعر البيع (إذا تم البيع)",
-        "addStockBtn": "إضافة مخزون",
-        "sellStockBtn": "بيع",
-        "salesByDate": "المبيعات حسب التاريخ",
-        "filterBtn": "تصفية",
-        "dailyTotal": "إجمالي اليوم",
-        "printBtn": "🖨️ طباعة",
-        "exportCSVBtn": "تصدير CSV",
-        "exportExcelBtn": "تصدير Excel",
-        "importCSVBtn": "استيراد CSV",
-        "shareWhatsAppBtn": "مشاركة WhatsApp"
-    }
+  fr: {
+    products:'Produits', stock:'Stock & Ventes', clients:'Clients', export:'Export / Paramètres',
+    addProduct:'Ajouter un produit', searchPlaceholder:'Recherche (nom/fournisseur/catégorie)',
+    qtyInvalid:'Quantité invalide', priceInvalid:'Prix invalide', stockInsuff:'Stock insuffisant',
+    addClient:'Ajouter client', unpaid:'Non payés', exportNote:'Format CSV: name,category,supplier,price,cost,stock,discount'
+  },
+  en: {
+    products:'Products', stock:'Stock & Sales', clients:'Clients', export:'Export / Settings',
+    addProduct:'Add product', searchPlaceholder:'Search (name/supplier/category)',
+    qtyInvalid:'Invalid quantity', priceInvalid:'Invalid price', stockInsuff:'Insufficient stock',
+    addClient:'Add client', unpaid:'Unpaid', exportNote:'CSV format: name,category,supplier,price,cost,stock,discount'
+  },
+  ar: {
+    products:'المنتجات', stock:'المخزون والمبيعات', clients:'العملاء', export:'تصدير / إعدادات',
+    addProduct:'إضافة منتج', searchPlaceholder:'بحث (الاسم/المورد/الفئة)',
+    qtyInvalid:'كمية غير صالحة', priceInvalid:'سعر غير صالح', stockInsuff:'المخزون غير كاف',
+    addClient:'إضافة عميل', unpaid:'غير مدفوعة', exportNote:'صيغة CSV: name,category,supplier,price,cost,stock,discount'
+  }
 };
-
-let currentLang = 'fr';
-function updateLanguage(lang){
-    currentLang = lang;
-    const t = translations[lang];
-
-    // Tabs
-    document.querySelector('.tab-btn[data-tab="tab1"]').textContent = t.tab1;
-    document.querySelector('.tab-btn[data-tab="tab2"]').textContent = t.tab2;
-    document.querySelector('.tab-btn[data-tab="tab3"]').textContent = t.tab3;
-
-    // Product form labels & buttons
-    document.querySelector('#productForm h2').textContent = t.productFormTitle;
-    document.getElementById('productName').placeholder = t.productName;
-    document.getElementById('productPrice').placeholder = t.productPrice;
-    document.getElementById('productCost').placeholder = t.productCost;
-    document.getElementById('productStock').placeholder = t.productStock;
-    document.getElementById('productDiscount').placeholder = t.productDiscount;
-    document.getElementById('productSupplier').placeholder = t.productSupplier;
-    document.getElementById('takePhotoBtn').textContent = t.takePhotoBtn;
-    document.querySelector('#productForm button[type="submit"]').textContent = t.addProductBtn;
-
-    // Search
-    document.getElementById('searchInput').placeholder = t.searchInput;
-
-    // Dashboard
-    document.querySelector('#dashboard h2').textContent = t.dashboardTitle;
-    document.querySelectorAll('#dashboard .card')[0].childNodes[0].textContent = t.totalSales + ': ';
-    document.querySelectorAll('#dashboard .card')[1].childNodes[0].textContent = t.totalStock + ': ';
-    document.querySelectorAll('#dashboard .card')[2].childNodes[0].textContent = t.topProducts + ': ';
-    document.querySelectorAll('#dashboard .card')[3].childNodes[0].textContent = t.lowStock + ': ';
-
-    // Stock & Sales
-    document.querySelector('#tab2 section:nth-of-type(2) h2').textContent = t.manageStock;
-    document.getElementById('stockQuantity').placeholder = t.stockQuantity;
-    document.getElementById('soldPriceInput').placeholder = t.soldPriceInput;
-    document.getElementById('addStock').textContent = t.addStockBtn;
-    document.getElementById('sellStock').textContent = t.sellStockBtn;
-
-    // Sales by date
-    document.querySelector('#tab2 section:nth-of-type(3) h2').textContent = t.salesByDate;
-    document.getElementById('filterBtn').textContent = t.filterBtn;
-    document.getElementById('printSalesBtn').textContent = t.printBtn;
-
-    // Export / Share
-    document.getElementById('exportCSVBtn').textContent = t.exportCSVBtn;
-    document.getElementById('exportExcelBtn').textContent = t.exportExcelBtn;
-    document.getElementById('importCSVBtn').textContent = t.importCSVBtn;
-    document.getElementById('shareWhatsAppBtn').textContent = t.shareWhatsAppBtn;
+function applyLanguage(lang){
+  langSelect.value = lang;
+  const t = translations[lang] || translations.fr;
+  $$('#btn-products').textContent = t.products;
+  $$('#btn-stock').textContent = t.stock;
+  $$('#btn-clients').textContent = t.clients;
+  $$('#btn-export').textContent = t.export;
+  $$('#searchBox').placeholder = t.searchPlaceholder;
+  $$('#clientName').placeholder = t.addClient;
+  $$('#importProductsFile').previousElementSibling && ($$('#importProductsFile').previousElementSibling.textContent = t.exportNote);
 }
-document.getElementById('languageToggle').addEventListener('click', ()=>{
-    if(currentLang==='fr') updateLanguage('ar');
-    else updateLanguage('fr');
+langSelect.addEventListener('change', e=> applyLanguage(e.target.value));
+applyLanguage('fr');
+
+// --- Products rendering & management
+function populateCategoryFilters(){
+  const cats = Array.from(new Set(products.map(p=>p.category).filter(Boolean)));
+  filterCategory.innerHTML = '<option value="">Toutes catégories</option>';
+  cats.forEach(c=>{ const o = document.createElement('option'); o.value=c; o.textContent=c; filterCategory.appendChild(o); });
+}
+function renderProducts(){
+  productsTableBody.innerHTML='';
+  const s = searchBox.value.trim().toLowerCase();
+  const fc = filterCategory.value;
+  const min = parseFloat(minPrice.value)||-Infinity, max = parseFloat(maxPrice.value)||Infinity;
+  products.forEach((p, idx)=>{
+    if(s && !(p.name.toLowerCase().includes(s) || (p.supplier||'').toLowerCase().includes(s) || (p.category||'').toLowerCase().includes(s))) return;
+    if(fc && p.category !== fc) return;
+    if(p.price < min || p.price > max) return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${p.image?'<img src="'+p.image+'" />':''}</td>
+      <td>${p.name}</td>
+      <td>${p.category||''}</td>
+      <td>${p.supplier||''}</td>
+      <td>${Number(p.price).toLocaleString()}</td>
+      <td>${Number(p.cost).toLocaleString()}</td>
+      <td>${p.stock}</td>
+      <td>${p.discount||0}%</td>
+      <td>
+        <button data-edit="${idx}">✏️</button>
+        <button data-del="${idx}" class="danger">🗑️</button>
+      </td>`;
+    productsTableBody.appendChild(tr);
+  });
+  // attach events
+  $$$('[data-edit]').forEach(btn=> btn.addEventListener('click', e=> {
+    const i = Number(btn.getAttribute('data-edit')); editProduct(i);
+  }));
+  $$$('[data-del]').forEach(btn=> btn.addEventListener('click', e=> {
+    const i = Number(btn.getAttribute('data-del'));
+    if(confirm('Supprimer ce produit ?')) { products.splice(i,1); saveAll(); }
+  }));
+  populateCategoryFilters();
+  populateMoveSelect();
+}
+
+// add/edit product
+prodForm.addEventListener('submit', async (ev)=>{
+  ev.preventDefault();
+  const name = prodName.value.trim();
+  if(!name) return alert('Nom requis');
+  const obj = {
+    id: editingProductIndex>-1 ? products[editingProductIndex].id : uid(),
+    name,
+    category: prodCategory.value.trim(),
+    supplier: prodSupplier.value.trim(),
+    price: Number(prodPrice.value)||0,
+    cost: Number(prodCost.value)||0,
+    stock: Number(prodStock.value)||0,
+    discount: Number(prodDiscount.value)||0,
+    image: ''
+  };
+  // image handling
+  if(prodImageFile.files && prodImageFile.files[0]) {
+    obj.image = await readFileAsDataURL(prodImageFile.files[0]);
+  } else if (editingProductIndex>-1 && products[editingProductIndex].image) {
+    obj.image = products[editingProductIndex].image;
+  }
+  if(editingProductIndex>-1) { products[editingProductIndex] = obj; editingProductIndex=-1; }
+  else products.push(obj);
+  prodForm.reset(); saveAll();
 });
+
+resetProductBtn.addEventListener('click', ()=>{ editingProductIndex=-1; prodForm.reset(); });
+
+// edit
+function editProduct(i){
+  const p = products[i];
+  editingProductIndex = i;
+  prodName.value = p.name; prodCategory.value = p.category; prodSupplier.value = p.supplier;
+  prodPrice.value = p.price; prodCost.value = p.cost; prodStock.value = p.stock; prodDiscount.value = p.discount;
+}
+
+// helper read file to data url
+function readFileAsDataURL(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>res(e.target.result); r.onerror=rej; r.readAsDataURL(file); }); }
+
+// --- Stock move / sales handling
+function populateMoveSelect(){
+  moveProductSelect.innerHTML='';
+  products.forEach((p,idx)=>{
+    const opt = document.createElement('option'); opt.value = idx; opt.textContent = `${p.name} (${p.stock})`; moveProductSelect.appendChild(opt);
+  });
+}
+doStockAdd.addEventListener('click', ()=> handleStockMove('Entrée') );
+doStockSale.addEventListener('click', ()=> handleStockMove('Vente') );
+
+function handleStockMove(defaultType='Entrée'){
+  const idx = Number(moveProductSelect.value);
+  if(isNaN(idx)) return alert('Choisir un produit');
+  const qty = Number(moveQty.value);
+  if(!qty || qty<=0) return alert(translations[langSelect.value].qtyInvalid || 'Quantité invalide');
+  const type = defaultType === 'Vente' ? 'Vente' : (moveType.value || defaultType);
+  const price = Number(movePrice.value) || products[idx].price;
+  const clientId = moveClientSelect.value || null;
+  if(type === 'Vente') {
+    if(products[idx].stock < qty) return alert(translations[langSelect.value].stockInsuff || 'Stock insuffisant');
+    products[idx].stock -= qty;
+    // record sale
+    stockLog.push({date: todayISO(), productId: products[idx].id, productName: products[idx].name, type:'Vente', qty, price, clientId});
+    if(clientId){
+      const c = clients.find(x=>x.id===clientId);
+      if(c){ c.balance = (c.balance||0) + qty*price; } // add credit
+    }
+  } else {
+    products[idx].stock += qty;
+    stockLog.push({date: todayISO(), productId: products[idx].id, productName: products[idx].name, type:'Entrée', qty, price, clientId});
+  }
+  moveQty.value=''; movePrice.value='';
+  saveAll();
+}
+
+// --- Sales rendering (by date filter)
+function renderSales(date=''){
+  salesTableBody.innerHTML='';
+  let total = 0;
+  const filtered = stockLog.filter(s => !date || s.date === date);
+  filtered.forEach(s=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.date}</td><td>${s.productName}</td><td>${s.type}</td><td>${s.qty}</td><td>${Number(s.price).toLocaleString()}</td><td>${Number(s.qty*s.price).toLocaleString()}</td><td>${s.clientId? (clients.find(c=>c.id===s.clientId)||{}).name : '-'}</td>`;
+    salesTableBody.appendChild(tr);
+    total += s.qty*s.price;
+  });
+  reportTotal.textContent = formatCFA(total);
+}
+
+// print report: prints only sales table for selected date
+printReportBtn.addEventListener('click', ()=>{
+  const date = salesDateFilter.value || todayISO();
+  renderSales(date);
+  // use print stylesheet already set: only salesTable visible
+  window.print();
+});
+
+// --- Clients management
+clientForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const obj = { id: uid(), name: clientName.value.trim(), phone: clientPhone.value.trim(), email: clientEmail.value.trim(), note: clientNote.value.trim(), balance: 0 };
+  clients.push(obj); clientForm.reset(); saveAll();
+});
+function renderClients(){
+  clientsTableBody.innerHTML=''; unpaidTableBody.innerHTML='';
+  clients.forEach((c, idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.name}</td><td>${c.phone||''}</td><td>${c.email||''}</td><td>${formatCFA(c.balance)}</td><td><button data-pay="${c.id}">Marquer payé</button></td>`;
+    clientsTableBody.appendChild(tr);
+  });
+  // unpaid entries from stockLog with clientId
+  stockLog.filter(s=>s.clientId && s.type==='Vente').forEach((s, i)=>{
+    const client = clients.find(c=>c.id===s.clientId);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.date}</td><td>${client?client.name:'-'}</td><td>${s.productName}</td><td>${s.qty}</td><td>${s.price}</td><td>${s.qty*s.price}</td><td><button data-mark="${i}">Règler</button></td>`;
+    unpaidTableBody.appendChild(tr);
+  });
+  // attach pay events
+  $$$('[data-pay]').forEach(b=> b.addEventListener('click', ()=> {
+    const id = b.getAttribute('data-pay');
+    const c = clients.find(x=>x.id===id);
+    if(c){ if(confirm('Réinitialiser le solde du client ?')){ c.balance=0; saveAll(); } }
+  }));
+  $$$('[data-mark]').forEach(b=> b.addEventListener('click', ()=>{
+    const idx = Number(b.getAttribute('data-mark'));
+    const entry = stockLog.filter(s=>s.clientId && s.type==='Vente')[idx];
+    if(!entry) return;
+    // mark as paid by removing clientId and reducing client's balance
+    const c = clients.find(x=>x.id===entry.clientId);
+    if(c){ c.balance = Math.max(0, c.balance - entry.qty*entry.price); }
+    entry.clientId = null;
+    saveAll();
+  }));
+}
+
+// --- Exports / Imports
+exportProductsCSV.addEventListener('click', ()=>{
+  const csv = ['name,category,supplier,price,cost,stock,discount'].concat(products.map(p=>`${csvSafe(p.name)},${csvSafe(p.category)},${csvSafe(p.supplier)},${p.price},${p.cost},${p.stock},${p.discount}`)).join('\n');
+  downloadBlob(csv, 'products.csv', 'text/csv');
+});
+exportLogCSV.addEventListener('click', ()=>{
+  const csv = ['date,productName,type,qty,price,client'].concat(stockLog.map(l=>`${l.date},${csvSafe(l.productName)},${l.type},${l.qty},${l.price},${l.clientId||''}`)).join('\n');
+  downloadBlob(csv, 'stocklog.csv', 'text/csv');
+});
+exportExcel.addEventListener('click', ()=>{
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.json_to_sheet(products);
+  const ws2 = XLSX.utils.json_to_sheet(stockLog);
+  XLSX.utils.book_append_sheet(wb, ws1, 'Products');
+  XLSX.utils.book_append_sheet(wb, ws2, 'StockLog');
+  XLSX.writeFile(wb, 'excellence_export.xlsx');
+});
+importProductsBtn.addEventListener('click', ()=> importProductsFile.click());
+importProductsFile.addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const rdr = new FileReader();
+  rdr.onload = evt=>{
+    const lines = evt.target.result.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    lines.slice(1).forEach(l=>{
+      const parts = csvLineToArray(l);
+      if(parts.length>=7){
+        const [name,category,supplier,price,cost,stock,discount] = parts;
+        products.push({id:uid(),name,category,supplier,price:Number(price),cost:Number(cost),stock:Number(stock),discount:Number(discount),image:''});
+      }
+    });
+    saveAll();
+  };
+  rdr.readAsText(f);
+});
+shareProductsBtn.addEventListener('click', ()=>{
+  let text = 'Produits:\\n';
+  products.forEach(p=> text += `${p.name} - ${p.stock}pcs - ${p.price} CFA\\n`);
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+});
+shareReportBtn.addEventListener('click', ()=>{
+  const date = salesDateFilter.value || todayISO();
+  const items = stockLog.filter(s=>s.date===date);
+  let text = `Rapport ${date}:\\n`;
+  items.forEach(i=> text += `${i.productName} ${i.type} ${i.qty} x ${i.price} = ${i.qty*i.price} CFA\\n`);
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+});
+
+// --- helpers
+function downloadBlob(content, name, type){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download = name; a.click(); URL.revokeObjectURL(url);
+}
+function csvSafe(s){ if(!s) return ''; return `"${String(s).replace(/"/g,'""')}"`; }
+function csvLineToArray(line){
+  // simple CSV parse supporting quoted values
+  const res = []; let cur='', inQuotes=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='\"'){ if(inQuotes && line[i+1]==='\"'){ cur+='"'; i++; } else inQuotes=!inQuotes; continue; }
+    if(ch===',' && !inQuotes){ res.push(cur); cur=''; continue; }
+    cur+=ch;
+  }
+  res.push(cur); return res.map(x=>x.trim());
+}
+
+// --- Dashboard & refresh
+function updateDashboard(){
+  const totalSales = stockLog.filter(s=>s.type==='Vente').reduce((a,b)=>a+b.qty*b.price,0);
+  $$('#dashTotalSales').textContent = formatCFA(totalSales);
+  const stockValue = products.reduce((a,b)=>a + (b.cost*b.stock), 0);
+  $$('#dashStockValue').textContent = formatCFA(stockValue);
+  const top = {};
+  stockLog.filter(s=>s.type==='Vente').forEach(s=> top[s.productName] = (top[s.productName]||0) + s.qty);
+  const topArr = Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]+'('+x[1]+')').join(', ');
+  $$('#dashTop').textContent = topArr || '-';
+  const low = products.filter(p=>p.stock<5).map(p=>p.name).slice(0,5).join(', ');
+  $$('#dashLow').textContent = low || '-';
+  // populate client select
+  moveClientSelect.innerHTML = '<option value="">Client (optionnel)</option>';
+  clients.forEach(c=> moveClientSelect.appendChild(Object.assign(document.createElement('option'), {value:c.id, textContent:c.name})));
+  // update clients table
+  renderClients();
+}
+
+function renderClients(){
+  clientsTableBody.innerHTML=''; unpaidTableBody.innerHTML='';
+  clients.forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.name}</td><td>${c.phone||''}</td><td>${c.email||''}</td><td>${formatCFA(c.balance||0)}</td><td><button data-clear="${c.id}">Effacer dette</button></td>`;
+    clientsTableBody.appendChild(tr);
+  });
+  $$$('[data-clear]').forEach(btn=> btn.addEventListener('click', ()=>{
+    const id = btn.getAttribute('data-clear'); const c = clients.find(x=>x.id===id);
+    if(c && confirm('Marquer comme payé ?')){ c.balance = 0; saveAll(); }
+  }));
+  // unpaid entries
+  stockLog.filter(s=>s.clientId && s.type==='Vente').forEach((s,i)=>{
+    const client = clients.find(c=>c.id===s.clientId);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.date}</td><td>${client?client.name:'-'}</td><td>${s.productName}</td><td>${s.qty}</td><td>${s.price}</td><td>${s.qty*s.price}</td><td><button data-setpaid="${i}">Marquer payé</button></td>`;
+    unpaidTableBody.appendChild(tr);
+  });
+  $$$('[data-setpaid]').forEach(btn=> btn.addEventListener('click', ()=>{
+    const idx = Number(btn.getAttribute('data-setpaid'));
+    const list = stockLog.filter(s=>s.clientId && s.type==='Vente');
+    const entry = list[idx];
+    if(!entry) return;
+    const client = clients.find(c=>c.id===entry.clientId);
+    if(client){ client.balance = Math.max(0, client.balance - entry.qty*entry.price); }
+    entry.clientId = null;
+    saveAll();
+  }));
+}
+
+function refreshAll(){
+  renderProducts(); renderSales(salesDateFilter.value||''); updateDashboard();
+}
+function saveAll(){ localStorage.setItem('ea_products',JSON.stringify(products)); localStorage.setItem('ea_stockLog',JSON.stringify(stockLog)); localStorage.setItem('ea_clients',JSON.stringify(clients)); refreshAll(); }
+
+// initial
+refreshAll();
