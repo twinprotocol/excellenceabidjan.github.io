@@ -29,6 +29,8 @@
   </div>
 
   <!-- Tab Contents -->
+
+  <!-- Produits Tab -->
   <div class="tab-content" id="produits">
     <input type="text" id="search-product" placeholder="Rechercher un produit...">
     <table id="product-table">
@@ -46,6 +48,7 @@
     </table>
   </div>
 
+  <!-- Ajouter Tab -->
   <div class="tab-content" id="ajouter" style="display:none;">
     <form id="add-product-form">
       <input type="text" id="product-name" placeholder="Nom du produit" required>
@@ -53,35 +56,40 @@
       <input type="number" id="product-price" placeholder="Prix de vente" required>
       <input type="number" id="product-cost" placeholder="Prix de revient" required>
       <input type="number" id="product-quantity" placeholder="Quantité" required>
-      <input type="file" id="product-image" accept="image/*">
+      <input type="file" id="product-image" accept="image/*" capture="environment">
       <button type="submit">Ajouter</button>
     </form>
   </div>
 
+  <!-- Ventes Tab -->
   <div class="tab-content" id="ventes" style="display:none;">
     <select id="select-sale-product"></select>
     <input type="number" id="sale-price" placeholder="Prix de vente" required>
     <input type="number" id="sale-quantity" placeholder="Quantité" required>
+    <input type="text" id="client-name" placeholder="Nom du client">
     <button id="add-sale">Ajouter Vente</button>
-
+    <br><br>
     <input type="date" id="sales-date">
     <button id="filter-sales">Filtrer</button>
     <table id="sales-table">
       <thead>
         <tr>
           <th>Produit</th>
-          <th>Prix de vente</th>
+          <th>Prix</th>
           <th>Quantité</th>
           <th>Total</th>
+          <th>Client</th>
           <th>Date</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-    <h3>Total du jour: <span id="sales-total">0</span> FCFA</h3>
+    <h3>Total: <span id="sales-total">0</span> FCFA</h3>
     <button id="print-sales">Imprimer</button>
+    <button id="share-whatsapp">Partager WhatsApp</button>
   </div>
 
+  <!-- Clients Tab -->
   <div class="tab-content" id="clients" style="display:none;">
     <table id="client-table">
       <thead>
@@ -95,6 +103,7 @@
     </table>
   </div>
 
+  <!-- Export Tab -->
   <div class="tab-content" id="export" style="display:none;">
     <button id="export-csv">Exporter CSV</button>
     <button id="export-excel">Exporter Excel</button>

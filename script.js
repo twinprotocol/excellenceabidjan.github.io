@@ -2,7 +2,7 @@
 const tabs = document.querySelectorAll(".tab");
 const contents = document.querySelectorAll(".tab-content");
 
-tabs.forEach((tab) => {
+tabs.forEach(tab => {
   tab.addEventListener("click", () => {
     tabs.forEach(t => t.classList.remove("active"));
     contents.forEach(c => c.style.display = "none");
@@ -11,16 +11,17 @@ tabs.forEach((tab) => {
   });
 });
 
-// ===== Products =====
+// ===== Data =====
 let products = [];
 let sales = [];
 let clients = [];
 
+// ===== Products =====
 const addForm = document.getElementById("add-product-form");
 const productTable = document.querySelector("#product-table tbody");
 const selectSaleProduct = document.getElementById("select-sale-product");
 
-addForm.addEventListener("submit", (e) => {
+addForm.addEventListener("submit", e => {
   e.preventDefault();
   const name = document.getElementById("product-name").value;
   const category = document.getElementById("product-category").value;
@@ -30,16 +31,14 @@ addForm.addEventListener("submit", (e) => {
   const imageFile = document.getElementById("product-image").files[0];
   const reader = new FileReader();
   reader.onload = () => {
-    const product = { name, category, price, cost, quantity, image: reader.result };
-    products.push(product);
+    products.push({ name, category, price, cost, quantity, image: reader.result });
     renderProducts();
     addForm.reset();
   };
   if(imageFile){
     reader.readAsDataURL(imageFile);
   } else {
-    const product = { name, category, price, cost, quantity, image: "" };
-    products.push(product);
+    products.push({ name, category, price, cost, quantity, image: "" });
     renderProducts();
     addForm.reset();
   }
@@ -48,7 +47,7 @@ addForm.addEventListener("submit", (e) => {
 function renderProducts(){
   productTable.innerHTML = "";
   selectSaleProduct.innerHTML = "";
-  products.forEach((p, index)=>{
+  products.forEach((p, i) => {
     productTable.innerHTML += `<tr>
       <td>${p.name}</td>
       <td>${p.category}</td>
@@ -57,15 +56,14 @@ function renderProducts(){
       <td>${p.quantity}</td>
       <td>${p.image ? `<img src="${p.image}">` : ""}</td>
     </tr>`;
-    selectSaleProduct.innerHTML += `<option value="${index}">${p.name}</option>`;
+    selectSaleProduct.innerHTML += `<option value="${i}">${p.name}</option>`;
   });
 }
 
-// ===== Search Filter =====
-document.getElementById("search-product").addEventListener("input", (e)=>{
+// ===== Search =====
+document.getElementById("search-product").addEventListener("input", e => {
   const filter = e.target.value.toLowerCase();
-  const rows = document.querySelectorAll("#product-table tbody tr");
-  rows.forEach(row=>{
+  document.querySelectorAll("#product-table tbody tr").forEach(row => {
     row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
   });
 });
@@ -73,11 +71,13 @@ document.getElementById("search-product").addEventListener("input", (e)=>{
 // ===== Sales =====
 const salesTable = document.querySelector("#sales-table tbody");
 const salesTotalEl = document.getElementById("sales-total");
+const clientTable = document.querySelector("#client-table tbody");
 
-document.getElementById("add-sale").addEventListener("click", ()=>{
+document.getElementById("add-sale").addEventListener("click", () => {
   const prodIndex = parseInt(selectSaleProduct.value);
   const quantity = parseInt(document.getElementById("sale-quantity").value);
   const price = parseFloat(document.getElementById("sale-price").value);
+  const client = document.getElementById("client-name").value || "Client anonyme";
   const date = new Date().toISOString().split('T')[0];
   const product = products[prodIndex];
 
@@ -87,20 +87,22 @@ document.getElementById("add-sale").addEventListener("click", ()=>{
   }
 
   product.quantity -= quantity;
-  sales.push({ name: product.name, price, quantity, date });
+  sales.push({ name: product.name, price, quantity, date, client });
+  if(client !== "Client anonyme") {
+    const existing = clients.find(c => c.name === client && c.product === product.name);
+    if(existing) existing.amount += price*quantity;
+    else clients.push({ name: client, product: product.name, amount: price*quantity });
+  }
   renderProducts();
-  renderSales(date);
+  renderSales();
+  renderClients();
 });
 
-document.getElementById("filter-sales").addEventListener("click", ()=>{
-  const date = document.getElementById("sales-date").value;
-  renderSales(date);
-});
-
-function renderSales(date){
+// ===== Render Sales =====
+function renderSales(filterDate){
   salesTable.innerHTML = "";
   let total = 0;
-  sales.filter(s=>!date || s.date===date).forEach(s=>{
+  sales.filter(s => !filterDate || s.date === filterDate).forEach(s => {
     const totalPrice = s.price * s.quantity;
     total += totalPrice;
     salesTable.innerHTML += `<tr>
@@ -108,18 +110,44 @@ function renderSales(date){
       <td>${s.price}</td>
       <td>${s.quantity}</td>
       <td>${totalPrice}</td>
+      <td>${s.client}</td>
       <td>${s.date}</td>
     </tr>`;
   });
   salesTotalEl.textContent = total;
 }
 
-// ===== Print Sales =====
+document.getElementById("filter-sales").addEventListener("click", ()=>{
+  const date = document.getElementById("sales-date").value;
+  renderSales(date);
+});
+
+// ===== Render Clients =====
+function renderClients(){
+  clientTable.innerHTML = "";
+  clients.forEach(c=>{
+    clientTable.innerHTML += `<tr>
+      <td>${c.name}</td>
+      <td>${c.product}</td>
+      <td>${c.amount}</td>
+    </tr>`;
+  });
+}
+
+// ===== Print =====
 document.getElementById("print-sales").addEventListener("click", ()=>{
-  const printContent = document.getElementById("ventes").innerHTML;
+  const content = document.getElementById("ventes").innerHTML;
   const newWin = window.open("");
-  newWin.document.write(`<html><head><title>Ventes</title></head><body>${printContent}</body></html>`);
+  newWin.document.write(`<html><head><title>Ventes</title></head><body>${content}</body></html>`);
   newWin.print();
+});
+
+// ===== WhatsApp Share =====
+document.getElementById("share-whatsapp").addEventListener("click", ()=>{
+  let message = "Ventes:\n";
+  sales.forEach(s => { message += `${s.date}: ${s.name} x${s.quantity} = ${s.price*s.quantity} FCFA\n`; });
+  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
 });
 
 // ===== Language =====
@@ -129,10 +157,7 @@ const translations = {
   ar: { "produits":"المنتجات","ajouter":"إضافة","ventes":"المبيعات","clients":"العملاء","export":"تصدير" },
   en: { "produits":"Products","ajouter":"Add","ventes":"Sales","clients":"Clients","export":"Export" }
 };
-
 langSelect.addEventListener("change", ()=>{
   const lang = langSelect.value;
-  tabs.forEach(tab=>{
-    tab.textContent = translations[lang][tab.dataset.tab];
-  });
+  tabs.forEach(tab => tab.textContent = translations[lang][tab.dataset.tab]);
 });
