@@ -1,190 +1,103 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Excellence Abidjan</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excellence Abidjan</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header class="topbar">
-  <div class="brand">Excellence Abidjan</div>
-  <div class="controls">
-    <select id="langSelect" aria-label="Language">
-      <option value="fr">FR</option>
-      <option value="en">EN</option>
-      <option value="ar">AR</option>
+<div class="app-container">
+
+  <!-- Header -->
+  <header>
+    <h1 id="app-title">Excellence Abidjan</h1>
+    <select id="language-select">
+      <option value="fr">Français</option>
+      <option value="ar">العربية</option>
+      <option value="en">English</option>
     </select>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="produits">Produits</div>
+    <div class="tab" data-tab="ajouter">Ajouter</div>
+    <div class="tab" data-tab="ventes">Ventes</div>
+    <div class="tab" data-tab="clients">Clients</div>
+    <div class="tab" data-tab="export">Exporter</div>
   </div>
-</header>
 
-<nav class="tabs" role="navigation">
-  <button class="tab-btn active" data-tab="tab-products" data-i18n="tab_products">Produits</button>
-  <button class="tab-btn" data-tab="tab-stock" data-i18n="tab_stock">Stock & Ventes</button>
-  <button class="tab-btn" data-tab="tab-clients" data-i18n="tab_clients">Clients</button>
-  <button class="tab-btn" data-tab="tab-export" data-i18n="tab_export">Export</button>
-</nav>
+  <!-- Tab Contents -->
+  <div class="tab-content" id="produits">
+    <input type="text" id="search-product" placeholder="Rechercher un produit...">
+    <table id="product-table">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Catégorie</th>
+          <th>Prix de vente</th>
+          <th>Prix de revient</th>
+          <th>Quantité</th>
+          <th>Image</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-<main class="tab-content">
+  <div class="tab-content" id="ajouter" style="display:none;">
+    <form id="add-product-form">
+      <input type="text" id="product-name" placeholder="Nom du produit" required>
+      <input type="text" id="product-category" placeholder="Catégorie" required>
+      <input type="number" id="product-price" placeholder="Prix de vente" required>
+      <input type="number" id="product-cost" placeholder="Prix de revient" required>
+      <input type="number" id="product-quantity" placeholder="Quantité" required>
+      <input type="file" id="product-image" accept="image/*">
+      <button type="submit">Ajouter</button>
+    </form>
+  </div>
 
-  <!-- PRODUCTS TAB -->
-  <section id="tab-products" class="tab active" aria-labelledby="tab-products">
-    <div class="card">
-      <h2 data-i18n="add_product_title">Ajouter un produit</h2>
+  <div class="tab-content" id="ventes" style="display:none;">
+    <input type="date" id="sales-date">
+    <button id="filter-sales">Afficher</button>
+    <table id="sales-table">
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th>Prix de vente</th>
+          <th>Quantité</th>
+          <th>Total</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <h3>Total du jour: <span id="sales-total">0</span> FCFA</h3>
+    <button id="print-sales">Imprimer</button>
+  </div>
 
-      <form id="productForm" class="form-grid" autocomplete="off">
-        <input id="p_name" data-i18n-placeholder="ph_name" placeholder="Nom du produit" required />
-        <input id="p_category" data-i18n-placeholder="ph_category" placeholder="Catégorie (ex: Boissons)" />
-        <input id="p_supplier" data-i18n-placeholder="ph_supplier" placeholder="Fournisseur" />
-        <input id="p_price" type="number" data-i18n-placeholder="ph_price" placeholder="Prix vente (CFA)" required />
-        <input id="p_cost" type="number" data-i18n-placeholder="ph_cost" placeholder="Prix de revient (CFA)" required />
-        <input id="p_stock" type="number" data-i18n-placeholder="ph_stock" placeholder="Stock initial" required />
-        <input id="p_discount" type="number" data-i18n-placeholder="ph_discount" placeholder="Ristourne (%)" />
-        <input id="p_image" type="file" accept="image/*" capture="environment" />
-        <div class="small-note" data-i18n="note_camera">Ou choisissez une image / utilisez la caméra</div>
+  <div class="tab-content" id="clients" style="display:none;">
+    <table id="client-table">
+      <thead>
+        <tr>
+          <th>Nom du client</th>
+          <th>Produit non payé</th>
+          <th>Montant dû</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-        <div class="form-actions">
-          <button id="saveProduct" type="submit" data-i18n="btn_add">Ajouter</button>
-          <button id="cancelProduct" type="button" class="ghost" data-i18n="btn_cancel">Annuler</button>
-        </div>
-      </form>
-    </div>
+  <div class="tab-content" id="export" style="display:none;">
+    <button id="export-csv">Exporter CSV</button>
+    <button id="export-excel">Exporter Excel</button>
+    <input type="file" id="import-file">
+  </div>
 
-    <div class="card">
-      <div class="toolbar">
-        <input id="searchBox" placeholder="Recherche (nom, fournisseur, catégorie)" data-i18n-placeholder="ph_search" />
-        <select id="filterCategory"><option value="">Toutes catégories</option></select>
-        <input id="minPrice" type="number" placeholder="Min prix" />
-        <input id="maxPrice" type="number" placeholder="Max prix" />
-        <button id="clearFilters" class="ghost" data-i18n="btn_clear">Réinitialiser</button>
-      </div>
-
-      <div class="table-wrap">
-        <table id="productsTable" class="striped">
-          <thead>
-            <tr>
-              <th>Img</th><th data-i18n="col_name">Nom</th><th data-i18n="col_cat">Catégorie</th><th data-i18n="col_supplier">Fournisseur</th>
-              <th data-i18n="col_price">Prix</th><th data-i18n="col_cost">Coût</th><th data-i18n="col_stock">Stock</th><th data-i18n="col_discount">Rist.</th><th data-i18n="col_actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- STOCK & SALES TAB -->
-  <section id="tab-stock" class="tab" aria-labelledby="tab-stock">
-    <div class="card">
-      <h2 data-i18n="dashboard_title">Tableau de bord</h2>
-      <div class="dash-grid">
-        <div class="dash-item" data-i18n="dash_total_sales">Total ventes: <span id="dashTotalSales">0 CFA</span></div>
-        <div class="dash-item" data-i18n="dash_stock_value">Valeur stock: <span id="dashStockValue">0 CFA</span></div>
-        <div class="dash-item" data-i18n="dash_top">Top ventes: <span id="dashTop">-</span></div>
-        <div class="dash-item" data-i18n="dash_low">Alertes stock: <span id="dashLow">-</span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="manage_stock_title">Gestion stock & vente</h2>
-      <div class="form-grid">
-        <select id="selProduct"></select>
-        <input id="moveQty" type="number" placeholder="Quantité" />
-        <select id="moveType"><option>Entrée</option><option>Vente</option></select>
-        <input id="movePrice" type="number" placeholder="Prix vendu (optionnel)" />
-        <select id="selClient"><option value="">Client (optionnel)</option></select>
-        <label class="checkbox"><input id="creditSale" type="checkbox" /> <span data-i18n="label_credit">Vente à crédit</span></label>
-
-        <div class="form-actions">
-          <button id="btnRecord" data-i18n="btn_record">Enregistrer</button>
-          <button id="btnSell" class="danger" data-i18n="btn_sell">Vendre</button>
-        </div>
-      </div>
-      <div class="note" data-i18n="note_stock">Utilisez Entrée pour ajouter stock, Vente pour réduire. Pour les ventes, saisir prix si différent.</div>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="sales_by_date">Ventes & entrées par date</h2>
-      <div class="toolbar">
-        <input id="reportDate" type="date" />
-        <button id="applyFilter" data-i18n="btn_filter">Afficher</button>
-        <button id="btnPrint" class="ghost" data-i18n="btn_print">Imprimer rapport</button>
-      </div>
-      <div class="table-wrap">
-        <table id="reportTable" class="striped">
-          <thead><tr><th>Date</th><th>Produit</th><th>Type</th><th>Qty</th><th>Prix U.</th><th>Total</th><th>Client</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div class="stats-line">Total sélection: <strong id="reportSum">0 CFA</strong></div>
-    </div>
-  </section>
-
-  <!-- CLIENTS TAB -->
-  <section id="tab-clients" class="tab" aria-labelledby="tab-clients">
-    <div class="card">
-      <h2 data-i18n="clients_title">Clients</h2>
-      <form id="clientForm" class="form-grid" autocomplete="off">
-        <input id="c_name" placeholder="Nom client" required />
-        <input id="c_phone" placeholder="Téléphone" />
-        <input id="c_email" placeholder="Email" />
-        <input id="c_note" placeholder="Note (adresse)" />
-        <div class="form-actions">
-          <button id="saveClient" type="submit" data-i18n="btn_add_client">Ajouter client</button>
-          <button id="resetClient" type="button" class="ghost" data-i18n="btn_cancel">Réinitialiser</button>
-        </div>
-      </form>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="clients_accounts">Comptes & Créances</h2>
-      <div class="toolbar"><input id="clientSearch" placeholder="Rechercher client..." /></div>
-      <div class="table-wrap">
-        <table id="clientsTable" class="striped">
-          <thead><tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Solde</th><th>Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="unpaid_sales">Ventes non payées</h2>
-      <div class="table-wrap">
-        <table id="unpaidTable" class="striped">
-          <thead><tr><th>Date</th><th>Client</th><th>Produit</th><th>Qty</th><th>Prix</th><th>Total</th><th>Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- EXPORT TAB -->
-  <section id="tab-export" class="tab" aria-labelledby="tab-export">
-    <div class="card">
-      <h2 data-i18n="export_title">Export / Import</h2>
-      <div class="form-grid">
-        <button id="exportProdCSV" data-i18n="btn_export_products">Exporter produits (CSV)</button>
-        <button id="exportLogCSV" data-i18n="btn_export_log">Exporter mouvements (CSV)</button>
-        <button id="exportExcel" data-i18n="btn_export_excel">Exporter Excel</button>
-        <input id="importProdFile" type="file" accept=".csv" />
-        <button id="importProducts" data-i18n="btn_import_products">Importer produits (CSV)</button>
-      </div>
-      <div class="note" data-i18n="note_csv">CSV format: name,category,supplier,price,cost,stock,discount</div>
-    </div>
-
-    <div class="card">
-      <h2 data-i18n="share_title">Partage Rapide</h2>
-      <div class="form-grid">
-        <button id="shareProducts" data-i18n="btn_share_products">Partager produits (WhatsApp)</button>
-        <button id="shareDaily" data-i18n="btn_share_report">Partager rapport</button>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<button id="fab" class="fab" title="Ajouter produit">+</button>
+</div>
 
 <script src="script.js"></script>
 </body>
