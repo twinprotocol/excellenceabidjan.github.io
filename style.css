@@ -1,97 +1,69 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
+:root{
+  --primary:#1976d2; --accent:#ff7043; --bg:#f6f8fb; --card:#fff; --muted:#6b7280;
+  --danger:#e53935; --radius:12px;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size:16px;
 }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#112241}
+.app{max-width:980px;margin:0 auto;padding:12px}
 
-.app-container {
-  max-width: 1000px;
-  margin: auto;
-  padding: 10px;
+/* topbar */
+.topbar{display:flex;justify-content:space-between;align-items:center;background:var(--primary);color:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.topbar .brand{font-weight:700}
+.controls select{padding:6px;border-radius:6px;border:none}
+
+/* tabs */
+.tabs{display:flex;gap:8px;margin:12px 0}
+.tab{flex:1;padding:10px;border-radius:10px;background:linear-gradient(90deg,#1565c0,#1976d2);color:#e7f3ff;border:none;font-weight:700;cursor:pointer}
+.tab.active{background:#fff;color:var(--primary);box-shadow:0 8px 30px rgba(9,30,66,.06)}
+
+/* main */
+.content{margin-top:8px}
+.panel{display:none}
+.panel.active{display:block}
+
+/* cards & form */
+.card{background:var(--card);padding:12px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(9,30,66,.04);margin-bottom:12px}
+.form{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;gap:8px}
+.row input, .row select{flex:1}
+input,select,button{padding:10px;border-radius:8px;border:1px solid #e6e9ee}
+.file input{padding:6px}
+label.file{display:block;padding:8px;border:1px dashed #ddd;border-radius:8px;text-align:center;cursor:pointer;color:var(--muted)}
+
+/* buttons */
+button{background:var(--primary);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+button.ghost{background:transparent;color:#333;border:1px solid #ddd}
+button.danger{background:var(--danger)}
+.fab{position:fixed;right:18px;bottom:22px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card.product{display:flex;flex-direction:column;gap:8px;padding:10px}
+.product img{width:100%;height:140px;object-fit:cover;border-radius:8px}
+
+/* table */
+.table-wrap{overflow:auto;max-height:260px}
+table{width:100%;border-collapse:collapse}
+thead th{position:sticky;top:0;background:#0d47a1;color:#fff;padding:8px}
+td,th{padding:8px;border-bottom:1px solid #f1f4f8;text-align:left}
+
+/* summary */
+.summary{display:flex;gap:8px;justify-content:space-between;padding:8px 0}
+
+/* small */
+.note{color:var(--muted);font-size:0.9rem}
+.report-sum{margin-top:8px;font-weight:700}
+
+/* responsive */
+@media(max-width:720px){
+  .row{flex-direction:column}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .topbar{padding:10px}
 }
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
+@media print{
+  body *{visibility:hidden}
+  #logTable, #logTable * {visibility:visible}
+  #logTable{position:fixed;left:0;top:0;width:100%}
 }
-
-header h1 {
-  font-size: 5vw;
-  color: #333;
-}
-
-header select {
-  padding: 5px;
-  font-size: 4vw;
-}
-
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  background-color: #333;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-
-.tab {
-  flex: 1;
-  text-align: center;
-  padding: 12px 0;
-  color: white;
-  cursor: pointer;
-  font-size: 4vw;
-}
-
-.tab.active {
-  background-color: #007bff;
-}
-
-.tab-content {
-  background: white;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-table, th, td {
-  border: 1px solid #ddd;
-}
-
-th, td {
-  padding: 8px;
-  text-align: center;
-}
-
-input, button, select {
-  margin: 5px 0;
-  padding: 8px;
-  font-size: 4vw;
-}
-
-button {
-  cursor: pointer;
-  background-color: #333;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-
-button:hover {
-  background-color: #555;
-}
-
-@media (min-width: 600px){
-  header h1 { font-size: 2em; }
-  header select { font-size: 1em; }
-  .tab { font-size: 1em; }
-  input, button, select { font-size: 1em; }
-}
-
-img { max-width: 50px; height: auto; }
