@@ -1,984 +1,176 @@
-<!DOCTYPE html>
-<html lang="fr">
+<!doctype html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Excellence Abidjan — Twin Protocol (v2)</title>
+  <title>Twin Protocol — Cyberpunk Inventory</title>
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-  <!-- XLSX for Excel export (same as your original) -->
+  <!-- XLSX (Excel export) -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
-  <style>
-    /* =========================
-       Improved Visual CSS
-       (keeps all original HTML structure / IDs)
-       ========================= */
-
-    :root{
-      --primary:#1976d2;
-      --primary-600:#2196f3;
-      --accent:#03a9f4;
-      --bg:#f5f8fb;
-      --card:#ffffff;
-      --muted:#666;
-      --success:#4caf50;
-      --danger:#f44336;
-      --glass: rgba(255,255,255,0.6);
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: "Roboto", Arial, sans-serif;
-      background:var(--bg);
-      color:#222;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      line-height:1.4;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* Header */
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:14px 18px;
-      background:linear-gradient(90deg,var(--primary),var(--primary-600));
-      color:#fff;
-      box-shadow:0 4px 14px rgba(25,118,210,0.12);
-      position:sticky;
-      top:0;
-      z-index:50;
-    }
-    header h1{font-size:1.25rem; font-weight:500; letter-spacing:0.2px}
-    header button#languageToggle{
-      background:rgba(255,255,255,0.12);
-      color:#fff;
-      border:none;
-      padding:8px 10px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:700;
-    }
-    header button#languageToggle:hover{background:rgba(255,255,255,0.18)}
-
-    /* Tabs (top) */
-    .tabs{display:flex; background:#fff; border-bottom:1px solid #e9eef6}
-    .tab-btn{
-      flex:1;
-      padding:12px 10px;
-      border:none;
-      background:transparent;
-      cursor:pointer;
-      font-weight:700;
-      color:var(--muted);
-      transition:all .22s ease;
-      text-align:center;
-      font-size:0.95rem;
-    }
-    .tab-btn:hover{background:#f6fbff}
-    .tab-btn.active{
-      color:var(--primary);
-      border-bottom:3px solid var(--primary-600);
-      background:linear-gradient(180deg, rgba(3,169,244,0.06), transparent);
-    }
-
-    /* Container */
-    .tab-content{padding:16px; max-width:1100px; margin:18px auto}
-    section{background:var(--card); border-radius:12px; padding:14px; box-shadow:0 6px 18px rgba(20,40,80,0.04); margin-bottom:14px; transition:transform .18s ease}
-    section:hover{transform:translateY(-3px)}
-
-    /* Forms & inputs */
-    form input, form select, form button, input, select, textarea{
-      width:100%;
-      padding:10px 12px;
-      border-radius:8px;
-      border:1px solid #d9e6f8;
-      background:#fff;
-      font-size:0.95rem;
-      margin-top:8px;
-    }
-    input:focus, select:focus, textarea:focus{outline:none; box-shadow:0 6px 14px rgba(33,150,243,0.08); border-color:var(--primary-600)}
-
-    /* Buttons */
-    button{cursor:pointer; border:none; border-radius:8px; padding:9px 12px; font-weight:700}
-    .btn-primary{background:var(--primary-600); color:#fff}
-    .btn-primary:hover{background:var(--primary)}
-    .btn-ghost{background:transparent; color:var(--primary-600); border:1px solid rgba(25,118,210,0.08)}
-
-    /* Search */
-    .search-section input{padding-left:14px}
-
-    /* Tables */
-    table{width:100%; border-collapse:collapse; margin-top:12px; font-size:0.92rem}
-    th, td{padding:10px 12px; border-bottom:1px solid #f1f6fb; text-align:center}
-    th{background:linear-gradient(180deg,#f6fbff,#fff); color:var(--primary-600); font-weight:700; font-size:0.9rem}
-    tr:hover td{background:#fbfeff}
-    .product-table img{width:56px; height:56px; object-fit:cover; border-radius:8px}
-
-    /* Stats */
-    .stats{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
-    .stats div{flex:1 1 220px; background:linear-gradient(180deg, #fff, #fbfeff); padding:12px; border-radius:10px; box-shadow:0 6px 12px rgba(20,40,80,0.03)}
-    .stats div h4{margin:0; color:var(--muted); font-weight:600; font-size:0.9rem}
-    .stats div p{margin:6px 0 0; font-weight:800; color:var(--primary-600); font-size:1.2rem}
-
-    /* FAB */
-    .fab{position:fixed; bottom:22px; right:22px; width:64px; height:64px; background:#ff6e40; color:#fff; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:28px; box-shadow:0 8px 22px rgba(0,0,0,0.18); z-index:999}
-    .fab:hover{transform:scale(1.05)}
-
-    /* Responsive */
-    @media (max-width:900px){
-      .tab-content{padding:12px}
-      th, td{font-size:0.82rem; padding:8px}
-      .product-table img{width:46px; height:46px}
-    }
-
-    @media (max-width:640px){
-      header{padding:10px}
-      .tabs{overflow:auto}
-      .tab-btn{flex:0 0 50%; min-width:140px}
-      .fab{width:56px;height:56px;font-size:24px}
-    }
-
-    /* Toast */
-    .toast{
-      position:fixed;
-      right:20px;
-      bottom:20px;
-      background:rgba(20,20,20,0.94);
-      color:#fff;
-      padding:12px 14px;
-      border-radius:10px;
-      box-shadow:0 8px 24px rgba(16,24,48,0.3);
-      z-index:9999;
-      transform:translateY(20px);
-      opacity:0;
-      transition:all 0.36s cubic-bezier(.16,.84,.44,1);
-      font-weight:700;
-    }
-    .toast.show{opacity:1; transform:translateY(0)}
-
-    /* Ripple effect */
-    button{position:relative; overflow:hidden}
-    button .ripple{
-      position:absolute;
-      width:100px;height:100px;border-radius:50%;
-      background:rgba(255,255,255,0.4);
-      transform:scale(0);
-      pointer-events:none;
-      animation:rippleAnim .6s linear;
-      mix-blend-mode:screen;
-    }
-    @keyframes rippleAnim{ to{transform:scale(4); opacity:0} }
-
-    /* small utilities */
-    .muted{color:var(--muted)}
-    .mb-8{margin-bottom:8px}
-    .mb-12{margin-bottom:12px}
-    .flex{display:flex}
-    .gap-8{gap:8px}
-    .center{display:flex;align-items:center;justify-content:center}
-
-    /* Toast specific color overrides when used in JS */
-    .toast.success{background:var(--success)}
-    .toast.error{background:var(--danger)}
-    .toast.info{background:#2196f3}
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <h1>Excellence Abidjan</h1>
-    <button id="languageToggle">AR/FR</button>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">TWIN<span>PROTOCOL</span></div>
+      <div class="subtitle">Excellence Abidjan — Cyberpunk</div>
+    </div>
+
+    <div class="controls">
+      <div class="lang-select">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+        <button class="lang-btn" data-lang="ar">AR</button>
+      </div>
+      <button id="themeToggle" class="icon-btn" title="Toggle theme">⚡</button>
+    </div>
   </header>
 
   <!-- TOP TABS -->
-  <div class="tabs" role="tablist">
-    <button class="tab-btn active" data-tab="tab1">Produits</button>
-    <button class="tab-btn" data-tab="tab2">Stock & Ventes</button>
-    <button class="tab-btn" data-tab="tab3">Export / Partage</button>
-  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="tab1">Products</button>
+    <button class="tab-btn" data-tab="tab2">Stock & Sales</button>
+    <button class="tab-btn" data-tab="tab3">Export / Share</button>
+  </nav>
 
-  <!-- CONTENT -->
-  <div class="tab-content">
+  <main class="content">
 
-    <!-- TAB 1 - PRODUCTS -->
-    <div class="tab active" id="tab1">
-      <section>
-        <h2>Ajouter un produit</h2>
-        <form id="productForm">
-          <input type="text" id="productName" placeholder="Nom du produit" required>
-          <input type="number" id="productPrice" placeholder="Prix de vente (CFA)" required>
-          <input type="number" id="productCost" placeholder="Prix de revient (CFA)" required>
-          <input type="number" id="productStock" placeholder="Stock initial" required>
-          <input type="number" id="productDiscount" placeholder="Ristourne (%)">
-          <input type="text" id="productSupplier" placeholder="Nom du fournisseur">
-          <input type="file" id="productImage" accept="image/*">
-          <div class="flex gap-8 mb-12">
-            <button type="button" id="takePhotoBtn" class="btn-ghost">📷 Prendre une photo</button>
-            <button type="submit" class="btn-primary">Ajouter produit</button>
+    <!-- TAB 1 -->
+    <section id="tab1" class="tab active">
+      <div class="panel glass">
+        <h2 id="productFormTitle">Add a product</h2>
+        <form id="productForm" autocomplete="off">
+          <div class="row">
+            <input id="productName" type="text" placeholder="Product name" required>
+            <input id="productPrice" type="number" placeholder="Sale price (CFA)" required>
+            <input id="productCost" type="number" placeholder="Cost price (CFA)" required>
+            <input id="productStock" type="number" placeholder="Initial stock" required>
+            <input id="productDiscount" type="number" placeholder="Discount (%)">
+            <input id="productSupplier" type="text" placeholder="Supplier name">
+            <input id="productImage" type="file" accept="image/*">
+          </div>
+
+          <div class="actions-row">
+            <button type="button" id="takePhotoBtn" class="btn-ghost">📷 Capture Photo</button>
+            <button type="submit" class="btn-accent">Add product</button>
           </div>
         </form>
-      </section>
+      </div>
 
-      <section>
-        <div class="search-section">
-          <input type="text" id="searchInput" placeholder="Rechercher produit...">
-        </div>
-
-        <table class="product-table">
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Nom</th>
-              <th>Prix</th>
-              <th>Coût</th>
-              <th>Stock</th>
-              <th>Ristourne</th>
-              <th>Fournisseur</th>
-              <th>Valeur Stock</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="productTableBody"></tbody>
-        </table>
-      </section>
-    </div>
-
-    <!-- TAB 2 - STOCK & SALES -->
-    <div class="tab" id="tab2">
-      <section id="dashboard">
-        <h2>Tableau de bord</h2>
-        <div class="stats">
-          <div>
-            <h4>Total Ventes</h4>
-            <p id="totalSalesCFA">0 CFA</p>
-          </div>
-          <div>
-            <h4>Valeur Stock</h4>
-            <p id="totalStockCFA">0 CFA</p>
-          </div>
-          <div>
-            <h4>Top Produits</h4>
-            <p id="topProducts">-</p>
-          </div>
-          <div>
-            <h4>Alertes Stock</h4>
-            <p id="lowStock">-</p>
+      <div class="panel glass mt-12">
+        <div class="row between">
+          <input id="searchInput" type="text" placeholder="Search product...">
+          <div class="small-stats">
+            <div><span id="totalProducts">0</span><small>Products</small></div>
+            <div><span id="totalStockCFA">0</span><small>Stock value</small></div>
           </div>
         </div>
-      </section>
 
-      <section>
-        <h2>Gestion du stock et ventes</h2>
+        <div class="table-wrap neon">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>Image</th><th>Name</th><th>Price</th><th>Cost</th><th>Stock</th><th>Discount</th><th>Supplier</th><th>Value</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2 -->
+    <section id="tab2" class="tab">
+      <div class="panel glass">
+        <h2>Dashboard</h2>
+        <div class="stats-grid">
+          <div class="stat neon-card">
+            <div class="stat-title">Total Sales</div>
+            <div class="stat-value" id="totalSalesCFA">0 CFA</div>
+          </div>
+          <div class="stat neon-card">
+            <div class="stat-title">Stock Value</div>
+            <div class="stat-value" id="totalStockCFA">0 CFA</div>
+          </div>
+          <div class="stat neon-card">
+            <div class="stat-title">Top Products</div>
+            <div class="stat-value" id="topProducts">-</div>
+          </div>
+          <div class="stat neon-card">
+            <div class="stat-title">Low Stock</div>
+            <div class="stat-value" id="lowStock">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel glass mt-12">
+        <h2>Manage stock & sell</h2>
         <select id="stockProductSelect"></select>
-        <input type="number" id="stockQuantity" placeholder="Quantité">
-        <input type="number" id="soldPriceInput" placeholder="Prix vendu (si vente)">
-        <div class="flex gap-8 mb-12">
-          <button id="addStock" class="btn-primary">Ajouter Stock</button>
-          <button id="sellStock" class="btn-primary">Vendre</button>
+        <input id="stockQuantity" type="number" placeholder="Quantity">
+        <input id="soldPriceInput" type="number" placeholder="Sold price (if sale)">
+        <div class="actions-row">
+          <button id="addStock" class="btn-accent">Add stock</button>
+          <button id="sellStock" class="btn-accent">Sell</button>
         </div>
-      </section>
+      </div>
 
-      <section>
-        <h2>Ventes par date</h2>
-        <input type="date" id="filterDate">
-        <button id="filterBtn" class="btn-ghost mb-8">Filtrer</button>
-
-        <table class="sales-table">
-          <thead>
-            <tr>
-              <th>Produit</th>
-              <th>Type</th>
-              <th>Quantité</th>
-              <th>Prix</th>
-              <th>Date</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody id="salesTableBody"></tbody>
-        </table>
-
-        <div class="stats" style="margin-top:12px">
+      <div class="panel glass mt-12">
+        <h2>Sales by date</h2>
+        <div class="row between">
+          <input id="filterDate" type="date">
           <div>
-            <h4>Total du jour</h4>
-            <p id="dailyTotal">0 CFA</p>
+            <button id="filterBtn" class="btn-ghost">Filter</button>
+            <button id="printSalesBtn" class="btn-ghost">🖨️ Print</button>
           </div>
         </div>
-
-        <div style="margin-top:12px">
-          <button id="printSalesBtn" class="btn-ghost">🖨️ Imprimer</button>
-        </div>
-      </section>
-    </div>
-
-    <!-- TAB 3 - EXPORT / SHARE -->
-    <div class="tab" id="tab3">
-      <section>
-        <h2>Exporter / Partager</h2>
-        <div class="flex gap-8 mb-12">
-          <button id="exportCSVBtn" class="btn-primary">Exporter CSV</button>
-          <button id="exportExcelBtn" class="btn-primary">Exporter Excel</button>
-          <button id="exportAllBtn" class="btn-ghost">Exporter JSON (toutes données)</button>
+        <div class="table-wrap neon mt-12">
+          <table class="sales-table">
+            <thead><tr><th>Product</th><th>Type</th><th>Qty</th><th>Price</th><th>Date</th><th>Total</th></tr></thead>
+            <tbody id="salesTableBody"></tbody>
+          </table>
         </div>
 
-        <div class="flex gap-8 mb-12">
-          <input type="file" id="importCSVFile" style="display:none">
-          <button id="importCSVBtn" class="btn-ghost">Importer CSV</button>
-
-          <input type="file" id="importAllFile" accept=".json" style="display:none">
-          <button id="importAllBtn" class="btn-ghost">Importer JSON</button>
-
-          <button id="shareWhatsAppBtn" class="btn-primary">Partager WhatsApp</button>
+        <div class="mt-12">
+          <div class="inline-stat">Daily total: <span id="dailyTotal">0 CFA</span></div>
         </div>
 
-      </section>
-    </div>
+      </div>
+    </section>
 
-  </div>
+    <!-- TAB 3 -->
+    <section id="tab3" class="tab">
+      <div class="panel glass">
+        <h2>Export / Share</h2>
+        <div class="actions-row">
+          <button id="exportCSVBtn" class="btn-accent">Export CSV</button>
+          <button id="exportExcelBtn" class="btn-accent">Export Excel</button>
+          <button id="exportAllBtn" class="btn-ghost">Export ALL (JSON)</button>
+        </div>
 
-  <!-- Floating Add -->
-  <div class="fab" id="fabAddProduct" title="Ajouter produit">+</div>
+        <div class="actions-row mt-12">
+          <input id="importCSVFile" type="file" accept=".csv" style="display:none">
+          <button id="importCSVBtn" class="btn-ghost">Import CSV</button>
 
-  <!-- Toast container is created dynamically by JS -->
+          <input id="importAllFile" type="file" accept=".json" style="display:none">
+          <button id="importAllBtn" class="btn-ghost">Import JSON</button>
 
-<script>
-/* ===========================
-   Integrated JS (all in one)
-   - Kept original functionality & IDs
-   - Added visual enhancements (toast, ripple, smooth tabs)
-   =========================== */
+          <button id="shareWhatsAppBtn" class="btn-accent">Share WhatsApp</button>
+        </div>
+      </div>
+    </section>
 
-(function(){
-  'use strict';
+  </main>
 
-  /* -------------------------
-     Data & Initial Load
-     ------------------------- */
-  let products = JSON.parse(localStorage.getItem('products')) || [];
-  let stockLog = JSON.parse(localStorage.getItem('stockLog')) || [];
-  let cameraData = null;
-  let currentLang = 'fr';
+  <button id="fabAddProduct" class="fab" title="Add product">+</button>
 
-  /* -------------------------
-     Elements (matching original IDs)
-     ------------------------- */
-  const productForm = document.getElementById('productForm');
-  const productTableBody = document.getElementById('productTableBody');
-  const searchInput = document.getElementById('searchInput');
-  const stockProductSelect = document.getElementById('stockProductSelect');
-  const stockQuantity = document.getElementById('stockQuantity');
-  const soldPriceInput = document.getElementById('soldPriceInput');
-  const addStockBtn = document.getElementById('addStock');
-  const sellStockBtn = document.getElementById('sellStock');
-  const filterDate = document.getElementById('filterDate');
-  const filterBtn = document.getElementById('filterBtn');
-  const salesTableBody = document.getElementById('salesTableBody');
-  const printSalesBtn = document.getElementById('printSalesBtn');
-  const takePhotoBtn = document.getElementById('takePhotoBtn');
-  const fabAddProduct = document.getElementById('fabAddProduct');
-  const exportCSVBtn = document.getElementById('exportCSVBtn');
-  const exportExcelBtn = document.getElementById('exportExcelBtn');
-  const importCSVBtn = document.getElementById('importCSVBtn');
-  const importCSVFile = document.getElementById('importCSVFile');
-  const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
-  const exportAllBtn = document.getElementById('exportAllBtn');
-  const importAllBtn = document.getElementById('importAllBtn');
-  const importAllFile = document.getElementById('importAllFile');
+  <!-- Toast (dynamically created by script) -->
 
-  /* Translation strings (FR / AR) - same keys as before */
-  const translations = {
-    fr: {
-      "tab1": "Produits","tab2":"Stock & Ventes","tab3":"Export / Partage",
-      "productFormTitle":"Ajouter un produit","productName":"Nom du produit","productPrice":"Prix de vente (CFA)",
-      "productCost":"Prix de revient (CFA)","productStock":"Stock initial","productDiscount":"Ristourne (%)",
-      "productSupplier":"Nom du fournisseur","takePhotoBtn":"📷 Prendre une photo","addProductBtn":"Ajouter produit",
-      "searchInput":"Rechercher produit...","dashboardTitle":"Tableau de bord","totalSales":"Total Ventes",
-      "totalStock":"Valeur Stock","topProducts":"Top Produits","lowStock":"Alertes Stock","manageStock":"Gestion du stock et ventes",
-      "stockQuantity":"Quantité","soldPriceInput":"Prix vendu (si vente)","addStockBtn":"Ajouter Stock","sellStockBtn":"Vendre",
-      "salesByDate":"Ventes par date","filterBtn":"Filtrer","dailyTotal":"Total du jour","printBtn":"🖨️ Imprimer",
-      "exportCSVBtn":"Exporter CSV","exportExcelBtn":"Exporter Excel","importCSVBtn":"Importer CSV","shareWhatsAppBtn":"Partager WhatsApp"
-    },
-    ar: {
-      "tab1":"المنتجات","tab2":"المخزون والمبيعات","tab3":"تصدير / مشاركة",
-      "productFormTitle":"إضافة منتج","productName":"اسم المنتج","productPrice":"سعر البيع (CFA)","productCost":"سعر التكلفة (CFA)",
-      "productStock":"المخزون الأولي","productDiscount":"الخصم (%)","productSupplier":"اسم المورد","takePhotoBtn":"📷 التقط صورة",
-      "addProductBtn":"إضافة المنتج","searchInput":"بحث عن المنتج...","dashboardTitle":"لوحة التحكم","totalSales":"إجمالي المبيعات",
-      "totalStock":"قيمة المخزون","topProducts":"أفضل المنتجات","lowStock":"تنبيهات المخزون","manageStock":"إدارة المخزون والمبيعات",
-      "stockQuantity":"الكمية","soldPriceInput":"سعر البيع (إذا تم البيع)","addStockBtn":"إضافة مخزون","sellStockBtn":"بيع",
-      "salesByDate":"المبيعات حسب التاريخ","filterBtn":"تصفية","dailyTotal":"إجمالي اليوم","printBtn":"🖨️ طباعة",
-      "exportCSVBtn":"تصدير CSV","exportExcelBtn":"تصدير Excel","importCSVBtn":"استيراد CSV","shareWhatsAppBtn":"مشاركة WhatsApp"
-    }
-  };
-
-  /* -------------------------
-     UI Enhancements: Toast & Ripple & Tabs
-     ------------------------- */
-
-  // Toast creation
-  function showToast(message, type='info') {
-    // remove existing
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    if (type === 'success') toast.classList.add('success');
-    if (type === 'error') toast.classList.add('error');
-    if (type === 'info') toast.classList.add('info');
-    document.body.appendChild(toast);
-    // show
-    setTimeout(()=>toast.classList.add('show'), 20);
-    // auto remove
-    setTimeout(()=> {
-      toast.classList.remove('show');
-      setTimeout(()=> toast.remove(), 360);
-    }, 2800);
-  }
-
-  // Replace alert with toast (keeps compatibility)
-  const nativeAlert = window.alert;
-  window.alert = function(msg){ showToast(String(msg), 'info'); }
-
-  // Ripple effect on all buttons (live)
-  function attachRipples() {
-    document.querySelectorAll('button').forEach(btn=>{
-      // avoid attaching multiple times
-      if (btn.dataset.rippleAttached) return;
-      btn.dataset.rippleAttached = '1';
-      btn.addEventListener('click', function(e){
-        const rect = this.getBoundingClientRect();
-        const ripple = document.createElement('span');
-        ripple.className = 'ripple';
-        ripple.style.left = (e.clientX - rect.left - 50) + 'px';
-        ripple.style.top = (e.clientY - rect.top - 50) + 'px';
-        this.appendChild(ripple);
-        setTimeout(()=> ripple.remove(), 650);
-      });
-    });
-  }
-
-  // Smooth tab switching (top tabs)
-  function initTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabs = document.querySelectorAll('.tab');
-    tabBtns.forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        tabBtns.forEach(b=>b.classList.remove('active'));
-        tabs.forEach(t=>t.classList.remove('active'));
-        btn.classList.add('active');
-        const id = btn.dataset.tab;
-        document.getElementById(id).classList.add('active');
-      });
-    });
-  }
-
-  /* -------------------------
-     Product Render / Save / Delete
-     ------------------------- */
-
-  function renderProducts(filter='') {
-    productTableBody.innerHTML = '';
-    products.forEach((p,i)=>{
-      if(filter && !p.name.toLowerCase().includes(filter.toLowerCase())) return;
-      const tr = document.createElement('tr');
-      const imgCell = p.image ? `<img src="${p.image}" alt="${p.name}">` : '';
-      tr.innerHTML = `
-        <td>${imgCell}</td>
-        <td>${p.name}</td>
-        <td>${p.price}</td>
-        <td>${p.cost}</td>
-        <td>${p.stock}</td>
-        <td>${p.discount||0}%</td>
-        <td>${p.supplier||''}</td>
-        <td>${(p.stock * (p.cost||0))} CFA</td>
-        <td><button class="btn-danger" data-delete-index="${i}">Supprimer</button></td>
-      `;
-      productTableBody.appendChild(tr);
-    });
-
-    // Attach delete button handlers
-    productTableBody.querySelectorAll('button[data-delete-index]').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        const idx = Number(btn.dataset.deleteIndex);
-        if (isNaN(idx)) return;
-        const name = products[idx]?.name || 'Produit';
-        if (confirm(`Supprimer ${name} ?`)) {
-          deleteProduct(idx);
-          showToast('Produit supprimé', 'success');
-        }
-      });
-    });
-
-    // Fill stock select
-    stockProductSelect.innerHTML = '';
-    products.forEach((p,i)=>{
-      const opt = document.createElement('option'); opt.value = i; opt.textContent = p.name; stockProductSelect.appendChild(opt);
-    });
-
-    attachRipples();
-  }
-
-  function deleteProduct(i){
-    products.splice(i,1);
-    saveProducts();
-  }
-
-  function refreshAll(){
-    renderProducts(searchInput.value);
-    renderSales(filterDate.value);
-    updateDashboard();
-    localStorage.setItem('products', JSON.stringify(products));
-  }
-
-  function saveProducts(){
-    // keep alias for compatibility; using refreshAll to ensure UI sync
-    refreshAll();
-  }
-
-  /* -------------------------
-     Add product (form submit)
-     ------------------------- */
-  productForm.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const name = document.getElementById('productName').value.trim();
-    const price = Number(document.getElementById('productPrice').value);
-    const cost = Number(document.getElementById('productCost').value);
-    const stock = Number(document.getElementById('productStock').value);
-    const discount = Number(document.getElementById('productDiscount').value || 0);
-    const supplier = document.getElementById('productSupplier').value.trim();
-    // image: priority cameraData then file input
-    const fileInput = document.getElementById('productImage');
-    let image = cameraData || '';
-    if (!image && fileInput && fileInput.files && fileInput.files[0]) {
-      image = URL.createObjectURL(fileInput.files[0]);
-    }
-    products.push({name, price, cost, stock, discount, supplier, image});
-    cameraData = null;
-    productForm.reset();
-    saveProducts();
-    showToast('Produit ajouté', 'success');
-  });
-
-  /* -------------------------
-     Search
-     ------------------------- */
-  let searchTimer=null;
-  searchInput && searchInput.addEventListener('input', ()=>{
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(()=> renderProducts(searchInput.value), 180);
-  });
-
-  /* -------------------------
-     Stock / Sell
-     ------------------------- */
-  addStockBtn && addStockBtn.addEventListener('click', ()=>{
-    const i = Number(stockProductSelect.value);
-    const qty = Number(stockQuantity.value);
-    if (isNaN(qty) || qty <= 0){ showToast('Quantité invalide', 'error'); return; }
-    if (!products[i]){ showToast('Produit invalide', 'error'); return; }
-    products[i].stock = (Number(products[i].stock) || 0) + qty;
-    saveProducts();
-    showToast('Stock ajouté', 'success');
-  });
-
-  sellStockBtn && sellStockBtn.addEventListener('click', ()=>{
-    const i = Number(stockProductSelect.value);
-    const qty = Number(stockQuantity.value);
-    const price = Number(soldPriceInput.value);
-    if (isNaN(qty) || qty <= 0 || isNaN(price) || price <= 0){ showToast('Quantité ou prix invalide', 'error'); return; }
-    if (!products[i]){ showToast('Produit invalide', 'error'); return; }
-    if (products[i].stock < qty){ showToast('Stock insuffisant', 'error'); return; }
-    products[i].stock -= qty;
-    stockLog.push({name: products[i].name, type: 'vente', qty, price, date: new Date().toISOString().split('T')[0]});
-    localStorage.setItem('stockLog', JSON.stringify(stockLog));
-    saveProducts();
-    renderSales(filterDate.value);
-    showToast('Vente enregistrée', 'success');
-  });
-
-  /* -------------------------
-     Render Sales
-     ------------------------- */
-  function renderSales(date='') {
-    salesTableBody.innerHTML = '';
-    let total = 0;
-    stockLog.forEach(s=>{
-      if(date && s.date !== date) return;
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${s.name}</td><td>${s.type}</td><td>${s.qty}</td><td>${s.price}</td><td>${s.date}</td><td>${s.qty * s.price}</td>`;
-      salesTableBody.appendChild(row);
-      total += s.qty * s.price;
-    });
-    const dailyTotalEl = document.getElementById('dailyTotal');
-    if (dailyTotalEl) dailyTotalEl.textContent = total + ' CFA';
-  }
-
-  filterBtn && filterBtn.addEventListener('click', ()=> renderSales(filterDate.value));
-
-  /* -------------------------
-     Print current tab
-     ------------------------- */
-  printSalesBtn && printSalesBtn.addEventListener('click', ()=>{
-    const activeTab = document.querySelector('.tab.active');
-    if (!activeTab) { showToast('Aucune donnée à imprimer', 'error'); return; }
-    const printContent = activeTab.innerHTML;
-    const w = window.open('', '_blank');
-    w.document.write(`<html><head><title>Rapport</title><style>
-      body{font-family:Roboto, Arial; padding:18px}
-      table{width:100%;border-collapse:collapse}
-      th,td{border:1px solid #000;padding:6px;text-align:center}
-      h2{margin-bottom:10px}
-    </style></head><body>${printContent}</body></html>`);
-    w.document.close();
-    w.focus();
-    w.print();
-  });
-
-  /* -------------------------
-     Export CSV
-     ------------------------- */
-  exportCSVBtn && exportCSVBtn.addEventListener('click', ()=>{
-    let csv = 'Nom,Type,Quantité,Prix,Date,Total\n';
-    stockLog.forEach(s => { csv += `${escapeCsv(s.name)},${s.type},${s.qty},${s.price},${s.date},${s.qty*s.price}\n`; });
-    const blob = new Blob([csv], {type: 'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'stock_log.csv'; a.click(); URL.revokeObjectURL(url);
-    showToast('CSV exporté', 'success');
-  });
-
-  function escapeCsv(t){
-    if (typeof t !== 'string') return t;
-    if (t.includes(',') || t.includes('"') || t.includes('\n')) return `"${t.replace(/"/g,'""')}"`;
-    return t;
-  }
-
-  /* -------------------------
-     Export Excel (XLSX)
-     ------------------------- */
-  exportExcelBtn && exportExcelBtn.addEventListener('click', ()=>{
-    try{
-      const ws = XLSX.utils.json_to_sheet(stockLog.map(s=>({Nom:s.name, Type:s.type, Quantité:s.qty, Prix:s.price, Date:s.date, Total:s.qty*s.price})));
-      const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'StockLog');
-      XLSX.writeFile(wb, 'stock_log.xlsx');
-      showToast('Excel exporté', 'success');
-    }catch(err){
-      showToast('Erreur export Excel', 'error');
-      console.error(err);
-    }
-  });
-
-  /* -------------------------
-     Import CSV
-     ------------------------- */
-  importCSVBtn && importCSVBtn.addEventListener('click', ()=> importCSVFile.click());
-  importCSVFile && importCSVFile.addEventListener('change', (e)=>{
-    const file = e.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(evt){
-      const text = evt.target.result;
-      const lines = text.split(/\r?\n/).filter(Boolean);
-      if (lines.length <= 1) { showToast('CSV vide ou invalide', 'error'); return; }
-      const header = lines.shift().split(',');
-      lines.forEach(line=>{
-        // robust split: support quoted values
-        const cells = parseCsvLine(line);
-        if (cells.length < 5) return;
-        const [name,type,qty,price,date] = cells;
-        stockLog.push({name, type, qty: Number(qty), price: Number(price), date});
-      });
-      localStorage.setItem('stockLog', JSON.stringify(stockLog));
-      renderSales(filterDate.value);
-      showToast('CSV importé', 'success');
-    };
-    reader.readAsText(file);
-    // reset
-    importCSVFile.value = '';
-  });
-
-  function parseCsvLine(line){
-    const res=[]; let cur=''; let inQuotes=false;
-    for (let i=0;i<line.length;i++){
-      const ch = line[i];
-      if (ch === '"' ) { inQuotes = !inQuotes; continue; }
-      if (ch === ',' && !inQuotes) { res.push(cur); cur=''; continue; }
-      cur += ch;
-    }
-    if (cur !== '') res.push(cur);
-    return res.map(s=>s.trim());
-  }
-
-  /* -------------------------
-     WhatsApp Share
-     ------------------------- */
-  shareWhatsAppBtn && shareWhatsAppBtn.addEventListener('click', ()=>{
-    let text = 'Rapport Stock & Ventes:%0A';
-    stockLog.forEach(s => { text += `${s.date}: ${s.name} ${s.type} ${s.qty} x ${s.price} = ${s.qty*s.price} CFA%0A`; });
-    const url = 'https://wa.me/?text=' + encodeURIComponent(decodeURIComponent(text));
-    window.open(url, '_blank');
-  });
-
-  /* -------------------------
-     Export/Import ALL data (JSON)
-     ------------------------- */
-  exportAllBtn && exportAllBtn.addEventListener('click', ()=>{
-    const all = {products, stockLog};
-    const blob = new Blob([JSON.stringify(all, null, 2)], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'excellence_abidjan_data.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    showToast('Toutes les données exportées', 'success');
-  });
-
-  importAllBtn && importAllBtn.addEventListener('click', ()=> importAllFile.click());
-  importAllFile && importAllFile.addEventListener('change', (e)=>{
-    const file = e.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(evt){
-      try{
-        const obj = JSON.parse(evt.target.result);
-        if (obj.products) products = obj.products;
-        if (obj.stockLog) stockLog = obj.stockLog;
-        localStorage.setItem('products', JSON.stringify(products));
-        localStorage.setItem('stockLog', JSON.stringify(stockLog));
-        refreshAll();
-        showToast('Données importées', 'success');
-      }catch(err){
-        showToast('Fichier JSON invalide', 'error');
-      }
-    };
-    reader.readAsText(file);
-    importAllFile.value = '';
-  });
-
-  /* -------------------------
-     Camera / Photo capture
-     - try direct camera (ImageCapture) then fallback to file input with capture
-     ------------------------- */
-  takePhotoBtn && takePhotoBtn.addEventListener('click', async ()=> {
-    // Try modern getUserMedia + ImageCapture
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
-      try{
-        const stream = await navigator.mediaDevices.getUserMedia({video:true});
-        const track = stream.getVideoTracks()[0];
-        // Try ImageCapture API
-        if (window.ImageCapture){
-          try{
-            const imageCapture = new ImageCapture(track);
-            const blob = await imageCapture.takePhoto();
-            const reader = new FileReader();
-            reader.onload = function(e){
-              cameraData = e.target.result; // base64
-              showToast('Photo capturée', 'success');
-            };
-            reader.readAsDataURL(blob);
-          }catch(errIC){
-            // fallback: grab frame from video
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            await video.play();
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d'); ctx.drawImage(video,0,0);
-            cameraData = canvas.toDataURL('image/png');
-            showToast('Photo capturée', 'success');
-            video.pause();
-          }
-        }else{
-          // no ImageCapture - use video frame
-          const video = document.createElement('video');
-          video.srcObject = stream;
-          await video.play();
-          const canvas = document.createElement('canvas');
-          canvas.width = video.videoWidth || 640;
-          canvas.height = video.videoHeight || 480;
-          const ctx = canvas.getContext('2d'); ctx.drawImage(video,0,0);
-          cameraData = canvas.toDataURL('image/png');
-          showToast('Photo capturée', 'success');
-          video.pause();
-        }
-        // stop tracks
-        stream.getTracks().forEach(t=>t.stop());
-      }catch(err){
-        // fallback: prompt file input (mobile)
-        fallbackFileCapture();
-      }
-    }else{
-      fallbackFileCapture();
-    }
-  });
-
-  function fallbackFileCapture(){
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
-    input.onchange = ()=>{
-      if (!input.files || !input.files[0]) return;
-      const reader = new FileReader();
-      reader.onload = (e)=>{
-        cameraData = e.target.result;
-        showToast('Photo capturée', 'success');
-      };
-      reader.readAsDataURL(input.files[0]);
-    };
-    input.click();
-  }
-
-  /* -------------------------
-     Dashboard updates
-     ------------------------- */
-  function updateDashboard(){
-    // total sales
-    let totalSales = 0;
-    stockLog.forEach(s => { totalSales += (s.qty * s.price); });
-    document.getElementById('totalSalesCFA').textContent = totalSales + ' CFA';
-
-    // stock value
-    let totalStockValue = 0;
-    products.forEach(p => { totalStockValue += (p.stock * (p.cost||0)); });
-    document.getElementById('totalStockCFA').textContent = totalStockValue + ' CFA';
-
-    // top products
-    let top = {};
-    stockLog.forEach(s => { if (s.type === 'vente') top[s.name] = (top[s.name] || 0) + s.qty; });
-    const topArr = Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,3);
-    document.getElementById('topProducts').textContent = topArr.map(t=>t[0] + '('+t[1]+')').join(', ') || '-';
-
-    // low stock
-    const low = products.filter(p=>p.stock < 5).map(p=>p.name).join(', ');
-    document.getElementById('lowStock').textContent = low || '-';
-  }
-
-  /* -------------------------
-     Initial render
-     ------------------------- */
-  function init(){
-    initTabs();
-    attachRipples();
-    renderProducts();
-    renderSales();
-    updateDashboard();
-  }
-
-  init();
-
-  /* -------------------------
-     FAB behavior (scroll to add product)
-     ------------------------- */
-  fabAddProduct && fabAddProduct.addEventListener('click', ()=>{
-    // switch to tab1
-    document.querySelectorAll('.tab-btn').forEach(b=>{ if (b.dataset.tab === 'tab1') b.click(); });
-    // scroll to top of tab content
-    const el = document.getElementById('tab1');
-    if (el) el.scrollIntoView({behavior:'smooth'});
-  });
-
-  /* -------------------------
-     Search render call (already attached above) -- ensure initial call
-     ------------------------- */
-  // renderProducts called in init
-
-  /* -------------------------
-     Language toggle + RTL support
-     ------------------------- */
-  const languageToggle = document.getElementById('languageToggle');
-  languageToggle && languageToggle.addEventListener('click', ()=>{
-    currentLang = (currentLang === 'fr') ? 'ar' : 'fr';
-    updateLanguage(currentLang);
-    showToast(currentLang === 'fr' ? 'Langue: Français' : 'اللغة: العربية', 'info');
-  });
-
-  function updateLanguage(lang){
-    const t = translations[lang];
-    // Tabs
-    const btn1 = document.querySelector('.tab-btn[data-tab="tab1"]');
-    const btn2 = document.querySelector('.tab-btn[data-tab="tab2"]');
-    const btn3 = document.querySelector('.tab-btn[data-tab="tab3"]');
-    if (btn1) btn1.textContent = t.tab1;
-    if (btn2) btn2.textContent = t.tab2;
-    if (btn3) btn3.textContent = t.tab3;
-
-    // Product form labels/placeholders
-    document.querySelector('#productForm h2') && (document.querySelector('#productForm h2').textContent = t.productFormTitle);
-    document.getElementById('productName').placeholder = t.productName;
-    document.getElementById('productPrice').placeholder = t.productPrice;
-    document.getElementById('productCost').placeholder = t.productCost;
-    document.getElementById('productStock').placeholder = t.productStock;
-    document.getElementById('productDiscount').placeholder = t.productDiscount;
-    document.getElementById('productSupplier').placeholder = t.productSupplier;
-    takePhotoBtn.textContent = t.takePhotoBtn;
-    document.querySelector('#productForm button[type="submit"]').textContent = t.addProductBtn;
-
-    // Search
-    document.getElementById('searchInput').placeholder = t.searchInput;
-
-    // Dashboard
-    document.querySelector('#dashboard h2') && (document.querySelector('#dashboard h2').textContent = t.dashboardTitle);
-
-    // Stock & Sales
-    document.querySelector('#tab2 section:nth-of-type(2) h2') && (document.querySelector('#tab2 section:nth-of-type(2) h2').textContent = t.manageStock);
-    document.getElementById('stockQuantity').placeholder = t.stockQuantity;
-    document.getElementById('soldPriceInput').placeholder = t.soldPriceInput;
-    document.getElementById('addStock').textContent = t.addStockBtn;
-    document.getElementById('sellStock').textContent = t.sellStockBtn;
-
-    // Sales by date
-    document.querySelector('#tab2 section:nth-of-type(3) h2') && (document.querySelector('#tab2 section:nth-of-type(3) h2').textContent = t.salesByDate);
-    document.getElementById('filterBtn').textContent = t.filterBtn;
-    document.getElementById('printSalesBtn').textContent = t.printBtn;
-
-    // Export/Share
-    document.getElementById('exportCSVBtn').textContent = t.exportCSVBtn;
-    document.getElementById('exportExcelBtn').textContent = t.exportExcelBtn;
-    document.getElementById('importCSVBtn').textContent = t.importCSVBtn;
-    document.getElementById('shareWhatsAppBtn').textContent = t.shareWhatsAppBtn;
-
-    // Direction
-    if (lang === 'ar'){
-      document.documentElement.dir = 'rtl';
-      document.body.style.direction = 'rtl';
-    } else {
-      document.documentElement.dir = 'ltr';
-      document.body.style.direction = 'ltr';
-    }
-  }
-
-  /* -------------------------
-     Make sure buttons get ripple after dynamic changes
-     ------------------------- */
-  const observer = new MutationObserver(()=> attachRipples());
-  observer.observe(document.body, {childList:true, subtree:true});
-
-  /* -------------------------
-     Expose saveProducts (compat)
-     ------------------------- */
-  window.saveProducts = saveProducts;
-
-  /* -------------------------
-     Fallback: if user wants to access the raw "products" or "stockLog"
-     ------------------------- */
-  window._excellence = { products, stockLog };
-
-  /* -------------------------
-     Safety: ensure UI updates when storage changes externally
-     ------------------------- */
-  window.addEventListener('storage', (e)=>{
-    if (e.key === 'products') products = JSON.parse(e.newValue || '[]');
-    if (e.key === 'stockLog') stockLog = JSON.parse(e.newValue || '[]');
-    refreshAll();
-  });
-
-})();
-</script>
+  <script src="script.js" defer></script>
 </body>
 </html>
