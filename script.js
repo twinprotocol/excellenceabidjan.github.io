@@ -1,22 +1,21 @@
-// IPTV World (offline-friendly, no proxy) by Twin Protocol
+// Netflix-style IPTV World — hosted version (works anywhere)
+const SAFE_URL = "https://iptv-org.github.io/iptv/index.m3u";
+const NSFW_URL = "https://iptv-org.github.io/iptv/index.nsfw.m3u";
+const PROXY = "https://api.allorigins.win/raw?url=";
 
-const SAFE_FILE = "index.m3u";
-const NSFW_FILE = "index.nsfw.m3u";
-
-const statusBox = document.getElementById("status");
-const grid = document.getElementById("channelsGrid");
 const searchInput = document.getElementById("search");
 const countrySelect = document.getElementById("countrySelect");
 const categorySelect = document.getElementById("categorySelect");
+const content = document.getElementById("content");
 const modal = document.getElementById("playerModal");
 const player = document.getElementById("videoPlayer");
 const closePlayer = document.getElementById("closePlayer");
 
 let allChannels = [];
 
-async function fetchLocalFile(file) {
-  const res = await fetch(file);
-  if (!res.ok) throw new Error("Cannot read local " + file);
+async function fetchPlaylist(url) {
+  const res = await fetch(PROXY + encodeURIComponent(url));
+  if (!res.ok) throw new Error("Network error");
   return await res.text();
 }
 
@@ -28,42 +27,47 @@ function parseM3U(text) {
       const info = lines[i];
       const url = lines[i + 1];
       const name = (info.split(",")[1] || "Unknown").trim();
-      const country = (info.match(/tvg-country="(.*?)"/) || [,"Other"])[1];
-      const logo = (info.match(/tvg-logo="(.*?)"/) || [,""])[1];
-      const group = (info.match(/group-title="(.*?)"/) || [,"General"])[1];
+      const country = (info.match(/tvg-country=\"(.*?)\"/) || [,"Other"])[1];
+      const logo = (info.match(/tvg-logo=\"(.*?)\"/) || [,""])[1];
+      const group = (info.match(/group-title=\"(.*?)\"/) || [,"General"])[1];
       ch.push({ name, country, logo, url, category: group });
     }
   }
   return ch;
 }
 
-function fillSelect(select, items, label) {
-  select.innerHTML = `<option value="">All ${label}</option>`;
-  items.forEach(i => {
-    const o = document.createElement("option");
-    o.value = i;
-    o.textContent = i;
-    select.appendChild(o);
+function groupByCategory(list) {
+  const grouped = {};
+  list.forEach(ch => {
+    const cat = ch.category || "General";
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(ch);
   });
+  return grouped;
 }
 
 function render(list) {
-  grid.innerHTML = "";
-  if (!list.length) {
-    grid.innerHTML = `<div style="color:gray;text-align:center;">No channels found</div>`;
-    return;
-  }
-  for (const c of list) {
-    const card = document.createElement("div");
-    card.className = "channel";
-    card.innerHTML = `
-      <img src="${c.logo || "https://via.placeholder.com/150x90?text=No+Logo"}">
-      <div class="name">${c.name}</div>
-      <div class="country">${c.country}</div>
-      <div class="category">${c.category}</div>`;
-    card.onclick = () => playChannel(c.url);
-    grid.appendChild(card);
-  }
+  content.innerHTML = "";
+  const grouped = groupByCategory(list);
+  Object.entries(grouped).forEach(([cat, chans]) => {
+    const section = document.createElement("div");
+    section.className = "section";
+    section.innerHTML = `<h2>${cat}</h2><div class="row"></div>`;
+    const row = section.querySelector(".row");
+    chans.forEach(c => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${c.logo || "https://via.placeholder.com/150x90?text="+encodeURIComponent(c.name)}">
+        <div class="info">
+          <div class="name">${c.name}</div>
+          <div class="country">${c.country}</div>
+        </div>`;
+      card.onclick = () => playChannel(c.url);
+      row.appendChild(card);
+    });
+    content.appendChild(section);
+  });
 }
 
 function filter() {
@@ -78,27 +82,34 @@ function filter() {
   render(filtered);
 }
 
+function fillSelect(select, items, label) {
+  select.innerHTML = `<option value="">All ${label}</option>`;
+  items.forEach(i => {
+    const o = document.createElement("option");
+    o.value = i;
+    o.textContent = i;
+    select.appendChild(o);
+  });
+}
+
 function playChannel(url) {
   modal.classList.remove("hidden");
   player.src = url;
-  player.play().catch(e => console.log("Play error:", e));
+  player.play().catch(e => console.log("playback error", e));
 }
-
 closePlayer.onclick = () => {
   modal.classList.add("hidden");
   player.pause();
   player.src = "";
 };
-
 searchInput.oninput = filter;
 countrySelect.onchange = filter;
 categorySelect.onchange = filter;
 
 (async function init() {
   try {
-    statusBox.textContent = "Loading local channels…";
-    const safe = await fetchLocalFile(SAFE_FILE);
-    const nsfw = await fetchLocalFile(NSFW_FILE);
+    const safe = await fetchPlaylist(SAFE_URL);
+    const nsfw = await fetchPlaylist(NSFW_URL);
     allChannels = [...parseM3U(safe), ...parseM3U(nsfw)];
 
     const countries = [...new Set(allChannels.map(c => c.country))].sort();
@@ -107,9 +118,8 @@ categorySelect.onchange = filter;
     fillSelect(categorySelect, cats, "categories");
 
     render(allChannels);
-    statusBox.textContent = `Loaded ${allChannels.length} channels`;
-  } catch (e) {
-    console.error(e);
-    statusBox.textContent = "Failed to read local playlists.";
+  } catch (err) {
+    content.innerHTML = "<p style='text-align:center;color:#999;'>Failed to load channels.</p>";
+    console.error(err);
   }
 })();
