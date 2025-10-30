@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPTV World v3</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>IPTV World — Categories (robust)</title>
+<link rel="stylesheet" href="style.css" />
+<!-- HLS.js for browsers that don't natively play .m3u8 -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
 <script src="app.js" defer></script>
 </head>
 <body>
+  <header class="navbar">
+    <div class="brand">
+      <div class="logo">IPTV<span>World</span></div>
+      <div class="tag">Safe channels — load on category click</div>
+    </div>
 
-<header class="navbar">
-  <h1 class="logo">IPTV<span>World</span></h1>
-  <div class="controls">
-    <input type="text" id="search" placeholder="Search channels...">
+    <div class="controls">
+      <input id="search" placeholder="Search channels in current view..." />
+      <button id="backBtn" class="hidden">← Back</button>
+      <button id="refreshBtn" title="Reload current category">⟳</button>
+    </div>
+  </header>
+
+  <main id="main" class="main">
+    <section id="categories" class="categories"></section>
+
+    <section id="channelsSection" class="channelsSection hidden">
+      <div class="channelsHeader">
+        <h2 id="channelsTitle">Channels</h2>
+        <div id="channelsStatus" class="muted small">—</div>
+      </div>
+      <div id="channels" class="channelsGrid"></div>
+    </section>
+  </main>
+
+  <div id="playerModal" class="playerModal hidden" role="dialog" aria-modal="true">
+    <div class="playerCard">
+      <button id="closePlayer" class="closeBtn">✕</button>
+      <div id="nowPlaying" class="nowPlaying">—</div>
+      <div class="videoWrap"><video id="video" playsinline controls></video></div>
+      <div id="playerNotice" class="muted small"></div>
+    </div>
   </div>
-</header>
 
-<main id="categories" class="categories"></main>
-<div id="channels" class="channels hidden"></div>
-
-<div id="playerModal" class="playerModal hidden">
-  <div class="playerCard">
-    <button id="closeBtn" class="closeBtn">✕</button>
-    <div id="nowPlaying" class="nowPlaying"></div>
-    <div class="videoWrap"><video id="video" controls playsinline></video></div>
-    <div id="playerNotice" class="playerNotice"></div>
-  </div>
-</div>
-
-<footer>© IPTV World v3 — Safe Channels</footer>
+  <footer class="footer">© Twin Protocol — Robust category loader</footer>
 </body>
 </html>
