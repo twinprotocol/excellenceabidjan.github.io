@@ -3,174 +3,48 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Twin Protocol — Cyberpunk Inventory</title>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-  <!-- XLSX (Excel export) -->
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-
-  <link rel="stylesheet" href="style.css">
+  <title>World IPTV — Twin Protocol</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- hls.js from CDN (used when browser doesn't natively play HLS) -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 <body>
+  <div id="app" class="app">
+    <aside class="sidebar">
+      <header class="sb-header">
+        <h1>WORLD IPTV</h1>
+        <div class="sb-sub">Channels by country</div>
+      </header>
 
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">TWIN<span>PROTOCOL</span></div>
-      <div class="subtitle">Excellence Abidjan — Cyberpunk</div>
-    </div>
-
-    <div class="controls">
-      <div class="lang-select">
-        <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="fr">FR</button>
-        <button class="lang-btn" data-lang="es">ES</button>
-        <button class="lang-btn" data-lang="ar">AR</button>
-      </div>
-      <button id="themeToggle" class="icon-btn" title="Toggle theme">⚡</button>
-    </div>
-  </header>
-
-  <!-- TOP TABS -->
-  <nav class="tabs" role="tablist">
-    <button class="tab-btn active" data-tab="tab1">Products</button>
-    <button class="tab-btn" data-tab="tab2">Stock & Sales</button>
-    <button class="tab-btn" data-tab="tab3">Export / Share</button>
-  </nav>
-
-  <main class="content">
-
-    <!-- TAB 1 -->
-    <section id="tab1" class="tab active">
-      <div class="panel glass">
-        <h2 id="productFormTitle">Add a product</h2>
-        <form id="productForm" autocomplete="off">
-          <div class="row">
-            <input id="productName" type="text" placeholder="Product name" required>
-            <input id="productPrice" type="number" placeholder="Sale price (CFA)" required>
-            <input id="productCost" type="number" placeholder="Cost price (CFA)" required>
-            <input id="productStock" type="number" placeholder="Initial stock" required>
-            <input id="productDiscount" type="number" placeholder="Discount (%)">
-            <input id="productSupplier" type="text" placeholder="Supplier name">
-            <input id="productImage" type="file" accept="image/*">
-          </div>
-
-          <div class="actions-row">
-            <button type="button" id="takePhotoBtn" class="btn-ghost">📷 Capture Photo</button>
-            <button type="submit" class="btn-accent">Add product</button>
-          </div>
-        </form>
+      <div class="controls">
+        <input id="search" placeholder="Search channels..." />
+        <select id="countrySelect"><option>Loading countries...</option></select>
+        <div id="status" class="status">Loading playlist…</div>
       </div>
 
-      <div class="panel glass mt-12">
-        <div class="row between">
-          <input id="searchInput" type="text" placeholder="Search product...">
-          <div class="small-stats">
-            <div><span id="totalProducts">0</span><small>Products</small></div>
-            <div><span id="totalStockCFA">0</span><small>Stock value</small></div>
+      <nav id="countryList" class="country-list" aria-label="Countries"></nav>
+    </aside>
+
+    <main class="main">
+      <section class="player-area">
+        <div class="player-top">
+          <div id="nowPlaying" class="now-playing">Choose a channel</div>
+          <div class="player-controls">
+            <button id="btnMute" title="Mute/unmute">🔊</button>
+            <button id="btnFullscreen" title="Fullscreen">⤢</button>
           </div>
         </div>
-
-        <div class="table-wrap neon">
-          <table class="product-table">
-            <thead>
-              <tr>
-                <th>Image</th><th>Name</th><th>Price</th><th>Cost</th><th>Stock</th><th>Discount</th><th>Supplier</th><th>Value</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="productTableBody"></tbody>
-          </table>
+        <div class="player-wrap">
+          <video id="video" playsinline controls></video>
         </div>
-      </div>
-    </section>
+        <div id="notice" class="notice"></div>
+      </section>
 
-    <!-- TAB 2 -->
-    <section id="tab2" class="tab">
-      <div class="panel glass">
-        <h2>Dashboard</h2>
-        <div class="stats-grid">
-          <div class="stat neon-card">
-            <div class="stat-title">Total Sales</div>
-            <div class="stat-value" id="totalSalesCFA">0 CFA</div>
-          </div>
-          <div class="stat neon-card">
-            <div class="stat-title">Stock Value</div>
-            <div class="stat-value" id="totalStockCFA">0 CFA</div>
-          </div>
-          <div class="stat neon-card">
-            <div class="stat-title">Top Products</div>
-            <div class="stat-value" id="topProducts">-</div>
-          </div>
-          <div class="stat neon-card">
-            <div class="stat-title">Low Stock</div>
-            <div class="stat-value" id="lowStock">-</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel glass mt-12">
-        <h2>Manage stock & sell</h2>
-        <select id="stockProductSelect"></select>
-        <input id="stockQuantity" type="number" placeholder="Quantity">
-        <input id="soldPriceInput" type="number" placeholder="Sold price (if sale)">
-        <div class="actions-row">
-          <button id="addStock" class="btn-accent">Add stock</button>
-          <button id="sellStock" class="btn-accent">Sell</button>
-        </div>
-      </div>
-
-      <div class="panel glass mt-12">
-        <h2>Sales by date</h2>
-        <div class="row between">
-          <input id="filterDate" type="date">
-          <div>
-            <button id="filterBtn" class="btn-ghost">Filter</button>
-            <button id="printSalesBtn" class="btn-ghost">🖨️ Print</button>
-          </div>
-        </div>
-        <div class="table-wrap neon mt-12">
-          <table class="sales-table">
-            <thead><tr><th>Product</th><th>Type</th><th>Qty</th><th>Price</th><th>Date</th><th>Total</th></tr></thead>
-            <tbody id="salesTableBody"></tbody>
-          </table>
-        </div>
-
-        <div class="mt-12">
-          <div class="inline-stat">Daily total: <span id="dailyTotal">0 CFA</span></div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- TAB 3 -->
-    <section id="tab3" class="tab">
-      <div class="panel glass">
-        <h2>Export / Share</h2>
-        <div class="actions-row">
-          <button id="exportCSVBtn" class="btn-accent">Export CSV</button>
-          <button id="exportExcelBtn" class="btn-accent">Export Excel</button>
-          <button id="exportAllBtn" class="btn-ghost">Export ALL (JSON)</button>
-        </div>
-
-        <div class="actions-row mt-12">
-          <input id="importCSVFile" type="file" accept=".csv" style="display:none">
-          <button id="importCSVBtn" class="btn-ghost">Import CSV</button>
-
-          <input id="importAllFile" type="file" accept=".json" style="display:none">
-          <button id="importAllBtn" class="btn-ghost">Import JSON</button>
-
-          <button id="shareWhatsAppBtn" class="btn-accent">Share WhatsApp</button>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <button id="fabAddProduct" class="fab" title="Add product">+</button>
-
-  <!-- Toast (dynamically created by script) -->
-
-  <script src="script.js" defer></script>
+      <section class="list-area">
+        <div id="channelsGrid" class="channels-grid"></div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
