@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 :root {
-  --bg: #0a0a0f;
+  --bg: #090909;
   --card: #151520;
   --accent: #e50914;
   --text: #f5f5f5;
@@ -43,12 +43,9 @@ input, select {
   padding: 6px 10px;
 }
 
-main {
-  padding: 15px;
-}
-.section {
-  margin-bottom: 30px;
-}
+main { padding: 15px; }
+
+.section { margin-bottom: 30px; }
 .section h2 {
   font-weight: 600;
   margin: 0 0 10px 8px;
@@ -78,13 +75,13 @@ main {
   object-fit: cover;
   border-radius: 10px 10px 0 0;
 }
-.card .info {
-  padding: 6px;
-  font-size: 0.85rem;
-}
-.card .country {
+.card .info { padding: 6px; font-size: 0.85rem; }
+.card .country { color: var(--muted); font-size: 0.7rem; }
+
+.loader {
+  text-align: center;
+  margin-top: 50px;
   color: var(--muted);
-  font-size: 0.7rem;
 }
 
 #playerModal {
