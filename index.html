@@ -1,33 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IPTV World — Twin Protocol</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>World IPTV — Twin Protocol</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>🌍 IPTV World</h1>
-    <select id="contentMode">
-      <option value="safe" selected>Safe</option>
-      <option value="nsfw">NSFW</option>
-      <option value="both">Both</option>
-    </select>
-    <input id="search" type="text" placeholder="Search channel..." />
-    <select id="countrySelect"></select>
-  </header>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">TP</div>
+        <div>
+          <h1>WORLD IPTV</h1>
+          <div class="sub">Channels by country — no raw links</div>
+        </div>
+      </div>
 
-  <main>
-    <div id="status">Loading channels...</div>
-    <div id="channelsGrid"></div>
-  </main>
+      <div class="controls">
+        <input id="search" placeholder="Search channels or country..." />
+        <select id="contentMode" title="Choose content">
+          <option value="safe">Safe</option>
+          <option value="nsfw">NSFW</option>
+          <option value="both" selected>Both</option>
+        </select>
+        <select id="countrySelect" title="Filter by country">
+          <option value="">All countries</option>
+        </select>
+        <div id="status" class="status">Initializing…</div>
+      </div>
 
-  <footer>
-    <p>Powered by <b>Twin Protocol</b> • IPTV-org API</p>
-  </footer>
+      <nav id="countryList" class="country-list" aria-label="Countries"></nav>
+      <div class="footer-note">Tip: run with <code>python -m http.server</code> if any fetch fails.</div>
+    </aside>
 
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <script src="app.js"></script>
+    <main class="main">
+      <section class="player-area">
+        <div class="player-top">
+          <div id="nowPlaying" class="now-playing">Choose a channel</div>
+          <div class="player-controls">
+            <button id="btnMute" title="Mute/unmute">🔊</button>
+            <button id="btnFullscreen" title="Fullscreen">⤢</button>
+          </div>
+        </div>
+
+        <div class="player-wrap">
+          <video id="video" playsinline controls></video>
+        </div>
+
+        <div id="notice" class="notice"></div>
+      </section>
+
+      <section class="list-area">
+        <h2 id="listTitle">Channels</h2>
+        <div id="channelsGrid" class="channels-grid"></div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
