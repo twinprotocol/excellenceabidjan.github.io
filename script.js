@@ -1,5 +1,5 @@
-const SAFE_URL = "proxy.php?url=https://iptv-org.github.io/api/channels.json";
-const NSFW_URL = "proxy.php?url=https://iptv-org.github.io/api/nsfw.json";
+const SAFE_URL = "https://iptv-org.github.io/api/channels.json";
+const NSFW_URL = "https://iptv-org.github.io/api/nsfw.json";
 
 const channelsContainer = document.getElementById("channels");
 const searchInput = document.getElementById("search");
@@ -19,6 +19,7 @@ async function loadChannels() {
 
     const safeChannels = await safeRes.json();
     const nsfwChannels = await nsfwRes.json();
+
     allChannels = [...safeChannels, ...nsfwChannels].filter(c => c.url && c.name);
 
     const countries = [...new Set(allChannels.map(c => c.country).filter(Boolean))].sort();
@@ -27,8 +28,8 @@ async function loadChannels() {
 
     renderChannels(allChannels);
   } catch (e) {
-    console.error(e);
-    channelsContainer.innerHTML = "<p>⚠️ Failed to load channels. Check your proxy.php file.</p>";
+    console.error("Error loading channels:", e);
+    channelsContainer.innerHTML = "<p>⚠️ Failed to load channels (network or CORS blocked).</p>";
   }
 }
 
