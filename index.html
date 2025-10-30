@@ -3,58 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-<<<<<<< HEAD
   <title>World IPTV — Twin Protocol</title>
   <link rel="stylesheet" href="styles.css" />
   <!-- hls.js from CDN (used when browser doesn't natively play HLS) -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js" defer></script>
   <script src="app.js" defer></script>
-=======
-  <title>Twin Protocol — Inventory</title>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-  <!-- XLSX (Excel export) -->
-  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-
-  <link rel="stylesheet" href="style.css">
->>>>>>> 812ced5efe9c3ae982fc0f1e455e669be267404a
 </head>
 <body>
   <div id="app" class="app">
     <aside class="sidebar">
       <header class="sb-header">
         <h1>WORLD IPTV</h1>
-        <div class="sb-sub">Channels by country</div>
+        <div class="sb-sub">Channels by country — no URLs shown</div>
       </header>
 
       <div class="controls">
-        <input id="search" placeholder="Search channels..." />
-        <select id="countrySelect"><option>Loading countries...</option></select>
-        <div id="status" class="status">Loading playlist…</div>
+        <input id="search" placeholder="Search channels..." autocomplete="off" />
+        <div class="control-row">
+          <label for="contentMode" class="label-small">Content</label>
+          <select id="contentMode" aria-label="Content mode">
+            <option value="safe" selected>Safe</option>
+            <option value="nsfw">NSFW</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+        <div class="control-row">
+          <label for="countrySelect" class="label-small">Country</label>
+          <select id="countrySelect"><option value="">All countries</option></select>
+        </div>
+        <div id="status" class="status">Idle</div>
       </div>
 
       <nav id="countryList" class="country-list" aria-label="Countries"></nav>
     </aside>
 
     <main class="main">
-      <section class="player-area">
+      <section class="player-area" aria-live="polite">
         <div class="player-top">
           <div id="nowPlaying" class="now-playing">Choose a channel</div>
           <div class="player-controls">
-            <button id="btnMute" title="Mute/unmute">🔊</button>
+            <button id="btnMute" title="Mute/unmute" aria-pressed="false">🔊</button>
             <button id="btnFullscreen" title="Fullscreen">⤢</button>
           </div>
         </div>
+
         <div class="player-wrap">
           <video id="video" playsinline controls></video>
         </div>
-        <div id="notice" class="notice"></div>
+
+        <div id="notice" class="notice" role="status"></div>
       </section>
 
       <section class="list-area">
-        <div id="channelsGrid" class="channels-grid"></div>
+        <div id="channelsGrid" class="channels-grid" role="list"></div>
       </section>
     </main>
   </div>

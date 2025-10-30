@@ -1,9 +1,11 @@
-// app.js
-// IPTV App — supports Safe and NSFW playlists.
-// Twin Protocol version.
+// app.js — stable fixed version
+// Supports: https://iptv-org.github.io/iptv/index.m3u and index.nsfw.m3u
+// Never prints raw URLs to UI. Use a static server to avoid CORS issues.
 
+// CONFIG
 const M3U_SAFE = 'https://iptv-org.github.io/iptv/index.m3u';
 const M3U_NSFW = 'https://iptv-org.github.io/iptv/index.nsfw.m3u';
+const FETCH_TIMEOUT_MS = 12000; // 12s
 
 // DOM
 const status = document.getElementById('status');
@@ -11,8 +13,10 @@ const channelsGrid = document.getElementById('channelsGrid');
 const countryList = document.getElementById('countryList');
 const countrySelect = document.getElementById('countrySelect');
 const searchInput = document.getElementById('search');
+const contentMode = document.getElementById('contentMode');
 const nowPlaying = document.getElementById('nowPlaying');
 const notice = document.getElementById('notice');
+
 const video = document.getElementById('video');
 const btnMute = document.getElementById('btnMute');
 const btnFullscreen = document.getElementById('btnFullscreen');
@@ -20,28 +24,28 @@ const btnFullscreen = document.getElementById('btnFullscreen');
 let allChannels = [];
 let grouped = {};
 let currentHls = null;
+let lastFilter = { q: '', country: '' };
 
-// === CONTENT FILTER ===
-const filterContainer = document.createElement('div');
-filterContainer.className = 'controls';
-filterContainer.innerHTML = `
-  <label style="font-size:13px;color:var(--muted)">
-    Content:
-    <select id="contentMode">
-      <option value="safe" selected>Safe</option>
-      <option value="nsfw">NSFW</option>
-      <option value="both">Both</option>
-    </select>
-  </label>
-`;
-document.querySelector('.controls').appendChild(filterContainer);
-const contentMode = document.getElementById('contentMode');
+// UTIL
+function setStatus(t){ status.textContent = t || ''; }
+function setNotice(t){ notice.textContent = t || ''; }
+function safe(val){ return (val||'').toString(); }
 
-// helpers
-function setStatus(t){ status.textContent = t; }
-function safeText(s){ return (s||'').toString(); }
+// FETCH WITH TIMEOUT
+async function fetchWithTimeout(url, timeout = FETCH_TIMEOUT_MS){
+  const controller = new AbortController();
+  const id = setTimeout(()=>controller.abort(), timeout);
+  try{
+    const res = await fetch(url, {signal: controller.signal});
+    clearTimeout(id);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.text();
+  }finally{
+    clearTimeout(id);
+  }
+}
 
-// === Parsing ===
+// PARSER
 function parseM3U(text){
   const lines = text.split(/\r?\n/);
   const channels = [];
@@ -58,164 +62,121 @@ function parseM3U(text){
         streamUrl = L;
         break;
       }
-      const titleMatch = info.split(',')[1] || '';
+      const parts = info.split(',');
+      const title = (parts.slice(1).join(',') || '').trim();
       const attrs = {};
       const attrRegex = /([a-zA-Z0-9\-_]+)="([^"]*)"/g;
       let m;
       while ((m = attrRegex.exec(info)) !== null){
         attrs[m[1]] = m[2];
       }
-      const name = (titleMatch || attrs['tvg-name'] || attrs['title'] || 'Unknown').trim();
+      const name = title || attrs['tvg-name'] || attrs['title'] || 'Unknown Channel';
       const country = attrs['tvg-country'] || attrs['group-title'] || 'Other';
       const logo = attrs['tvg-logo'] || '';
-      channels.push({
-        name, country, logo,
-        _url: streamUrl
-      });
+      channels.push({ name: safe(name), country: safe(country), logo: safe(logo), _url: streamUrl });
     }
   }
   return channels;
 }
 
+// GROUP
 function groupByCountry(channels){
   const map = {};
   for (const ch of channels){
     const c = ch.country || 'Other';
-    if (!map[c]) map[c] = [];
-    map[c].push(ch);
+    (map[c] = map[c] || []).push(ch);
   }
-  const ordered = Object.keys(map).sort((a,b)=>{
+  // order with 'Other' last
+  const keys = Object.keys(map).sort((a,b)=>{
     if (a==='Other') return 1;
     if (b==='Other') return -1;
     return a.localeCompare(b);
-  }).reduce((acc,k)=>{ acc[k]=map[k]; return acc; }, {});
+  });
+  const ordered = {};
+  for (const k of keys) ordered[k] = map[k];
   return ordered;
 }
 
-// === UI rendering ===
-function renderCountryList(grouped){
+// RENDER COUNTRIES
+function renderCountryList(groupedObj){
   countryList.innerHTML = '';
   countrySelect.innerHTML = '';
-  const def = document.createElement('option');
-  def.value = ''; def.textContent = 'All countries';
-  countrySelect.appendChild(def);
+  const opt = document.createElement('option'); opt.value=''; opt.textContent='All countries'; countrySelect.appendChild(opt);
 
-  Object.entries(grouped).forEach(([country, arr])=>{
+  Object.entries(groupedObj).forEach(([country, arr])=>{
     const div = document.createElement('div');
     div.className = 'country-item';
     div.dataset.country = country;
-    div.innerHTML = `<span>${country}</span><small style="opacity:.7">${arr.length}</small>`;
-    div.addEventListener('click', ()=>{
+    div.innerHTML = `<span>${escapeHtml(country)}</span><small style="opacity:.7">${arr.length}</small>`;
+    div.addEventListener('click', ()=> {
       document.querySelectorAll('.country-item').forEach(e=>e.classList.remove('active'));
       div.classList.add('active');
       countrySelect.value = country;
-      filterAndShow();
+      applyFilters();
+      // keep focus for keyboard users
+      div.focus();
     });
     countryList.appendChild(div);
 
-    const opt = document.createElement('option');
-    opt.value = country;
-    opt.textContent = `${country} (${arr.length})`;
-    countrySelect.appendChild(opt);
+    const option = document.createElement('option');
+    option.value = country;
+    option.textContent = `${country} (${arr.length})`;
+    countrySelect.appendChild(option);
   });
 }
 
-function renderChannels(channels){
+// RENDER CHANNELS (no URLs shown anywhere)
+function renderChannels(list){
   channelsGrid.innerHTML = '';
-  if (!channels || channels.length===0){
+  if (!list || list.length === 0){
     channelsGrid.innerHTML = `<div style="color:var(--muted);padding:16px">No channels found.</div>`;
     return;
   }
-  for (const ch of channels){
+  const frag = document.createDocumentFragment();
+  for (const ch of list){
     const card = document.createElement('div');
     card.className = 'channel-card';
+    card.tabIndex = 0;
+    card.setAttribute('role','button');
     card.title = ch.name;
+    const logoHtml = ch.logo ? `<img loading="lazy" alt="${escapeHtml(ch.name)}" src="${escapeHtml(ch.logo)}">` : '<svg width="64" height="40" viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="40" rx="6" fill="#0b0b12"/></svg>';
     card.innerHTML = `
-      <div class="channel-logo">${ch.logo ? `<img loading="lazy" alt="${ch.name}" src="${ch.logo}">` : '<svg width="64" height="40"><rect width="64" height="40" rx="6" fill="#0b0b12"/></svg>'}</div>
+      <div class="channel-logo">${logoHtml}</div>
       <div class="channel-meta">
         <div class="channel-name">${escapeHtml(ch.name)}</div>
         <div class="channel-sub">${escapeHtml(ch.country)}</div>
       </div>
     `;
     card.addEventListener('click', ()=> playChannel(ch));
-    channelsGrid.appendChild(card);
+    card.addEventListener('keydown', (ev)=> { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); playChannel(ch);} });
+    frag.appendChild(card);
   }
+  channelsGrid.appendChild(frag);
 }
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
 
-// === Filters & Search ===
-function filterAndShow(){
+// ESCAPE
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// FILTERS (debounced search)
+let searchTimer = null;
+searchInput.addEventListener('input', ()=>{
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(()=> applyFilters(), 180);
+});
+countrySelect.addEventListener('change', ()=> applyFilters());
+contentMode.addEventListener('change', ()=> loadPlaylists()); // change source
+
+function applyFilters(){
   const q = (searchInput.value||'').toLowerCase().trim();
   const country = countrySelect.value;
+  lastFilter.q = q; lastFilter.country = country;
+
   let list = allChannels.slice();
-  if (country) list = list.filter(c=> (c.country||'').toLowerCase() === country.toLowerCase());
-  if (q) list = list.filter(c=> (c.name||'').toLowerCase().includes(q));
+  if (country) list = list.filter(c => (c.country||'').toLowerCase() === country.toLowerCase());
+  if (q) list = list.filter(c => (c.name||'').toLowerCase().includes(q) || (c.country||'').toLowerCase().includes(q));
   renderChannels(list);
 }
 
-// === Playback ===
-function playChannel(ch){
-  nowPlaying.textContent = `${ch.name} — ${ch.country}`;
-  notice.textContent = '';
-  if (currentHls){ try{currentHls.destroy();}catch{} currentHls=null; }
-  const url = ch._url;
-  if (video.canPlayType('application/vnd.apple.mpegurl') && !window.Hls){
-    video.src = url;
-    video.play().catch(()=>{ notice.textContent='Click to start playback.'; });
-  }else if (window.Hls && Hls.isSupported()){
-    currentHls = new Hls();
-    currentHls.loadSource(url);
-    currentHls.attachMedia(video);
-    currentHls.on(Hls.Events.MANIFEST_PARSED, ()=> video.play().catch(()=>{ notice.textContent='Click to play.'; }));
-    currentHls.on(Hls.Events.ERROR,(e,data)=>{
-      if (data && /network|manifest|frag/.test(data.details))
-        notice.textContent = 'Cannot play (CORS or host blocked).';
-    });
-  }else{
-    video.src = url;
-    video.play().catch(()=>{ notice.textContent='Browser cannot play this stream.'; });
-  }
-}
-
-// === Controls ===
-btnMute.addEventListener('click',()=>{ video.muted=!video.muted; btnMute.textContent=video.muted?'🔇':'🔊'; });
-btnFullscreen.addEventListener('click',()=>{ if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>{}); });
-searchInput.addEventListener('input',()=> filterAndShow());
-countrySelect.addEventListener('change',()=> filterAndShow());
-contentMode.addEventListener('change',()=> boot()); // reload playlists
-
-// === Loader ===
-async function fetchPlaylist(url){
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return await r.text();
-}
-
-async function boot(){
-  try{
-    setStatus('Fetching playlists...');
-    channelsGrid.innerHTML = '';
-    const mode = contentMode.value;
-
-    let textSafe = '', textNsfw = '';
-    if (mode==='safe' || mode==='both') textSafe = await fetchPlaylist(M3U_SAFE);
-    if (mode==='nsfw' || mode==='both') textNsfw = await fetchPlaylist(M3U_NSFW);
-
-    const safeCh = textSafe ? parseM3U(textSafe) : [];
-    const nsfwCh = textNsfw ? parseM3U(textNsfw) : [];
-
-    allChannels = [...safeCh, ...nsfwCh];
-    grouped = groupByCountry(allChannels);
-
-    setStatus(`Loaded ${allChannels.length} channels (${mode.toUpperCase()})`);
-    renderCountryList(grouped);
-    renderChannels(allChannels);
-  }catch(e){
-    console.error(e);
-    setStatus('Failed to load playlists.');
-    notice.textContent = 'If blocked by CORS, run locally via a small HTTP server.';
-  }
-}
-
-boot();
-window.__IPTV = {boot,parseM3U,groupByCountry};
+// PLAYBACK — keeps URL internal
+function teardownHls(){
+  if (currentHls){
