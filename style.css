@@ -1,48 +1,98 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
-:root{
-  --bg:#050508; --panel:#0f1116; --card:#12121a;
-  --accent:#e50914; --muted:#9aa0a6; --text:#fff;
+body {
+  margin: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: "Poppins", sans-serif;
 }
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Poppins,system-ui,Arial;color:var(--text);background:linear-gradient(180deg,#071019 0%, #050508 100%)}
-.app{min-height:100vh;display:flex;flex-direction:column}
-/* topbar */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:linear-gradient(90deg, rgba(229,9,20,0.06), rgba(55,0,255,0.03));gap:12px}
-.left{display:flex;flex-direction:column}
-.logo{font-weight:700;letter-spacing:1px;font-size:1.15rem}
-.small{font-size:0.8rem;color:var(--muted)}
-.controls{display:flex;gap:8px;align-items:center}
-.controls input, .controls select, .controls button{background:var(--card);border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;color:var(--text);min-width:120px}
-.controls button{cursor:pointer}
 
-/* content */
-.content{padding:14px;flex:1;overflow:auto}
-.status{color:var(--muted);padding:28px;text-align:center}
-.section{margin-bottom:22px}
-.section h2{margin:0 0 10px 6px;color:var(--accent);font-size:1.05rem}
-.row{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-behavior:smooth}
-.card{flex:0 0 180px;background:var(--panel);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform .18s,box-shadow .18s;padding-bottom:6px}
-.card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.6)}
-.thumb{width:100%;height:110px;object-fit:cover;background:#000}
-.meta{padding:8px}
-.title{font-weight:600;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.subtitle{font-size:0.78rem;color:var(--muted);margin-top:6px}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background: linear-gradient(to right, #000, #1a1a1a);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-/* modal player */
-.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);z-index:60}
-.modal.hidden{display:none}
-.playerCard{width:92%;max-width:980px;background:linear-gradient(180deg,#0b0b10,#09090c);padding:14px;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.7)}
-.close{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text);padding:6px 10px;border-radius:8px;cursor:pointer;float:right}
-.nowPlaying{font-weight:700;margin-bottom:8px}
-.videoWrap{background:#000;border-radius:8px;padding:6px}
-video{width:100%;height:480px;max-height:65vh;border-radius:6px;background:#000}
-.playerNotice{color:var(--muted);font-size:0.9rem;margin-top:8px}
+header h1 {
+  color: #e50914;
+  font-size: 1.5em;
+  letter-spacing: 1px;
+}
 
-/* footer */
-.footer{text-align:center;padding:8px;color:var(--muted);font-size:0.9rem;border-top:1px solid rgba(255,255,255,0.02)}
+header input, header select {
+  background: #111;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
 
-/* responsive */
-@media (max-width:900px){
-  .card{flex:0 0 140px}
-  video{height:320px}
+#channels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 20px;
+}
+
+.channel {
+  background: #111;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.channel:hover {
+  transform: scale(1.05);
+}
+
+.channel img {
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+  background: #000;
+}
+
+.channel p {
+  text-align: center;
+  padding: 8px;
+  font-size: 0.9em;
+  color: #ddd;
+}
+
+#playerContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#playerContainer.hidden {
+  display: none;
+}
+
+#player {
+  width: 90%;
+  height: 70%;
+  border-radius: 8px;
+  background: #000;
+}
+
+#closePlayer {
+  background: #e50914;
+  border: none;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+  cursor: pointer;
 }

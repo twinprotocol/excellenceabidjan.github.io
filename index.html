@@ -1,47 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>IPTV World — Twin Protocol</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- HLS player (used when native HLS not supported) -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
-  <!-- fetch + cache helper (must be loaded before app) -->
-  <script src="fetch_channels.js"></script>
-  <!-- main app -->
-  <script src="app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTV World</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app">
-    <header class="topbar">
-      <div class="left">
-        <div class="logo">IPTV World</div>
-        <div class="small">Twin Protocol</div>
-      </div>
+  <header>
+    <h1>IPTV World</h1>
+    <input type="text" id="search" placeholder="Search channel..." />
+    <select id="countrySelect"></select>
+  </header>
 
-      <div class="controls">
-        <input id="search" placeholder="Search channels, countries, categories..." />
-        <select id="countrySelect"><option value="">All countries</option></select>
-        <select id="contentMode" title="Content"><option value="both" selected>Both</option><option value="safe">Safe</option><option value="nsfw">NSFW</option></select>
-        <button id="refreshBtn" title="Refresh channels">Refresh</button>
-      </div>
-    </header>
+  <main id="channels"></main>
 
-    <main id="content" class="content">
-      <div id="status" class="status">Initializing…</div>
-    </main>
-
-    <div id="playerModal" class="modal hidden" role="dialog" aria-modal="true">
-      <div class="playerCard">
-        <button id="closePlayer" class="close">✖</button>
-        <div id="nowPlaying" class="nowPlaying">—</div>
-        <div class="videoWrap"><video id="video" playsinline controls></video></div>
-        <div id="playerNotice" class="playerNotice"></div>
-      </div>
-    </div>
-
-    <footer class="footer">© Twin Protocol — cached JSON mode</footer>
+  <div id="playerContainer" class="hidden">
+    <video id="player" controls autoplay></video>
+    <button id="closePlayer">✖</button>
   </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
