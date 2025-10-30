@@ -1,75 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>World IPTV — Twin Protocol</title>
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css" />
-
-  <!-- hls.js for HLS playback -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js" defer></script>
-
-  <!-- App -->
-  <script src="app.js" defer></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPTV World</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="logo">TP</div>
-        <div>
-          <h1>WORLD IPTV</h1>
-          <div class="sub">Channels by country — NSFW optional — no raw links</div>
-        </div>
-      </div>
+  <header>
+    <h1>IPTV World</h1>
+    <div class="controls">
+      <input id="search" type="text" placeholder="Search channel..." />
+      <select id="countrySelect"></select>
+      <select id="categorySelect"></select>
+    </div>
+  </header>
 
-      <div class="controls">
-        <input id="search" placeholder="Search channels or country..." aria-label="Search" />
-        <div class="row">
-          <label for="contentMode">Content</label>
-          <select id="contentMode" title="Content mode">
-            <option value="both" selected>Both</option>
-            <option value="safe">Safe only</option>
-            <option value="nsfw">NSFW only</option>
-          </select>
-        </div>
+  <main>
+    <div id="status">Loading channels…</div>
+    <div id="channelsGrid"></div>
+  </main>
 
-        <div class="row">
-          <label for="countrySelect">Country</label>
-          <select id="countrySelect"><option value="">All countries</option></select>
-        </div>
-
-        <div id="status" class="status">Initializing…</div>
-      </div>
-
-      <nav id="countryList" class="country-list" aria-label="Countries"></nav>
-      <div class="footer-note">Tip: Run <code>python proxy.py</code> in this folder, then open <b>http://localhost:8000</b></div>
-    </aside>
-
-    <main class="main">
-      <section class="player-area">
-        <div class="player-top">
-          <div id="nowPlaying" class="now-playing">Choose a channel</div>
-          <div class="player-controls">
-            <button id="btnMute" title="Mute/unmute" aria-pressed="false">🔊</button>
-            <button id="btnFullscreen" title="Fullscreen">⤢</button>
-          </div>
-        </div>
-
-        <div class="player-wrap">
-          <video id="video" playsinline controls></video>
-        </div>
-
-        <div id="notice" class="notice" role="status"></div>
-      </section>
-
-      <section class="list-area">
-        <h2 id="listTitle">Channels</h2>
-        <div id="channelsGrid" class="channels-grid" role="list"></div>
-      </section>
-    </main>
+  <div id="playerModal" class="hidden">
+    <video id="videoPlayer" controls autoplay></video>
+    <button id="closePlayer">✕</button>
   </div>
+
+  <footer>© Twin Protocol • Powered by iptv-org</footer>
+  <script src="script.js"></script>
 </body>
 </html>
