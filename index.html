@@ -1,25 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IPTV World</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPTV World</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>IPTV World</h1>
-    <input type="text" id="search" placeholder="Search channel..." />
+
+<header class="navbar">
+  <h1 class="logo">IPTV<span>World</span></h1>
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search channels..." />
     <select id="countrySelect"></select>
-  </header>
-
-  <main id="channels"></main>
-
-  <div id="playerContainer" class="hidden">
-    <video id="player" controls autoplay></video>
-    <button id="closePlayer">✖</button>
   </div>
+</header>
 
-  <script src="app.js"></script>
+<div class="hero">
+  <div class="hero-overlay"></div>
+  <h2>Watch Live Channels from Around the World</h2>
+</div>
+
+<main id="categories" class="categories"></main>
+
+<div id="playerContainer" class="player hidden">
+  <video id="player" controls autoplay></video>
+  <button id="closePlayer">×</button>
+</div>
+
+<footer>
+  <p>Powered by IPTV-Org | Safe Channels 🌍</p>
+</footer>
+
+<script src="app.js"></script>
 </body>
 </html>
