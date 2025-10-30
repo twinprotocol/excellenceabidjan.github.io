@@ -1,11 +1,15 @@
 const SAFE_URL = "https://iptv-org.github.io/iptv/index.m3u";
 const NSFW_URL = "https://iptv-org.github.io/iptv/index.nsfw.m3u";
 
+// multiple fallbacks for reliability
 const PROXIES = [
   "https://corsproxy.io/?",
   "https://thingproxy.freeboard.io/fetch/",
   "https://api.allorigins.win/raw?url="
 ];
+
+const FALLBACK_JSON =
+  "https://iptv-org.github.io/api/channels.json"; // permanent backup
 
 const searchInput = document.getElementById("search");
 const countrySelect = document.getElementById("countrySelect");
@@ -24,7 +28,7 @@ async function fetchWithFallback(url) {
       if (res.ok) return await res.text();
     } catch (e) {}
   }
-  throw new Error("Failed to load playlist via proxies");
+  throw new Error("All proxies failed");
 }
 
 function parseM3U(text) {
@@ -45,19 +49,14 @@ function parseM3U(text) {
   return ch;
 }
 
-function groupByCategory(list) {
+function render(list) {
+  content.innerHTML = "";
   const grouped = {};
   list.forEach(ch => {
     const cat = ch.category || "General";
     if (!grouped[cat]) grouped[cat] = [];
     grouped[cat].push(ch);
   });
-  return grouped;
-}
-
-function render(list) {
-  content.innerHTML = "";
-  const grouped = groupByCategory(list);
   Object.entries(grouped).forEach(([cat, chans]) => {
     const section = document.createElement("div");
     section.className = "section";
@@ -79,6 +78,16 @@ function render(list) {
   });
 }
 
+function fillSelect(select, items, label) {
+  select.innerHTML = `<option value="">All ${label}</option>`;
+  items.forEach(i => {
+    const o = document.createElement("option");
+    o.value = i;
+    o.textContent = i;
+    select.appendChild(o);
+  });
+}
+
 function filter() {
   const q = searchInput.value.toLowerCase();
   const country = countrySelect.value;
@@ -89,16 +98,6 @@ function filter() {
     (cat === "" || c.category === cat)
   );
   render(filtered);
-}
-
-function fillSelect(select, items, label) {
-  select.innerHTML = `<option value="">All ${label}</option>`;
-  items.forEach(i => {
-    const o = document.createElement("option");
-    o.value = i;
-    o.textContent = i;
-    select.appendChild(o);
-  });
 }
 
 function playChannel(url) {
@@ -112,21 +111,39 @@ closePlayer.onclick = () => {
   player.pause();
   player.src = "";
 };
+
 searchInput.oninput = filter;
 countrySelect.onchange = filter;
 categorySelect.onchange = filter;
 
-(async function init() {
+async function loadChannels() {
   try {
+    // try m3u playlists first
     const safe = await fetchWithFallback(SAFE_URL);
     const nsfw = await fetchWithFallback(NSFW_URL);
-    allChannels = [...parseM3U(safe), ...parseM3U(nsfw)];
+    return [...parseM3U(safe), ...parseM3U(nsfw)];
+  } catch (e) {
+    console.warn("Fallback to JSON source", e);
+    // fallback to JSON API if M3U fails
+    const res = await fetch(FALLBACK_JSON);
+    const json = await res.json();
+    return json.map(c => ({
+      name: c.name,
+      country: c.country || "Unknown",
+      logo: c.logo || "",
+      url: c.url_resolved || "",
+      category: c.categories && c.categories[0] ? c.categories[0] : "General"
+    }));
+  }
+}
 
+(async function init() {
+  try {
+    allChannels = await loadChannels();
     const countries = [...new Set(allChannels.map(c => c.country))].sort();
     const cats = [...new Set(allChannels.map(c => c.category))].sort();
     fillSelect(countrySelect, countries, "countries");
     fillSelect(categorySelect, cats, "categories");
-
     render(allChannels);
   } catch (err) {
     console.error(err);
