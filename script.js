@@ -1,3 +1,7 @@
+const PROXY = "https://api.allorigins.win/raw?url=";
+const SAFE_URL = PROXY + "https://iptv-org.github.io/api/channels.json";
+const NSFW_URL = PROXY + "https://iptv-org.github.io/api/nsfw.json";
+
 const SAFE_URL = "https://iptv-org.github.io/api/channels.json";
 const NSFW_URL = "https://iptv-org.github.io/api/nsfw.json";
 
