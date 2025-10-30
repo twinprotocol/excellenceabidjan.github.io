@@ -1,49 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>World IPTV – Twin Protocol</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10" defer></script>
-  <script src="script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IPTV World — Twin Protocol</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
-    <h1>🌐 World IPTV</h1>
-    <p>Watch worldwide channels by country — no links, just play.</p>
+    <h1>🌍 IPTV World</h1>
+    <select id="contentMode">
+      <option value="safe" selected>Safe</option>
+      <option value="nsfw">NSFW</option>
+      <option value="both">Both</option>
+    </select>
+    <input id="search" type="text" placeholder="Search channel..." />
+    <select id="countrySelect"></select>
   </header>
 
-  <div class="controls">
-    <input id="search" placeholder="🔎 Search channel or country...">
-    <select id="contentMode">
-      <option value="safe">🌍 Safe</option>
-      <option value="nsfw">🔞 NSFW</option>
-      <option value="both" selected>🌐 Both</option>
-    </select>
-    <select id="countrySelect">
-      <option value="">All Countries</option>
-    </select>
-  </div>
-
   <main>
-    <aside id="countryList"></aside>
-    <section class="channels">
-      <h2 id="sectionTitle">All Channels</h2>
-      <div id="channelsGrid" class="grid"></div>
-    </section>
+    <div id="status">Loading channels...</div>
+    <div id="channelsGrid"></div>
   </main>
 
   <footer>
-    <p>Created by <b>Twin Protocol</b> — powered by <a href="https://iptv-org.github.io/" target="_blank">IPTV-org</a></p>
+    <p>Powered by <b>Twin Protocol</b> • IPTV-org API</p>
   </footer>
 
-  <div id="playerModal" class="modal hidden">
-    <div class="player">
-      <button id="closePlayer">✖</button>
-      <h3 id="nowPlaying">Loading...</h3>
-      <video id="video" controls autoplay></video>
-    </div>
-  </div>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="app.js"></script>
 </body>
 </html>
