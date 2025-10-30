@@ -1,31 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IPTV World</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <h1>IPTV World</h1>
-    <div class="controls">
-      <input id="search" type="text" placeholder="Search channel...">
-      <select id="countrySelect"></select>
-      <select id="categorySelect"></select>
-    </div>
+    <input type="text" id="search" placeholder="Search channel..." />
+    <select id="countrySelect"></select>
   </header>
 
-  <main id="content">
-    <div class="loader">Loading channels...</div>
-  </main>
+  <main id="channels"></main>
 
-  <div id="playerModal" class="hidden">
-    <video id="videoPlayer" controls autoplay></video>
-    <button id="closePlayer">✕</button>
+  <div id="playerContainer" class="hidden">
+    <video id="player" controls autoplay></video>
+    <button id="closePlayer">✖</button>
   </div>
-
-  <footer>© Twin Protocol • Powered by iptv-org</footer>
 
   <script src="script.js"></script>
 </body>
