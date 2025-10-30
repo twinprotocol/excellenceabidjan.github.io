@@ -1,182 +1,158 @@
-// app.js — stable fixed version
-// Supports: https://iptv-org.github.io/iptv/index.m3u and index.nsfw.m3u
-// Never prints raw URLs to UI. Use a static server to avoid CORS issues.
+const PROXY = "https://cors-proxy.fringe.zone/?";
+const M3U_SAFE = PROXY + "https://iptv-org.github.io/iptv/index.m3u";
+const M3U_NSFW = PROXY + "https://iptv-org.github.io/iptv/index.nsfw.m3u";
 
-// CONFIG
-const M3U_SAFE = 'https://iptv-org.github.io/iptv/index.m3u';
-const M3U_NSFW = 'https://iptv-org.github.io/iptv/index.nsfw.m3u';
-const FETCH_TIMEOUT_MS = 12000; // 12s
+const searchInput = document.getElementById("search");
+const countrySelect = document.getElementById("countrySelect");
+const countryList = document.getElementById("countryList");
+const contentMode = document.getElementById("contentMode");
+const grid = document.getElementById("channelsGrid");
+const sectionTitle = document.getElementById("sectionTitle");
 
-// DOM
-const status = document.getElementById('status');
-const channelsGrid = document.getElementById('channelsGrid');
-const countryList = document.getElementById('countryList');
-const countrySelect = document.getElementById('countrySelect');
-const searchInput = document.getElementById('search');
-const contentMode = document.getElementById('contentMode');
-const nowPlaying = document.getElementById('nowPlaying');
-const notice = document.getElementById('notice');
+const modal = document.getElementById("playerModal");
+const closeBtn = document.getElementById("closePlayer");
+const video = document.getElementById("video");
+const nowPlaying = document.getElementById("nowPlaying");
 
-const video = document.getElementById('video');
-const btnMute = document.getElementById('btnMute');
-const btnFullscreen = document.getElementById('btnFullscreen');
-
-let allChannels = [];
+let all = [];
 let grouped = {};
 let currentHls = null;
-let lastFilter = { q: '', country: '' };
 
-// UTIL
-function setStatus(t){ status.textContent = t || ''; }
-function setNotice(t){ notice.textContent = t || ''; }
-function safe(val){ return (val||'').toString(); }
-
-// FETCH WITH TIMEOUT
-async function fetchWithTimeout(url, timeout = FETCH_TIMEOUT_MS){
-  const controller = new AbortController();
-  const id = setTimeout(()=>controller.abort(), timeout);
-  try{
-    const res = await fetch(url, {signal: controller.signal});
-    clearTimeout(id);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.text();
-  }finally{
-    clearTimeout(id);
-  }
+// =============== FETCH + PARSE ===============
+async function loadM3U(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch playlist");
+  return await res.text();
 }
 
-// PARSER
-function parseM3U(text){
-  const lines = text.split(/\r?\n/);
+function parseM3U(data) {
+  const lines = data.split("\n");
   const channels = [];
-  for (let i=0;i<lines.length;i++){
+  for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    if (!line) continue;
-    if (line.startsWith('#EXTINF')){
-      const info = line;
-      let streamUrl = '';
-      for (let j=i+1;j<lines.length;j++){
-        const L = lines[j].trim();
-        if (!L) continue;
-        if (L.startsWith('#')) continue;
-        streamUrl = L;
-        break;
-      }
-      const parts = info.split(',');
-      const title = (parts.slice(1).join(',') || '').trim();
+    if (line.startsWith("#EXTINF")) {
+      const next = lines[i + 1] ? lines[i + 1].trim() : "";
       const attrs = {};
-      const attrRegex = /([a-zA-Z0-9\-_]+)="([^"]*)"/g;
-      let m;
-      while ((m = attrRegex.exec(info)) !== null){
-        attrs[m[1]] = m[2];
-      }
-      const name = title || attrs['tvg-name'] || attrs['title'] || 'Unknown Channel';
-      const country = attrs['tvg-country'] || attrs['group-title'] || 'Other';
-      const logo = attrs['tvg-logo'] || '';
-      channels.push({ name: safe(name), country: safe(country), logo: safe(logo), _url: streamUrl });
+      line.replace(/([a-zA-Z0-9-]+)="([^"]*)"/g, (_, k, v) => (attrs[k] = v));
+      const name = (line.split(",")[1] || attrs["tvg-name"] || "Unknown").trim();
+      const country = attrs["tvg-country"] || "Other";
+      const logo = attrs["tvg-logo"] || "";
+      channels.push({ name, country, logo, url: next });
     }
   }
   return channels;
 }
 
-// GROUP
-function groupByCountry(channels){
+// =============== UI BUILDERS ===============
+function groupByCountry(channels) {
   const map = {};
-  for (const ch of channels){
-    const c = ch.country || 'Other';
-    (map[c] = map[c] || []).push(ch);
-  }
-  // order with 'Other' last
-  const keys = Object.keys(map).sort((a,b)=>{
-    if (a==='Other') return 1;
-    if (b==='Other') return -1;
-    return a.localeCompare(b);
+  channels.forEach((c) => {
+    (map[c.country] = map[c.country] || []).push(c);
   });
-  const ordered = {};
-  for (const k of keys) ordered[k] = map[k];
-  return ordered;
+  return map;
 }
 
-// RENDER COUNTRIES
-function renderCountryList(groupedObj){
-  countryList.innerHTML = '';
-  countrySelect.innerHTML = '';
-  const opt = document.createElement('option'); opt.value=''; opt.textContent='All countries'; countrySelect.appendChild(opt);
+function renderCountries() {
+  countryList.innerHTML = "";
+  countrySelect.innerHTML = '<option value="">All Countries</option>';
+  Object.keys(grouped)
+    .sort()
+    .forEach((c) => {
+      const div = document.createElement("div");
+      div.className = "country-item";
+      div.textContent = `${c} (${grouped[c].length})`;
+      div.onclick = () => {
+        document.querySelectorAll(".country-item").forEach((x) => x.classList.remove("active"));
+        div.classList.add("active");
+        countrySelect.value = c;
+        renderChannels();
+      };
+      countryList.appendChild(div);
 
-  Object.entries(groupedObj).forEach(([country, arr])=>{
-    const div = document.createElement('div');
-    div.className = 'country-item';
-    div.dataset.country = country;
-    div.innerHTML = `<span>${escapeHtml(country)}</span><small style="opacity:.7">${arr.length}</small>`;
-    div.addEventListener('click', ()=> {
-      document.querySelectorAll('.country-item').forEach(e=>e.classList.remove('active'));
-      div.classList.add('active');
-      countrySelect.value = country;
-      applyFilters();
-      // keep focus for keyboard users
-      div.focus();
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      countrySelect.appendChild(opt);
     });
-    countryList.appendChild(div);
-
-    const option = document.createElement('option');
-    option.value = country;
-    option.textContent = `${country} (${arr.length})`;
-    countrySelect.appendChild(option);
-  });
 }
 
-// RENDER CHANNELS (no URLs shown anywhere)
-function renderChannels(list){
-  channelsGrid.innerHTML = '';
-  if (!list || list.length === 0){
-    channelsGrid.innerHTML = `<div style="color:var(--muted);padding:16px">No channels found.</div>`;
-    return;
-  }
-  const frag = document.createDocumentFragment();
-  for (const ch of list){
-    const card = document.createElement('div');
-    card.className = 'channel-card';
-    card.tabIndex = 0;
-    card.setAttribute('role','button');
-    card.title = ch.name;
-    const logoHtml = ch.logo ? `<img loading="lazy" alt="${escapeHtml(ch.name)}" src="${escapeHtml(ch.logo)}">` : '<svg width="64" height="40" viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="40" rx="6" fill="#0b0b12"/></svg>';
-    card.innerHTML = `
-      <div class="channel-logo">${logoHtml}</div>
-      <div class="channel-meta">
-        <div class="channel-name">${escapeHtml(ch.name)}</div>
-        <div class="channel-sub">${escapeHtml(ch.country)}</div>
-      </div>
-    `;
-    card.addEventListener('click', ()=> playChannel(ch));
-    card.addEventListener('keydown', (ev)=> { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); playChannel(ch);} });
-    frag.appendChild(card);
-  }
-  channelsGrid.appendChild(frag);
-}
-
-// ESCAPE
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-// FILTERS (debounced search)
-let searchTimer = null;
-searchInput.addEventListener('input', ()=>{
-  if (searchTimer) clearTimeout(searchTimer);
-  searchTimer = setTimeout(()=> applyFilters(), 180);
-});
-countrySelect.addEventListener('change', ()=> applyFilters());
-contentMode.addEventListener('change', ()=> loadPlaylists()); // change source
-
-function applyFilters(){
-  const q = (searchInput.value||'').toLowerCase().trim();
+function renderChannels() {
+  grid.innerHTML = "";
+  const search = searchInput.value.toLowerCase();
   const country = countrySelect.value;
-  lastFilter.q = q; lastFilter.country = country;
+  const list = all.filter(
+    (ch) =>
+      (!country || ch.country === country) &&
+      (ch.name.toLowerCase().includes(search) || ch.country.toLowerCase().includes(search))
+  );
 
-  let list = allChannels.slice();
-  if (country) list = list.filter(c => (c.country||'').toLowerCase() === country.toLowerCase());
-  if (q) list = list.filter(c => (c.name||'').toLowerCase().includes(q) || (c.country||'').toLowerCase().includes(q));
-  renderChannels(list);
+  sectionTitle.textContent = country || "All Channels";
+
+  list.forEach((ch) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${ch.logo || "https://via.placeholder.com/300x150?text=No+Logo"}" alt="${ch.name}">
+      <h3>${ch.name}</h3>
+      <p style="font-size:0.8em;color:#999">${ch.country}</p>`;
+    card.onclick = () => play(ch);
+    grid.appendChild(card);
+  });
+
+  if (!list.length) grid.innerHTML = "<p>No channels found.</p>";
 }
 
-// PLAYBACK — keeps URL internal
-function teardownHls(){
-  if (currentHls){
+// =============== PLAYER ===============
+function play(ch) {
+  nowPlaying.textContent = `${ch.name} (${ch.country})`;
+  modal.classList.remove("hidden");
+
+  if (Hls.isSupported()) {
+    if (currentHls) currentHls.destroy();
+    currentHls = new Hls();
+    currentHls.loadSource(ch.url);
+    currentHls.attachMedia(video);
+    currentHls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+  } else {
+    video.src = ch.url;
+    video.play();
+  }
+}
+
+closeBtn.onclick = () => {
+  modal.classList.add("hidden");
+  video.pause();
+  if (currentHls) currentHls.destroy();
+};
+
+// =============== LOAD DATA ===============
+async function loadAll() {
+  try {
+    const mode = contentMode.value;
+    let safe = [],
+      nsfw = [];
+    if (mode === "safe" || mode === "both") {
+      const s = await loadM3U(M3U_SAFE);
+      safe = parseM3U(s);
+    }
+    if (mode === "nsfw" || mode === "both") {
+      const n = await loadM3U(M3U_NSFW);
+      nsfw = parseM3U(n);
+    }
+    all = [...safe, ...nsfw];
+    grouped = groupByCountry(all);
+    renderCountries();
+    renderChannels();
+  } catch (e) {
+    grid.innerHTML = `<p style="color:red;">Error loading channels. Try refreshing.</p>`;
+    console.error(e);
+  }
+}
+
+// =============== EVENTS ===============
+searchInput.oninput = () => renderChannels();
+countrySelect.onchange = () => renderChannels();
+contentMode.onchange = () => loadAll();
+
+// START
+loadAll();
