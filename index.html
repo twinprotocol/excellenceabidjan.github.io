@@ -3,35 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IPTV World</title>
+<title>IPTV World v3</title>
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
+<script src="app.js" defer></script>
 </head>
 <body>
 
 <header class="navbar">
   <h1 class="logo">IPTV<span>World</span></h1>
   <div class="controls">
-    <input type="text" id="search" placeholder="Search channels..." />
-    <select id="countrySelect"></select>
+    <input type="text" id="search" placeholder="Search channels...">
   </div>
 </header>
 
-<div class="hero">
-  <div class="hero-overlay"></div>
-  <h2>Watch Live Channels from Around the World</h2>
-</div>
-
 <main id="categories" class="categories"></main>
+<div id="channels" class="channels hidden"></div>
 
-<div id="playerContainer" class="player hidden">
-  <video id="player" controls autoplay></video>
-  <button id="closePlayer">×</button>
+<div id="playerModal" class="playerModal hidden">
+  <div class="playerCard">
+    <button id="closeBtn" class="closeBtn">✕</button>
+    <div id="nowPlaying" class="nowPlaying"></div>
+    <div class="videoWrap"><video id="video" controls playsinline></video></div>
+    <div id="playerNotice" class="playerNotice"></div>
+  </div>
 </div>
 
-<footer>
-  <p>Powered by IPTV-Org | Safe Channels 🌍</p>
-</footer>
-
-<script src="app.js"></script>
+<footer>© IPTV World v3 — Safe Channels</footer>
 </body>
 </html>
