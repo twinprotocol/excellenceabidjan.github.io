@@ -4,8 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>World IPTV — Twin Protocol</title>
+
+  <!-- Styles -->
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- hls.js for HLS playback -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js" defer></script>
+
+  <!-- App -->
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -15,25 +21,31 @@
         <div class="logo">TP</div>
         <div>
           <h1>WORLD IPTV</h1>
-          <div class="sub">Channels by country — no raw links</div>
+          <div class="sub">Channels by country — NSFW optional — no raw links</div>
         </div>
       </div>
 
       <div class="controls">
-        <input id="search" placeholder="Search channels or country..." />
-        <select id="contentMode" title="Choose content">
-          <option value="safe">Safe</option>
-          <option value="nsfw">NSFW</option>
-          <option value="both" selected>Both</option>
-        </select>
-        <select id="countrySelect" title="Filter by country">
-          <option value="">All countries</option>
-        </select>
+        <input id="search" placeholder="Search channels or country..." aria-label="Search" />
+        <div class="row">
+          <label for="contentMode">Content</label>
+          <select id="contentMode" title="Content mode">
+            <option value="both" selected>Both</option>
+            <option value="safe">Safe only</option>
+            <option value="nsfw">NSFW only</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="countrySelect">Country</label>
+          <select id="countrySelect"><option value="">All countries</option></select>
+        </div>
+
         <div id="status" class="status">Initializing…</div>
       </div>
 
       <nav id="countryList" class="country-list" aria-label="Countries"></nav>
-      <div class="footer-note">Tip: run with <code>python -m http.server</code> if any fetch fails.</div>
+      <div class="footer-note">Tip: Run <code>python proxy.py</code> in this folder, then open <b>http://localhost:8000</b></div>
     </aside>
 
     <main class="main">
@@ -41,7 +53,7 @@
         <div class="player-top">
           <div id="nowPlaying" class="now-playing">Choose a channel</div>
           <div class="player-controls">
-            <button id="btnMute" title="Mute/unmute">🔊</button>
+            <button id="btnMute" title="Mute/unmute" aria-pressed="false">🔊</button>
             <button id="btnFullscreen" title="Fullscreen">⤢</button>
           </div>
         </div>
@@ -50,12 +62,12 @@
           <video id="video" playsinline controls></video>
         </div>
 
-        <div id="notice" class="notice"></div>
+        <div id="notice" class="notice" role="status"></div>
       </section>
 
       <section class="list-area">
         <h2 id="listTitle">Channels</h2>
-        <div id="channelsGrid" class="channels-grid"></div>
+        <div id="channelsGrid" class="channels-grid" role="list"></div>
       </section>
     </main>
   </div>

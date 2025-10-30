@@ -1,19 +1,8 @@
-// app.js — Twin Protocol final
-// Cyberpunk UI + robust multi-proxy loader + internal HLS playback
-// No raw URLs are displayed in the UI.
+// app.js — final, local-proxy aware, grouped by country, internal HLS player
+// Uses local proxy endpoint: /proxy?url=<encodedPlaylistURL>
 
 const PLAYLIST_SAFE = 'https://iptv-org.github.io/iptv/index.m3u';
 const PLAYLIST_NSFW = 'https://iptv-org.github.io/iptv/index.nsfw.m3u';
-
-// Proxy fallbacks (tried in order). This increases chance the playlist loads.
-const PROXIES = [
-  (u)=>u, // direct
-  (u)=>`https://r.jina.ai/http://${u.replace(/^https?:\/\//,'')}`, // jina.ai proxy
-  (u)=>`https://r.jina.ai/http://${u.replace(/^https?:\/\//,'')}`, // duplicate intentional (some envs)
-  (u)=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  (u)=>`https://thingproxy.freeboard.io/fetch/${u}`,
-  (u)=>`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
-];
 
 // DOM
 const statusEl = document.getElementById('status');
@@ -33,37 +22,21 @@ let allChannels = [];
 let grouped = {};
 let currentHls = null;
 
-// Small helper
-function setStatus(text){ statusEl.textContent = text || ''; }
-function setNotice(text){ if(notice) notice.textContent = text || ''; }
+// helpers
+function setStatus(t){ statusEl.textContent = t || ''; }
+function setNotice(t){ if (notice) notice.textContent = t || ''; }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-// Try multiple proxy endpoints until one returns text
-async function fetchWithProxies(url, timeout = 15000){
-  let lastErr = null;
-  for (const makeUrl of PROXIES){
-    const target = makeUrl(url);
-    try{
-      setStatus(`Fetching playlist (${shortName(target)})`);
-      const controller = new AbortController();
-      const id = setTimeout(()=>controller.abort(), timeout);
-      const res = await fetch(target, { signal: controller.signal });
-      clearTimeout(id);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      // quick sanity: must contain "#EXTINF"
-      if (text && text.includes('#EXTINF')) return text;
-      else throw new Error('no EXTINF in response');
-    }catch(err){
-      lastErr = err;
-      console.warn('proxy failed', target, err);
-      // try next
-    }
-  }
-  throw lastErr;
+// fetch via local proxy (guaranteed if proxy.py is running)
+async function fetchPlaylist(url){
+  // proxy endpoint served by proxy.py
+  const prox = `/proxy?url=${encodeURIComponent(url)}`;
+  const res = await fetch(prox);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.text();
 }
-function shortName(u){ try { const o=new URL(u); return o.hostname; } catch(e){ return u.slice(0,40); } }
 
-// Parse M3U - returns channels array with internal _url
+// parse M3U into channel objects
 function parseM3U(text){
   const lines = text.split(/\r?\n/);
   const channels = [];
@@ -72,8 +45,8 @@ function parseM3U(text){
     if (!line) continue;
     if (line.startsWith('#EXTINF')){
       const info = line;
+      // next non-empty non-comment line is URL
       let streamUrl = '';
-      // find next non-empty non-comment line
       for (let j=i+1;j<lines.length;j++){
         const L = lines[j].trim();
         if (!L) continue;
@@ -97,17 +70,15 @@ function parseM3U(text){
   return channels;
 }
 
-// Group and render
 function groupByCountry(channels){
   const map = {};
   channels.forEach(ch => {
     const c = ch.country || 'Other';
     (map[c] = map[c] || []).push(ch);
   });
-  // order keys with Other last
   const keys = Object.keys(map).sort((a,b)=>{
-    if (a==='Other') return 1;
-    if (b==='Other') return -1;
+    if (a === 'Other') return 1;
+    if (b === 'Other') return -1;
     return a.localeCompare(b);
   });
   const ordered = {};
@@ -115,6 +86,7 @@ function groupByCountry(channels){
   return ordered;
 }
 
+// render
 function renderCountryList(obj){
   countryList.innerHTML = '';
   countrySelect.innerHTML = '<option value="">All countries</option>';
@@ -139,18 +111,17 @@ function renderCountryList(obj){
 }
 
 function renderChannels(list){
-  const grid = channelsGrid;
-  grid.innerHTML = '';
-  if (!list || list.length===0){
-    grid.innerHTML = `<div style="color:var(--muted);padding:18px">No channels found.</div>`;
+  channelsGrid.innerHTML = '';
+  if (!list || list.length === 0){
+    channelsGrid.innerHTML = `<div style="color:var(--muted);padding:18px">No channels found.</div>`;
     return;
   }
   const frag = document.createDocumentFragment();
-  for (const ch of list){
+  list.forEach(ch => {
     const card = document.createElement('div');
     card.className = 'channel-card';
     card.title = ch.name;
-    const logoHtml = ch.logo ? `<img loading="lazy" alt="${escapeHtml(ch.name)}" src="${escapeHtml(ch.logo)}">` : '<svg width="72" height="44" viewBox="0 0 72 44" xmlns="http://www.w3.org/2000/svg"><rect width="72" height="44" rx="6" fill="#0b0b12"/></svg>';
+    const logoHtml = ch.logo ? `<img loading="lazy" alt="${escapeHtml(ch.name)}" src="${escapeHtml(ch.logo)}">` : '<svg width="84" height="48" viewBox="0 0 84 48" xmlns="http://www.w3.org/2000/svg"><rect width="84" height="48" rx="6" fill="#0b0b12"/></svg>';
     card.innerHTML = `
       <div class="channel-logo">${logoHtml}</div>
       <div class="channel-meta">
@@ -160,13 +131,11 @@ function renderChannels(list){
     `;
     card.addEventListener('click', ()=> playChannel(ch));
     frag.appendChild(card);
-  }
-  grid.appendChild(frag);
+  });
+  channelsGrid.appendChild(frag);
 }
 
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-// Filters
+// filters
 let searchTimer = null;
 searchInput.addEventListener('input', ()=>{
   if (searchTimer) clearTimeout(searchTimer);
@@ -179,12 +148,12 @@ function applyFilters(){
   const q = (searchInput.value||'').toLowerCase().trim();
   const country = countrySelect.value;
   let list = allChannels.slice();
-  if (country) list = list.filter(c=> (c.country||'').toLowerCase() === country.toLowerCase());
-  if (q) list = list.filter(c=> (c.name||'').toLowerCase().includes(q) || (c.country||'').toLowerCase().includes(q));
+  if (country) list = list.filter(c => (c.country||'').toLowerCase() === country.toLowerCase());
+  if (q) list = list.filter(c => (c.name||'').toLowerCase().includes(q) || (c.country||'').toLowerCase().includes(q));
   renderChannels(list);
 }
 
-// Playback (internal)
+// playback (internal)
 function teardownHls(){
   if (currentHls){
     try{ currentHls.stopLoad(); currentHls.destroy(); } catch(e){ console.warn(e); }
@@ -199,74 +168,76 @@ function playChannel(ch){
   teardownHls();
 
   const url = ch._url;
-  if (!url){ setNotice('No stream URL'); return; }
+  if (!url){ setNotice('No stream URL available'); return; }
 
-  // prefer native (Safari) else Hls.js
+  // For Hls.js we need absolute playable URL. Many entries are http(s) HLS.
   if (video.canPlayType('application/vnd.apple.mpegurl') && !window.Hls){
     video.src = url;
-    video.play().catch(()=> setNotice('Click the video to start playback.'));
+    video.play().catch(()=> setNotice('Click video to start playback'));
     return;
   }
   if (window.Hls && Hls.isSupported()){
     currentHls = new Hls();
-    currentHls.on(Hls.Events.ERROR, (evt, data)=> {
+    currentHls.on(Hls.Events.ERROR, (evt, data) => {
       console.warn('HLS ERROR', data);
-      if (data && data.type === Hls.ErrorTypes.NETWORK_ERROR) setNotice('Network/host blocked playback (CORS or 403).');
+      if (data && data.type === Hls.ErrorTypes.NETWORK_ERROR) setNotice('Host blocked playback (CORS/403). Try local server.');
       if (data && data.fatal) currentHls.destroy();
     });
     currentHls.attachMedia(video);
-    try {
+    try{
       currentHls.loadSource(url);
-    } catch(e){
-      console.error(e); setNotice('Failed to load stream.');
+    }catch(e){
+      console.error(e);
+      setNotice('Failed to load stream.');
     }
     currentHls.on(Hls.Events.MANIFEST_PARSED, ()=> {
-      video.play().catch(()=> setNotice('Click to start.'));
+      video.play().catch(()=> setNotice('Click to start playback'));
     });
     return;
   }
+
   // fallback
   video.src = url;
-  video.play().catch(()=> setNotice('Playback blocked—click to play.'));
+  video.play().catch(()=> setNotice('Playback blocked by browser.'));
 }
 
-// UI Buttons
+// UI buttons
 btnMute.addEventListener('click', ()=> {
   video.muted = !video.muted;
   btnMute.textContent = video.muted ? '🔇' : '🔊';
+  btnMute.setAttribute('aria-pressed', video.muted ? 'true' : 'false');
 });
 btnFullscreen.addEventListener('click', ()=> {
   if (document.fullscreenElement) document.exitFullscreen();
   else document.documentElement.requestFullscreen().catch(()=>{});
 });
 
-// Load playlists (tries proxies)
+// main loader — uses local proxy endpoint
 async function loadPlaylists(){
   try{
-    setStatus('Loading playlists…');
+    setStatus('Loading playlists...');
     setNotice('');
     channelsGrid.innerHTML = '';
     allChannels = [];
 
     const mode = contentModeEl.value || 'both';
-    let textSafe = '', textNsfw = '';
+    let safeText = '', nsfwText = '';
 
     if (mode === 'safe' || mode === 'both'){
-      try { textSafe = await fetchWithProxies(PLAYLIST_SAFE); } catch(e){ console.warn('safe failed', e); }
+      try { safeText = await fetchPlaylist(PLAYLIST_SAFE); } catch(e){ console.warn('safe fetch failed', e); }
     }
     if (mode === 'nsfw' || mode === 'both'){
-      try { textNsfw = await fetchWithProxies(PLAYLIST_NSFW); } catch(e){ console.warn('nsfw failed', e); }
+      try { nsfwText = await fetchPlaylist(PLAYLIST_NSFW); } catch(e){ console.warn('nsfw fetch failed', e); }
     }
 
-    const safeCh = textSafe ? parseM3U(textSafe) : [];
-    const nsfwCh = textNsfw ? parseM3U(textNsfw) : [];
+    const safeCh = safeText ? parseM3U(safeText) : [];
+    const nsfwCh = nsfwText ? parseM3U(nsfwText) : [];
 
     allChannels = [...safeCh, ...nsfwCh];
 
     if (!allChannels.length){
       setStatus('No channels loaded');
-      setNotice('Could not fetch playlists — try running a local static server or check your network.');
-      group = {};
+      setNotice('Could not fetch playlists. Make sure proxy.py is running (python proxy.py) and open http://localhost:8000');
       renderCountryList({});
       renderChannels([]);
       return;
@@ -279,15 +250,15 @@ async function loadPlaylists(){
   }catch(e){
     console.error('loadPlaylists error', e);
     setStatus('Error loading playlists');
-    setNotice('Network or proxy error. Try running a local server: python -m http.server');
+    setNotice('Network or proxy error. Run: python proxy.py');
   }
 }
 
 // init
 loadPlaylists();
 
-// expose for quick debugging (safe)
+// small expose for debugging
 window.__IPTV = {
   reload: loadPlaylists,
-  channels: ()=>allChannels.length
+  channelsCount: ()=> allChannels.length
 };
