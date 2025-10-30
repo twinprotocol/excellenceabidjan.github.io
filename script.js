@@ -1,5 +1,5 @@
-const SAFE_URL = "https://iptv-org.github.io/api/channels.json";
-const NSFW_URL = "https://iptv-org.github.io/api/nsfw.json"; // optional, adult channels
+const SAFE_URL = "proxy.php?url=https://iptv-org.github.io/api/channels.json";
+const NSFW_URL = "proxy.php?url=https://iptv-org.github.io/api/nsfw.json";
 
 const channelsContainer = document.getElementById("channels");
 const searchInput = document.getElementById("search");
@@ -19,20 +19,16 @@ async function loadChannels() {
 
     const safeChannels = await safeRes.json();
     const nsfwChannels = await nsfwRes.json();
-    allChannels = [...safeChannels, ...nsfwChannels];
+    allChannels = [...safeChannels, ...nsfwChannels].filter(c => c.url && c.name);
 
-    // Filter only valid streams
-    allChannels = allChannels.filter(ch => ch.url && ch.name);
-
-    // Populate country selector
     const countries = [...new Set(allChannels.map(c => c.country).filter(Boolean))].sort();
     countrySelect.innerHTML = `<option value="">All countries</option>` +
       countries.map(c => `<option value="${c}">${c}</option>`).join("");
 
     renderChannels(allChannels);
   } catch (e) {
-    console.error("Error loading channels:", e);
-    channelsContainer.innerHTML = "<p>⚠️ Failed to load channels.</p>";
+    console.error(e);
+    channelsContainer.innerHTML = "<p>⚠️ Failed to load channels. Check your proxy.php file.</p>";
   }
 }
 
