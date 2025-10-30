@@ -1,27 +1,22 @@
-// IPTV World – Twin Protocol (mobile-friendly)
+// IPTV World (offline-friendly, no proxy) by Twin Protocol
 
-const SAFE_URL = "https://iptv-org.github.io/iptv/index.m3u";
-const NSFW_URL = "https://iptv-org.github.io/iptv/index.nsfw.m3u";
+const SAFE_FILE = "index.m3u";
+const NSFW_FILE = "index.nsfw.m3u";
 
 const statusBox = document.getElementById("status");
 const grid = document.getElementById("channelsGrid");
 const searchInput = document.getElementById("search");
 const countrySelect = document.getElementById("countrySelect");
 const categorySelect = document.getElementById("categorySelect");
-
 const modal = document.getElementById("playerModal");
 const player = document.getElementById("videoPlayer");
 const closePlayer = document.getElementById("closePlayer");
 
 let allChannels = [];
 
-// --- reliable fetch for WebView (Option A) ---
-async function fetchM3U(url) {
-  const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(url);
-  const res = await fetch(proxyUrl, {
-    headers: { "X-Requested-With": "XMLHttpRequest" },
-  });
-  if (!res.ok) throw new Error("Network error");
+async function fetchLocalFile(file) {
+  const res = await fetch(file);
+  if (!res.ok) throw new Error("Cannot read local " + file);
   return await res.text();
 }
 
@@ -44,7 +39,7 @@ function parseM3U(text) {
 
 function fillSelect(select, items, label) {
   select.innerHTML = `<option value="">All ${label}</option>`;
-  items.forEach((i) => {
+  items.forEach(i => {
     const o = document.createElement("option");
     o.value = i;
     o.textContent = i;
@@ -86,7 +81,7 @@ function filter() {
 function playChannel(url) {
   modal.classList.remove("hidden");
   player.src = url;
-  player.play();
+  player.play().catch(e => console.log("Play error:", e));
 }
 
 closePlayer.onclick = () => {
@@ -101,9 +96,9 @@ categorySelect.onchange = filter;
 
 (async function init() {
   try {
-    statusBox.textContent = "Loading channels…";
-    const safe = await fetchM3U(SAFE_URL);
-    const nsfw = await fetchM3U(NSFW_URL);
+    statusBox.textContent = "Loading local channels…";
+    const safe = await fetchLocalFile(SAFE_FILE);
+    const nsfw = await fetchLocalFile(NSFW_FILE);
     allChannels = [...parseM3U(safe), ...parseM3U(nsfw)];
 
     const countries = [...new Set(allChannels.map(c => c.country))].sort();
@@ -115,6 +110,6 @@ categorySelect.onchange = filter;
     statusBox.textContent = `Loaded ${allChannels.length} channels`;
   } catch (e) {
     console.error(e);
-    statusBox.textContent = "Failed to load channels.";
+    statusBox.textContent = "Failed to read local playlists.";
   }
 })();
