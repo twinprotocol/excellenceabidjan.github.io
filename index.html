@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mounir Zouaoui — Anime Channels</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="script.js" defer></script>
 </head>
-<body>
+
+<body data-theme="dark">
   <header class="topbar">
     <div class="brand">
       <div class="title">Mounir Zouaoui</div>
@@ -16,22 +17,22 @@
     </div>
 
     <div class="controls">
-      <input id="search" placeholder="Search channels..." aria-label="Search channels">
-      <select id="themeSelect" title="Theme">
+      <input id="search" placeholder="Search channels…" aria-label="Search channels">
+      <select id="themeSelect">
         <option value="dark">Dark</option>
         <option value="grey">Grey</option>
         <option value="light">Light</option>
       </select>
-      <button id="refreshBtn" class="btn">⟳ Refresh</button>
+      <button id="refreshBtn" class="btn">⟳</button>
     </div>
   </header>
 
   <main class="main">
-    <div id="status" class="status">Initializing — loading anime playlist…</div>
-    <section id="grid" class="grid hidden" aria-live="polite"></section>
+    <div id="status" class="status">Initializing …</div>
+    <section id="grid" class="grid hidden"></section>
   </main>
 
-  <div id="playerModal" class="playerModal hidden" role="dialog" aria-modal="true">
+  <div id="playerModal" class="playerModal hidden">
     <div class="playerCard">
       <button id="closePlayer" class="closeBtn">✕</button>
       <div id="nowPlaying" class="nowPlaying">—</div>
