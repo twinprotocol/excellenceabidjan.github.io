@@ -1,46 +1,198 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mounir Zouaoui — Anime Channels</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <script src="script.js" defer></script>
+  <title>Excellence Abidjan — Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
-<body data-theme="dark">
-  <header class="topbar">
-    <div class="brand">
-      <div class="title">Mounir Zouaoui</div>
-      <div class="subtitle">Anime Channels</div>
+<body>
+  <!-- LOGIN / APP shell -->
+  <div id="root">
+    <!-- Login screen -->
+    <div id="loginScreen" class="screen center">
+      <div class="card login-card">
+        <h2>Welcome</h2>
+        <form id="loginForm" class="form">
+          <label>Email
+            <input id="loginEmail" type="email" placeholder="you@excellenceabidjan.link" required>
+          </label>
+          <label>Mot de passe
+            <input id="loginPass" type="password" placeholder="••••••••" required>
+          </label>
+          <label class="row">
+            <input id="loginRemember" type="checkbox"> Se souvenir de moi
+          </label>
+          <div class="form-actions">
+            <button type="submit" id="loginBtn">Sign in</button>
+            <button type="button" id="createAccount" class="ghost">Create account</button>
+          </div>
+        </form>
+        <hr>
+        <div class="small muted">Manage Reviews</div>
+        <div class="stars">★ ★ ★ ★ ★</div>
+      </div>
     </div>
 
-    <div class="controls">
-      <input id="search" placeholder="Search channels…" aria-label="Search channels">
-      <select id="themeSelect">
-        <option value="dark">Dark</option>
-        <option value="grey">Grey</option>
-        <option value="light">Light</option>
-      </select>
-      <button id="refreshBtn" class="btn">⟳</button>
-    </div>
-  </header>
+    <!-- Main app -->
+    <div id="app" class="screen hidden">
+      <header class="topbar">
+        <div class="brand">Excellence Abidjan</div>
+        <div class="top-actions">
+          <select id="langSelect" title="Language">
+            <option value="fr">FR</option><option value="en">EN</option><option value="ar">AR</option>
+          </select>
+          <button id="logout" class="ghost">Logout</button>
+        </div>
+      </header>
 
-  <main class="main">
-    <div id="status" class="status">Initializing …</div>
-    <section id="grid" class="grid hidden"></section>
-  </main>
+      <nav class="nav">
+        <button class="nav-btn active" data-panel="panel-dashboard">Dashboard</button>
+        <button class="nav-btn" data-panel="panel-products">Produits</button>
+        <button class="nav-btn" data-panel="panel-stock">Stock & Ventes</button>
+        <button class="nav-btn" data-panel="panel-clients">Clients</button>
+        <button class="nav-btn" data-panel="panel-reviews">Reviews</button>
+        <button class="nav-btn" data-panel="panel-export">Export</button>
+      </nav>
 
-  <div id="playerModal" class="playerModal hidden">
-    <div class="playerCard">
-      <button id="closePlayer" class="closeBtn">✕</button>
-      <div id="nowPlaying" class="nowPlaying">—</div>
-      <div class="videoWrap"><video id="video" playsinline controls></video></div>
-      <div id="playerNotice" class="playerNotice"></div>
+      <main class="main">
+        <!-- Dashboard -->
+        <section id="panel-dashboard" class="panel active">
+          <div class="grid-3">
+            <div class="card stat">
+              <div class="muted">Total ventes</div>
+              <div id="dash_total_sales" class="big">0 CFA</div>
+            </div>
+            <div class="card stat">
+              <div class="muted">Valeur stock</div>
+              <div id="dash_stock_value" class="big">0 CFA</div>
+            </div>
+            <div class="card stat">
+              <div class="muted">Top produits</div>
+              <div id="dash_top" class="big">-</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Derniers mouvements</h3>
+            <div class="table-wrap small">
+              <table id="dashLogTable">
+                <thead><tr><th>Date</th><th>Produit</th><th>Type</th><th>Qty</th><th>Total</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Products -->
+        <section id="panel-products" class="panel">
+          <div class="toolbar">
+            <input id="prodSearch" placeholder="Recherche (nom/fournisseur/catégorie)">
+            <select id="prodCategoryFilter"><option value="">Toutes catégories</option></select>
+            <button id="btnNewProduct">+ Nouveau</button>
+          </div>
+
+          <div class="grid" id="productsGrid"></div>
+        </section>
+
+        <!-- Stock & Sales -->
+        <section id="panel-stock" class="panel">
+          <div class="card form">
+            <h3>Mouvement</h3>
+            <div class="row">
+              <select id="moveProduct"></select>
+              <input id="moveQty" type="number" placeholder="Quantité">
+            </div>
+            <div class="row">
+              <select id="moveType"><option>Entrée</option><option>Vente</option></select>
+              <input id="movePrice" type="number" placeholder="Prix (optionnel)">
+            </div>
+            <div class="row">
+              <input id="moveClient" placeholder="Nom client (optionnel)">
+              <label class="inline"><input id="moveCredit" type="checkbox"> Vente à crédit</label>
+            </div>
+            <div class="actions">
+              <button id="applyMove">Enregistrer</button>
+              <button id="applySell" class="danger">Vendre</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Ventes / Entrées</h3>
+            <div class="row">
+              <input id="reportDate" type="date">
+              <button id="filterLog">Filtrer</button>
+              <button id="printLog" class="ghost">🖨️ Imprimer</button>
+              <button id="shareWA" class="ghost">WhatsApp</button>
+            </div>
+            <div class="table-wrap">
+              <table id="logTable">
+                <thead><tr><th>Date</th><th>Produit</th><th>Type</th><th>Qty</th><th>PU</th><th>Total</th><th>Client</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="report-sum">Total: <b id="reportTotal">0 CFA</b></div>
+          </div>
+        </section>
+
+        <!-- Clients -->
+        <section id="panel-clients" class="panel">
+          <div class="card">
+            <h3>Clients</h3>
+            <div class="row">
+              <input id="clientName" placeholder="Nom client">
+              <input id="clientPhone" placeholder="Téléphone">
+              <button id="addClient">Ajouter</button>
+            </div>
+            <div class="table-wrap">
+              <table id="clientsTable">
+                <thead><tr><th>Client</th><th>Dette</th><th>Actions</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Reviews -->
+        <section id="panel-reviews" class="panel">
+          <div class="card">
+            <h3>Avis & Messages</h3>
+            <textarea id="reviewText" placeholder="Écrire un message..."></textarea>
+            <div class="row">
+              <button id="saveReview">Save</button>
+              <button id="clearReviews" class="ghost">Clear</button>
+            </div>
+            <div class="table-wrap">
+              <table id="reviewsTable">
+                <thead><tr><th>Date</th><th>Message</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Export -->
+        <section id="panel-export" class="panel">
+          <div class="card">
+            <h3>Export / Import</h3>
+            <div class="row">
+              <button id="exportProductsCSV">Exporter produits (CSV)</button>
+              <button id="exportLogCSV">Exporter log (CSV)</button>
+              <button id="exportXLSX">Exporter Excel</button>
+            </div>
+            <div class="row">
+              <input id="importFile" type="file" accept=".csv,.xlsx" />
+            </div>
+            <div class="note">CSV produits format: name,category,supplier,price,cost,stock,discount</div>
+          </div>
+        </section>
+
+      </main>
     </div>
   </div>
 
-  <footer class="footer">© Mounir Zouaoui</footer>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
