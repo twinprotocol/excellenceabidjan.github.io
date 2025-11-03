@@ -3,36 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>IPTV World — Netflix+</title>
+  <title>Mounir Zouaoui — Anime Channels</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- hls.js for HLS fallback -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
   <script src="script.js" defer></script>
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="logo">IPTV<span>World+</span></div>
-      <div class="sub">Live channels • Premium UI</div>
+      <div class="title">Mounir Zouaoui</div>
+      <div class="subtitle">Anime Channels</div>
     </div>
 
     <div class="controls">
-      <input id="search" placeholder="Search channels (current view)..." />
-      <button id="backBtn" class="btn hidden">← Categories</button>
+      <input id="search" placeholder="Search channels..." aria-label="Search channels">
+      <select id="themeSelect" title="Theme">
+        <option value="dark">Dark</option>
+        <option value="grey">Grey</option>
+        <option value="light">Light</option>
+      </select>
       <button id="refreshBtn" class="btn">⟳ Refresh</button>
     </div>
   </header>
 
-  <main id="main" class="main">
-    <section id="categories" class="categories" aria-label="Categories"></section>
-
-    <section id="channelsSection" class="channelsSection hidden" aria-label="Channels">
-      <div class="channelsHeader">
-        <h2 id="channelsTitle">Channels</h2>
-        <div id="channelsStatus" class="muted small">—</div>
-      </div>
-      <div id="channels" class="channelsGrid" role="list"></div>
-    </section>
+  <main class="main">
+    <div id="status" class="status">Initializing — loading anime playlist…</div>
+    <section id="grid" class="grid hidden" aria-live="polite"></section>
   </main>
 
   <div id="playerModal" class="playerModal hidden" role="dialog" aria-modal="true">
@@ -40,10 +36,10 @@
       <button id="closePlayer" class="closeBtn">✕</button>
       <div id="nowPlaying" class="nowPlaying">—</div>
       <div class="videoWrap"><video id="video" playsinline controls></video></div>
-      <div id="playerNotice" class="muted small"></div>
+      <div id="playerNotice" class="playerNotice"></div>
     </div>
   </div>
 
-  <footer class="footer">© Twin Protocol — Netflix+ IPTV</footer>
+  <footer class="footer">© Mounir Zouaoui</footer>
 </body>
 </html>
