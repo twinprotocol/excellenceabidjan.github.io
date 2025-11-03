@@ -1,82 +1,69 @@
 :root{
-  --primary:#1e88e5; --accent:#ff7043; --bg:#f6f8fb; --card:#fff; --muted:#69707a;
+  --primary:#1976d2; --accent:#ff7043; --bg:#f6f8fb; --card:#fff; --muted:#6b7280;
   --danger:#e53935; --radius:12px;
-  font-family: Inter, Roboto, Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size:16px;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#122;line-height:1.3}
-.screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
-.hidden{display:none}
+body{margin:0;background:var(--bg);color:#112241}
+.app{max-width:980px;margin:0 auto;padding:12px}
 
-/* Login */
-.login-card{width:360px;padding:18px;border-radius:12px;background:#fff;box-shadow:0 12px 40px rgba(17,24,39,.08);text-align:left}
-.login-card h2{text-align:center;margin:0 0 12px}
-.form label{display:block;font-size:13px;margin:8px 0}
-.form input[type="email"], .form input[type="password"]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ee}
-.form .form-actions{display:flex;gap:8px;justify-content:space-between;margin-top:12px}
-.form .ghost{background:transparent;border:1px solid #ddd;padding:8px;border-radius:8px}
+/* topbar */
+.topbar{display:flex;justify-content:space-between;align-items:center;background:var(--primary);color:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.topbar .brand{font-weight:700}
+.controls select{padding:6px;border-radius:6px;border:none}
 
-/* App layout */
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;margin:12px;background:linear-gradient(90deg,var(--primary),#1976d2);color:#fff}
-.brand{font-weight:700;font-size:1.1rem}
-.top-actions select{padding:6px;border-radius:8px;border:none}
-
-/* nav */
-.nav{display:flex;gap:6px;padding:8px}
-.nav-btn{flex:1;padding:10px;border-radius:10px;background:#e8f2ff;border:none;cursor:pointer;font-weight:700}
-.nav-btn.active{background:#fff;color:var(--primary);box-shadow:0 6px 18px rgba(9,30,66,.06)}
+/* tabs */
+.tabs{display:flex;gap:8px;margin:12px 0}
+.tab{flex:1;padding:10px;border-radius:10px;background:linear-gradient(90deg,#1565c0,#1976d2);color:#e7f3ff;border:none;font-weight:700;cursor:pointer}
+.tab.active{background:#fff;color:var(--primary);box-shadow:0 8px 30px rgba(9,30,66,.06)}
 
 /* main */
-.main{padding:12px;max-width:1100px;margin:12px auto}
-.card{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 8px 30px rgba(9,30,66,.03);margin-bottom:12px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.stat{padding:14px;text-align:center}
-.big{font-size:1.15rem}
-.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-.toolbar input, .toolbar select{padding:8px;border-radius:8px;border:1px solid #e6e9ee}
-.button-small{padding:8px 10px;border-radius:8px;border:none;background:var(--primary);color:#fff;cursor:pointer}
-.button-ghost{background:transparent;border:1px solid #ddd;padding:8px;border-radius:8px}
+.content{margin-top:8px}
+.panel{display:none}
+.panel.active{display:block}
 
-/* grid of products */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.product{padding:10px;border-radius:10px;background:linear-gradient(180deg,#fff,#f7fbff);box-shadow:0 6px 20px rgba(9,30,66,.03)}
-.product img{width:100%;height:140px;object-fit:cover;border-radius:8px}
-.product h4{margin:8px 0 4px}
-.product .muted{color:var(--muted);font-size:13px}
-.card-actions{display:flex;gap:8px;margin-top:8px}
-
-/* form rows */
+/* cards & form */
+.card{background:var(--card);padding:12px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(9,30,66,.04);margin-bottom:12px}
 .form{display:flex;flex-direction:column;gap:8px}
 .row{display:flex;gap:8px}
-.row input, .row select{flex:1;padding:8px;border-radius:8px;border:1px solid #e6e9ee}
+.row input, .row select{flex:1}
+input,select,button{padding:10px;border-radius:8px;border:1px solid #e6e9ee}
+.file input{padding:6px}
+label.file{display:block;padding:8px;border:1px dashed #ddd;border-radius:8px;text-align:center;cursor:pointer;color:var(--muted)}
+
+/* buttons */
+button{background:var(--primary);color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer}
+button.ghost{background:transparent;color:#333;border:1px solid #ddd}
+button.danger{background:var(--danger)}
+.fab{position:fixed;right:18px;bottom:22px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:24px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card.product{display:flex;flex-direction:column;gap:8px;padding:10px}
+.product img{width:100%;height:140px;object-fit:cover;border-radius:8px}
 
 /* table */
-.table-wrap{overflow:auto;max-height:320px}
+.table-wrap{overflow:auto;max-height:260px}
 table{width:100%;border-collapse:collapse}
-thead th{position:sticky;top:0;background:var(--primary);color:#fff;padding:8px}
-td, th{padding:8px;border-bottom:1px solid #f1f4f8;text-align:left}
+thead th{position:sticky;top:0;background:#0d47a1;color:#fff;padding:8px}
+td,th{padding:8px;border-bottom:1px solid #f1f4f8;text-align:left}
+
+/* summary */
+.summary{display:flex;gap:8px;justify-content:space-between;padding:8px 0}
 
 /* small */
-.muted{color:var(--muted);font-size:13px}
-.note{color:var(--muted);font-size:13px}
-.actions{display:flex;gap:8px;align-items:center}
-.danger{background:var(--danger);color:#fff;border:none;padding:8px;border-radius:8px}
-
-.fab{position:fixed;right:18px;bottom:22px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:28px;box-shadow:0 12px 34px rgba(9,30,66,.12)}
+.note{color:var(--muted);font-size:0.9rem}
+.report-sum{margin-top:8px;font-weight:700}
 
 /* responsive */
-@media(max-width:900px){
-  .grid-3{grid-template-columns:repeat(2,1fr)}
-  .product img{height:120px}
-}
-@media(max-width:520px){
-  .grid-3{grid-template-columns:1fr}
-  .nav{flex-direction:row;overflow:auto}
-  .toolbar{flex-direction:column}
+@media(max-width:720px){
   .row{flex-direction:column}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .topbar{padding:10px}
 }
 @media print{
   body *{visibility:hidden}
-  #logTable, #logTable *{visibility:visible}
+  #logTable, #logTable * {visibility:visible}
   #logTable{position:fixed;left:0;top:0;width:100%}
 }
