@@ -1,71 +1,56 @@
-:root{
-  --bg:#071224; --card:#0f1724; --muted:#9aa4b2; --accent:#00b3ff; --accent-2:#00ffd6; --danger:#ff6b6b;
-  --radius:12px; --glass:rgba(255,255,255,0.03); --maxwidth:1100px;
-  --gap:12px;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#051224 0%,#07122b 70%);color:#e6eef6;-webkit-font-smoothing:antialiased}
-.app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
-.sidebar{background:linear-gradient(180deg,#071226,#071226);padding:18px;box-shadow:2px 0 18px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:12px}
-.brand{display:flex;gap:12px;align-items:center}
-.logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;color:#021}
-.brand-text .muted{font-size:12px;color:var(--muted)}
-.menu{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-.menu-btn{background:transparent;border:none;color:inherit;padding:10px;border-radius:8px;text-align:left;cursor:pointer}
-.menu-btn.active{background:rgba(255,255,255,0.03)}
-.sidebar-controls{margin-top:auto;display:flex;flex-direction:column;gap:8px}
-.sidebar-controls select{padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)}
-.sidebar-footer{font-size:12px;color:var(--muted);margin-top:8px}
-
-/* Topbar */
-.topbar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:transparent;box-shadow:0 6px 20px rgba(2,6,23,0.4)}
-.top-left{display:flex;align-items:center;gap:10px}
-.icon-btn{background:transparent;border:none;color:inherit;font-size:20px;cursor:pointer}
-.top-actions{display:flex;align-items:center;gap:8px}
-.top-actions input{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-
-/* content */
-.content{padding:16px;max-width:var(--maxwidth);margin:0 auto;display:grid;grid-template-columns:1fr;gap:12px}
-.grid{display:flex;gap:12px;flex-wrap:wrap}
-.card{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.5)}
-.card-title{font-size:13px;color:var(--muted)}
-.card-value{font-size:28px;font-weight:700;margin-top:6px}
-.chart-card{padding:8px}
-
-/* toolbar/table */
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-.table-wrap{background:var(--card);padding:8px;border-radius:12px;overflow:auto}
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03);font-size:14px}
-th{font-size:12px;text-transform:uppercase;color:var(--muted)}
-.btn{background:linear-gradient(90deg,var(--accent),#00ffd6);border:none;color:#001;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:700}
-.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit}
-.btn.danger{background:linear-gradient(90deg,#ff5c5c,#ff3b3b);color:#fff}
-.row{display:flex;gap:8px;align-items:center}
-.form input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-.sheet{width:720px;max-width:96%;background:linear-gradient(180deg,#071226,#071226);border-radius:12px;padding:12px}
-.sheet-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);padding:12px;z-index:999}
-.modal.open{display:flex}
-.muted{color:var(--muted);font-size:13px}
-.list{margin-top:8px}
-.low{color:var(--danger);font-weight:700}
-.footer{padding:12px;text-align:center;color:var(--muted)}
-
-/* bottom nav for mobile */
-.bottom-nav{display:none}
-@media (max-width:900px){
-  .app{grid-template-columns:1fr}
-  .sidebar{position:fixed;left:-320px;top:0;height:100vh;width:280px;transition:left .22s ease;z-index:80}
-  .sidebar.open{left:0}
-  .topbar{position:sticky;top:0;z-index:70}
-  .bottom-nav{display:flex;position:fixed;left:0;right:0;bottom:0;height:62px;background:var(--card);justify-content:space-around;align-items:center;box-shadow:0 -6px 20px rgba(0,0,0,0.6);z-index:90}
-  .content{padding-bottom:80px}
+/* General body */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin:0; padding:0;
+  background:#f5f5f5; color:#111;
 }
 
-/* theme variants */
-:root.theme-cyber { --accent:#ff00c8; --accent-2:#00ffd6; background:linear-gradient(180deg,#040014,#071226) }
-:root.theme-light { --bg:#f6f7fb; --card:#ffffff; --muted:#5b6b78; --accent:#0066ff; color:#071224 }
+/* Header */
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:1rem; background:#e0e0e0;
+  flex-wrap: wrap;
+}
+header select, header button { margin-left:0.5rem; padding:0.5rem; border-radius:5px; border:none; }
+header h1 { font-size:1.5rem; }
 
-/* utility */
-.hidden{display:none}
+/* Main sections */
+main { padding:1rem; }
+section { margin-bottom:2rem; }
+
+/* Cards */
+.card {
+  display:inline-block; background:white; padding:1rem; margin:0.5rem;
+  border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  max-width:200px; text-align:center;
+  word-wrap: break-word;
+}
+#product-cards, #client-cards, #invoice-list {
+  display:flex; flex-wrap:wrap; justify-content:flex-start;
+}
+
+/* Buttons */
+button { cursor:pointer; padding:0.5rem 1rem; border-radius:5px; border:none; background:#007bff; color:white; margin:0.5rem 0; }
+button:hover { background:#0056b3; }
+
+/* Hidden modal overlay */
+.hidden { display:none; }
+#modal-overlay {
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center;
+  z-index:1000;
+}
+#modal-content {
+  background:white; padding:1rem; border-radius:8px; max-width:90%; width:400px;
+}
+
+/* Inputs and selects */
+input, select { width:100%; margin:0.3rem 0; padding:0.5rem; border-radius:5px; border:1px solid #ccc; }
+
+/* Images inside cards */
+img { max-width:100%; border-radius:5px; margin:0.5rem 0; }
+
+/* Dark mode styles */
+.dark-mode { background:#111; color:#f5f5f5; }
+.dark-mode .card { background:#222; color:white; }
+.dark-mode header { background:#222; }
