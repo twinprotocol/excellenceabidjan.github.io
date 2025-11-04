@@ -1,36 +1,50 @@
-<!DOCTYPE html>
+<!-- index.html -->
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AtlasStock — Multilingual Stock Manager</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <header>
-      <h1 id="app-title">AtlasStock</h1>
-      <div class="selectors">
-        <select id="language-selector">
-          <option value="en">English</option>
-          <option value="fr">Français</option>
-          <option value="ar">العربية</option>
-        </select>
-        <select id="currency-selector"></select>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>AtlasStock — Ultimate Offline Stock Manager</title>
+  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#071224">
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">AS</div>
+        <div>
+          <div id="app-title">AtlasStock</div>
+          <div id="app-sub" class="muted">Offline stock manager — installable PWA</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <select id="language-selector" aria-label="Language"></select>
+        <select id="currency-selector" aria-label="Currency"></select>
+        <button id="btn-add" class="btn compact">+ <span data-i18n="add">Add</span></button>
+        <button id="btn-scan" class="btn ghost compact" title="Scan barcode">Scan</button>
+        <button id="btn-print" class="btn ghost compact" title="Print labels">Print</button>
       </div>
     </header>
-    <main>
-      <section class="table-section">
-        <h2 id="title-products"></h2>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
-          <input id="q" placeholder="Search..." style="flex:1;padding:8px;border-radius:6px;border:1px solid #222;background:#0f1724;color:inherit;">
-          <button id="addBtn" class="btn">+ <span data-i18n="add">Add</span></button>
-          <button id="importBtn" class="btn ghost" data-i18n="import">Import CSV</button>
-          <button id="exportBtn" class="btn" data-i18n="export">Export CSV</button>
-          <button id="undoBtn" class="btn ghost">Undo</button>
-          <button id="redoBtn" class="btn ghost">Redo</button>
-          <button id="clearBtn" class="btn danger" data-i18n="clear">Clear DB</button>
-        </div>
-        <table style="margin-top:12px;">
+
+    <main class="container">
+      <section class="panel search-row">
+        <input id="q" type="search" placeholder="Search..." aria-label="Search" />
+        <button id="btn-import" class="btn ghost compact" data-i18n="import">Import</button>
+        <button id="btn-export" class="btn compact" data-i18n="export">Export</button>
+        <button id="btn-backup" class="btn ghost compact">Backup</button>
+        <button id="btn-reset" class="btn danger compact">Reset</button>
+      </section>
+
+      <section class="panel stats">
+        <div><span data-i18n="total">Total</span>: <strong id="totalCount">0</strong></div>
+        <div><span data-i18n="low">Low</span>: <strong id="lowCount">0</strong></div>
+        <div><span data-i18n="value">Value</span>: <strong id="stockValue">0</strong></div>
+      </section>
+
+      <section class="panel table-wrap">
+        <table id="productsTable" aria-label="Products">
           <thead>
             <tr>
               <th>#</th>
@@ -43,22 +57,82 @@
               <th data-i18n="actions">Actions</th>
             </tr>
           </thead>
-          <tbody id="product-list"></tbody>
+          <tbody id="tbody"></tbody>
         </table>
+      </section>
 
-        <div style="display:flex;gap:12px;margin-top:12px;align-items:center;">
-          <div><strong data-i18n="total">Total items</strong>: <span id="totalCount">0</span></div>
-          <div><strong data-i18n="low">Low stock</strong>: <span id="lowCount">0</span></div>
-          <div><strong data-i18n="stockValue">Stock Value</strong>: <span id="stockValue">0</span></div>
-          <div><strong data-i18n="skuCount">Unique SKUs</strong>: <span id="skuCount">0</span></div>
-        </div>
+      <section class="panel activity">
+        <div class="muted" data-i18n="activity">Activity</div>
+        <div id="activity" class="log"></div>
+      </section>
 
-        <div style="margin-top:12px;background:#0b1020;padding:10px;border-radius:8px;">
-          <div class="muted" data-i18n="activity">Activity log</div>
-          <div id="activity" style="max-height:180px;overflow:auto;margin-top:8px;"></div>
-        </div>
+      <section class="panel charts">
+        <canvas id="chartCanvas" width="800" height="240"></canvas>
       </section>
     </main>
-    <script src="app.js"></script>
-  </body>
+
+    <footer class="footer muted">AtlasStock — offline • mobile-ready</footer>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3 id="modalTitle">New product</h3>
+        <button id="modalClose" class="btn ghost compact">×</button>
+      </div>
+      <form id="productForm" class="form">
+        <label><span data-i18n="name">Name</span><input id="p_name" required></label>
+        <label><span data-i18n="sku">SKU</span><input id="p_sku"></label>
+        <label><span data-i18n="category">Category</span><input id="p_category"></label>
+        <div class="row">
+          <label><span data-i18n="qty">Qty</span><input id="p_qty" type="number" min="0" value="0"></label>
+          <label><span data-i18n="price">Price</span><input id="p_price" type="number" min="0" step="0.01" value="0"></label>
+        </div>
+        <label><span data-i18n="threshold">Low threshold</span><input id="p_threshold" type="number" min="0" value="5"></label>
+        <div class="row actions">
+          <button type="submit" class="btn" id="modalSave" data-i18n="save">Save</button>
+          <button type="button" id="modalCancel" class="btn ghost" data-i18n="cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sell Modal -->
+  <div id="sellModal" class="modal" aria-hidden="true">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3 id="sellTitle">Sell item</h3>
+        <button id="sellClose" class="btn ghost compact">×</button>
+      </div>
+      <form id="sellForm" class="form">
+        <div id="sellInfo" class="muted"></div>
+        <label><span data-i18n="sellQty">Quantity to sell</span><input id="sell_qty" type="number" min="1" value="1"></label>
+        <div class="row actions">
+          <button type="submit" class="btn" data-i18n="sell">Sell</button>
+          <button type="button" id="sellCancel" class="btn ghost" data-i18n="cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scanner Modal -->
+  <div id="scanModal" class="modal" aria-hidden="true">
+    <div class="sheet">
+      <div class="sheet-header"><h3>Scanner</h3><button id="scanClose" class="btn ghost compact">×</button></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <video id="video" autoplay playsinline style="width:100%;border-radius:8px;background:#000;"></video>
+        <div class="muted">Point the camera at a barcode / QR. If not supported, upload an image.</div>
+        <div style="display:flex;gap:8px;">
+          <input id="scanFile" type="file" accept="image/*">
+          <button id="scanStop" class="btn ghost">Stop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input id="fileInput" type="file" accept=".csv,.json" style="display:none">
+
+  <script src="app.js"></script>
+</body>
 </html>
