@@ -1,9 +1,7 @@
 // -------------------------
 // DATA
 // -------------------------
-let products = [];    // { name, quantity, unit, purchasePrice, sellPrice, photo, conversionUnits }
-let clients = [];     // { name, photo, idData }
-let invoices = [];    // { client, product, qty, unit, price, profit, date, paid }
+let products=[], clients=[], invoices=[];
 
 // -------------------------
 // SETTINGS
@@ -14,65 +12,60 @@ const currencies = [
   { code: 'EUR', name: 'Euro' },
   { code: 'XOF', name: 'West African CFA Franc' }
 ];
-const translations = {
-  en: { title: 'AtlasStock Pro', products: 'Products', clients: 'Clients', invoices: 'Invoices' },
-  fr: { title: 'AtlasStock Pro', products: 'Produits', clients: 'Clients', invoices: 'Factures' },
-  ar: { title: 'أطلس ستوك برو', products: 'المنتجات', clients: 'العملاء', invoices: 'الفواتير' }
+const translations={
+  en:{ title:'AtlasStock Pro', products:'Products', clients:'Clients', invoices:'Invoices' },
+  fr:{ title:'AtlasStock Pro', products:'Produits', clients:'Clients', invoices:'Factures' },
+  ar:{ title:'أطلس ستوك برو', products:'المنتجات', clients:'العملاء', invoices:'الفواتير' }
 };
 
 // -------------------------
 // ELEMENTS
 // -------------------------
-const langSelect = document.getElementById('language-selector');
-const currencySelect = document.getElementById('currency-selector');
-const themeToggle = document.getElementById('theme-toggle');
-const appTitle = document.getElementById('app-title');
-const productCards = document.getElementById('product-cards');
-const clientCards = document.getElementById('client-cards');
-const invoiceList = document.getElementById('invoice-list');
-const addProductBtn = document.getElementById('add-product-btn');
-const addClientBtn = document.getElementById('add-client-btn');
-const exportCSVBtn = document.getElementById('export-csv');
-const modalOverlay = document.getElementById('modal-overlay');
-const modalContent = document.getElementById('modal-content');
+const langSelect=document.getElementById('language-selector');
+const currencySelect=document.getElementById('currency-selector');
+const themeToggle=document.getElementById('theme-toggle');
+const appTitle=document.getElementById('app-title');
+const productCards=document.getElementById('product-cards');
+const clientCards=document.getElementById('client-cards');
+const invoiceList=document.getElementById('invoice-list');
+const addProductBtn=document.getElementById('add-product-btn');
+const addClientBtn=document.getElementById('add-client-btn');
+const exportCSVBtn=document.getElementById('export-csv');
+const modalOverlay=document.getElementById('modal-overlay');
+const modalContent=document.getElementById('modal-content');
 
 // -------------------------
-// UTILITY FUNCTIONS
+// UTILITY
 // -------------------------
-function showModal(html) { modalContent.innerHTML = html; modalOverlay.classList.remove('hidden'); }
-function closeModal() { modalOverlay.classList.add('hidden'); }
-modalOverlay.addEventListener('click', e => { if(e.target===modalOverlay) closeModal(); });
+function showModal(html){ modalContent.innerHTML=html; modalOverlay.classList.add('active'); }
+function closeModal(){ modalOverlay.classList.remove('active'); }
+modalOverlay.addEventListener('click', e=>{ if(e.target===modalOverlay) closeModal(); });
 
 // -------------------------
 // THEME & LANGUAGE
 // -------------------------
-themeToggle.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
-langSelect.addEventListener('change', () => {
-  const lang = langSelect.value;
-  appTitle.textContent = translations[lang].title;
+themeToggle.addEventListener('click', ()=>document.body.classList.toggle('dark-mode'));
+langSelect.addEventListener('change', ()=>{
+  const lang=langSelect.value;
+  appTitle.textContent=translations[lang].title;
 });
-currencies.forEach(c => {
-  const opt = document.createElement('option');
-  opt.value = c.code;
-  opt.textContent = `${c.code} — ${c.name}`;
-  currencySelect.appendChild(opt);
-});
+currencies.forEach(c=>{ let opt=document.createElement('option'); opt.value=c.code; opt.textContent=`${c.code} — ${c.name}`; currencySelect.appendChild(opt); });
 
 // -------------------------
 // DASHBOARD
 // -------------------------
-function updateDashboard() {
-  document.getElementById('total-products').textContent = products.length;
-  const totalValue = products.reduce((sum,p)=>sum+p.quantity*p.purchasePrice,0);
-  document.getElementById('total-value').textContent = totalValue.toFixed(2);
-  const totalProfit = invoices.reduce((sum,inv)=>sum+inv.profit,0);
-  document.getElementById('total-profit').textContent = totalProfit.toFixed(2);
+function updateDashboard(){
+  document.getElementById('total-products').textContent=products.length;
+  let totalValue=products.reduce((s,p)=>s+p.quantity*p.purchasePrice,0);
+  document.getElementById('total-value').textContent=totalValue.toFixed(2);
+  let totalProfit=invoices.reduce((s,i)=>s+i.profit,0);
+  document.getElementById('total-profit').textContent=totalProfit.toFixed(2);
 }
 
 // -------------------------
 // PRODUCTS
 // -------------------------
-function renderProducts() {
+function renderProducts(){
   productCards.innerHTML='';
   products.forEach((p,i)=>{
     const card=document.createElement('div'); card.classList.add('card');
@@ -100,7 +93,7 @@ addProductBtn.addEventListener('click', ()=>{
     Unit:<input id="prod-unit" value="piece"><br>
     Purchase Price:<input id="prod-purchase" type="number"><br>
     Sell Price:<input id="prod-sell" type="number"><br>
-    Conversion Units (JSON):<input id="prod-conv" placeholder='{"box":12,"carton":120}'><br>
+    Conversion Units(JSON):<input id="prod-conv" placeholder='{"box":12,"carton":120}'><br>
     Photo:<input id="prod-photo" type="file" accept="image/*"><br>
     <button id="save-product">Save</button>
   `);
@@ -110,53 +103,19 @@ addProductBtn.addEventListener('click', ()=>{
     const unit=document.getElementById('prod-unit').value;
     const purchasePrice=parseFloat(document.getElementById('prod-purchase').value);
     const sellPrice=parseFloat(document.getElementById('prod-sell').value);
-    let convUnits={};
-    try{convUnits=JSON.parse(document.getElementById('prod-conv').value);}catch{}
+    let convUnits={}; try{ convUnits=JSON.parse(document.getElementById('prod-conv').value); }catch{}
     const photoInput=document.getElementById('prod-photo');
     const reader=new FileReader();
-    reader.onload=function(e){
-      products.push({name,quantity:qty,unit,purchasePrice,sellPrice,photo:e.target.result,conversionUnits:convUnits});
-      renderProducts(); closeModal();
-    };
+    reader.onload=function(e){ products.push({name,quantity:qty,unit,purchasePrice,sellPrice,photo:e.target.result,conversionUnits:convUnits}); renderProducts(); closeModal(); };
     if(photoInput.files[0]) reader.readAsDataURL(photoInput.files[0]);
     else { products.push({name,quantity:qty,unit,purchasePrice,sellPrice,photo:'',conversionUnits:convUnits}); renderProducts(); closeModal(); }
   });
 });
 
-function editProduct(i){
-  const p=products[i];
-  showModal(`
-    <h3>Edit Product</h3>
-    Name:<input id="prod-name" value="${p.name}"><br>
-    Quantity:<input id="prod-qty" type="number" value="${p.quantity}"><br>
-    Unit:<input id="prod-unit" value="${p.unit}"><br>
-    Purchase Price:<input id="prod-purchase" type="number" value="${p.purchasePrice}"><br>
-    Sell Price:<input id="prod-sell" type="number" value="${p.sellPrice}"><br>
-    Conversion Units:<input id="prod-conv" value='${JSON.stringify(p.conversionUnits)}'><br>
-    Photo:<input id="prod-photo" type="file" accept="image/*"><br>
-    <button id="save-product">Save</button>
-  `);
-  document.getElementById('save-product').addEventListener('click',()=>{
-    p.name=document.getElementById('prod-name').value;
-    p.quantity=parseInt(document.getElementById('prod-qty').value);
-    p.unit=document.getElementById('prod-unit').value;
-    p.purchasePrice=parseFloat(document.getElementById('prod-purchase').value);
-    p.sellPrice=parseFloat(document.getElementById('prod-sell').value);
-    try{p.conversionUnits=JSON.parse(document.getElementById('prod-conv').value);}catch{}
-    const photoInput=document.getElementById('prod-photo');
-    const reader=new FileReader();
-    reader.onload=function(e){ p.photo=e.target.result; renderProducts(); closeModal(); };
-    if(photoInput.files[0]) reader.readAsDataURL(photoInput.files[0]);
-    else { renderProducts(); closeModal(); }
-  });
-}
-
-function deleteProduct(i){ if(confirm('Delete this product?')) { products.splice(i,1); renderProducts(); } }
-
 // -------------------------
 // CLIENTS
 // -------------------------
-function renderClients() {
+function renderClients(){
   clientCards.innerHTML='';
   clients.forEach((c,i)=>{
     const card=document.createElement('div'); card.classList.add('card');
@@ -188,28 +147,8 @@ addClientBtn.addEventListener('click', ()=>{
   });
 });
 
-function editClient(i){
-  const c=clients[i];
-  showModal(`
-    <h3>Edit Client</h3>
-    Name:<input id="client-name" value="${c.name}"><br>
-    Photo:<input id="client-photo" type="file" accept="image/*"><br>
-    <button id="save-client">Save</button>
-  `);
-  document.getElementById('save-client').addEventListener('click',()=>{
-    c.name=document.getElementById('client-name').value;
-    const photoInput=document.getElementById('client-photo');
-    const reader=new FileReader();
-    reader.onload=function(e){ c.photo=e.target.result; renderClients(); closeModal(); };
-    if(photoInput.files[0]) reader.readAsDataURL(photoInput.files[0]);
-    else { renderClients(); closeModal(); }
-  });
-}
-
-function deleteClient(i){ if(confirm('Delete this client?')) { clients.splice(i,1); renderClients(); } }
-
 // -------------------------
-// SELL PRODUCT
+// SELL / INVOICES
 // -------------------------
 function sellProduct(i){
   const p=products[i];
@@ -226,7 +165,6 @@ function sellProduct(i){
     const clientIdx=parseInt(document.getElementById('sell-client').value);
     const qty=parseInt(document.getElementById('sell-qty').value);
     const unit=document.getElementById('sell-unit').value;
-    // Convert unit to base unit if conversion exists
     let qtyInBase=qty;
     if(unit!==p.unit && p.conversionUnits[unit]) qtyInBase*=p.conversionUnits[unit];
     if(qtyInBase>p.quantity){ alert('Not enough stock'); return; }
@@ -237,9 +175,6 @@ function sellProduct(i){
   });
 }
 
-// -------------------------
-// INVOICES
-// -------------------------
 function renderInvoices(){
   invoiceList.innerHTML='';
   invoices.forEach(inv=>{
@@ -261,7 +196,7 @@ function togglePaid(dateStr){
 }
 
 // -------------------------
-// EXPORT CSV
+// CSV EXPORT
 // -------------------------
 exportCSVBtn.addEventListener('click', ()=>{
   let csv='Type,Name,Quantity,Unit,Price,Profit,Client,Date,Paid\n';
@@ -274,7 +209,7 @@ exportCSVBtn.addEventListener('click', ()=>{
 });
 
 // -------------------------
-// LABEL PRINTING
+// LABEL / OCR / BARCODE PLACEHOLDER
 // -------------------------
 function printLabel(i){
   const p=products[i];
@@ -283,11 +218,8 @@ function printLabel(i){
   win.print();
 }
 
-// -------------------------
-// PLACEHOLDER FOR OCR / BARCODE / CLOUD
-// -------------------------
 function scanID(i){
-  alert('OCR ID scan not implemented in this demo. Integrate Tesseract.js or similar library here.');
+  alert('OCR ID scan not implemented in this demo. Use Tesseract.js or other library.');
 }
 
 // -------------------------

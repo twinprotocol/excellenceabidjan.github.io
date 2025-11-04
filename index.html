@@ -9,7 +9,7 @@
 <body>
 <header>
   <h1 id="app-title">AtlasStock Pro</h1>
-  <div class="controls">
+  <div class="header-controls">
     <select id="language-selector">
       <option value="en">English</option>
       <option value="fr">Français</option>
@@ -22,32 +22,32 @@
 
 <main>
   <section id="dashboard">
-    <div class="card">Total Products: <span id="total-products">0</span></div>
-    <div class="card">Total Stock Value: <span id="total-value">0</span></div>
-    <div class="card">Total Profit: <span id="total-profit">0</span></div>
+    <div>Total Products: <span id="total-products">0</span></div>
+    <div>Total Stock Value: <span id="total-value">0</span></div>
+    <div>Total Profit: <span id="total-profit">0</span></div>
   </section>
 
-  <section id="inventory">
+  <section id="products-section">
     <h2>Products</h2>
-    <div id="product-cards"></div>
     <button id="add-product-btn">Add Product</button>
+    <div id="product-cards" class="cards-container"></div>
   </section>
 
-  <section id="clients">
+  <section id="clients-section">
     <h2>Clients</h2>
-    <div id="client-cards"></div>
     <button id="add-client-btn">Add Client</button>
+    <div id="client-cards" class="cards-container"></div>
   </section>
 
-  <section id="sales">
+  <section id="invoices-section">
     <h2>Invoices</h2>
-    <div id="invoice-list"></div>
     <button id="export-csv">Export CSV</button>
+    <div id="invoice-list" class="cards-container"></div>
   </section>
 </main>
 
-<!-- Modals for forms & confirmations -->
-<div id="modal-overlay" class="hidden">
+<!-- Modal -->
+<div id="modal-overlay">
   <div id="modal-content"></div>
 </div>
 
