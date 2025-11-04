@@ -1,132 +1,171 @@
-<!-- index.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>AtlasStock — Ultimate Offline Stock Manager</title>
+  <title>AtlasStock — Mobile-first Inventory</title>
   <link rel="stylesheet" href="style.css">
   <meta name="theme-color" content="#071224">
 </head>
 <body>
   <div class="app">
-    <header class="top">
+    <aside class="sidebar" id="sidebar">
       <div class="brand">
         <div class="logo">AS</div>
-        <div>
+        <div class="brand-text">
           <div id="app-title">AtlasStock</div>
-          <div id="app-sub" class="muted">Offline stock manager — installable PWA</div>
+          <div class="muted" id="app-sub">Offline inventory</div>
         </div>
       </div>
 
-      <div class="controls">
+      <nav class="menu">
+        <button class="menu-btn active" data-view="dashboard">Dashboard</button>
+        <button class="menu-btn" data-view="inventory">Inventory</button>
+        <button class="menu-btn" data-view="sell">Sell</button>
+        <button class="menu-btn" data-view="settings">Settings</button>
+      </nav>
+
+      <div class="sidebar-controls">
         <select id="language-selector" aria-label="Language"></select>
         <select id="currency-selector" aria-label="Currency"></select>
-        <button id="btn-add" class="btn compact">+ <span data-i18n="add">Add</span></button>
-        <button id="btn-scan" class="btn ghost compact" title="Scan barcode">Scan</button>
-        <button id="btn-print" class="btn ghost compact" title="Print labels">Print</button>
+        <button id="btn-add-side" class="btn">+ Add</button>
+      </div>
+
+      <div class="sidebar-footer muted">AtlasStock • Offline</div>
+    </aside>
+
+    <header class="topbar" id="topbar">
+      <div class="top-left">
+        <button id="menuToggle" class="icon-btn">☰</button>
+        <div class="title" id="topTitle">Dashboard</div>
+      </div>
+      <div class="top-actions">
+        <input id="q" placeholder="Search..." aria-label="Search" />
+        <button id="btn-scan" class="btn ghost" title="Scan">Scan</button>
+        <button id="btn-print" class="btn ghost" title="Print">Print</button>
       </div>
     </header>
 
-    <main class="container">
-      <section class="panel search-row">
-        <input id="q" type="search" placeholder="Search..." aria-label="Search" />
-        <button id="btn-import" class="btn ghost compact" data-i18n="import">Import</button>
-        <button id="btn-export" class="btn compact" data-i18n="export">Export</button>
-        <button id="btn-backup" class="btn ghost compact">Backup</button>
-        <button id="btn-reset" class="btn danger compact">Reset</button>
+    <main class="content">
+      <!-- Dashboard -->
+      <section class="view" id="view-dashboard" data-view="dashboard">
+        <div class="grid">
+          <div class="card">
+            <div class="card-title">Total Items</div>
+            <div class="card-value" id="totalCount">0</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Low Stock</div>
+            <div class="card-value" id="lowCount">0</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Stock Value</div>
+            <div class="card-value" id="stockValue">0</div>
+          </div>
+        </div>
+
+        <div class="card chart-card">
+          <canvas id="chartCanvas" width="800" height="240"></canvas>
+        </div>
       </section>
 
-      <section class="panel stats">
-        <div><span data-i18n="total">Total</span>: <strong id="totalCount">0</strong></div>
-        <div><span data-i18n="low">Low</span>: <strong id="lowCount">0</strong></div>
-        <div><span data-i18n="value">Value</span>: <strong id="stockValue">0</strong></div>
+      <!-- Inventory -->
+      <section class="view hidden" id="view-inventory" data-view="inventory">
+        <div class="toolbar">
+          <button id="btn-add" class="btn">+ Add product</button>
+          <button id="btn-import" class="btn ghost">Import CSV/JSON</button>
+          <button id="btn-export" class="btn">Export CSV</button>
+          <button id="btn-backup" class="btn ghost">Backup JSON</button>
+          <button id="btn-reset" class="btn danger">Reset</button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="productsTable" aria-label="Products">
+            <thead>
+              <tr>
+                <th>#</th><th>Name</th><th>SKU</th><th>Category</th><th>Qty</th><th>Price</th><th>Updated</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
       </section>
 
-      <section class="panel table-wrap">
-        <table id="productsTable" aria-label="Products">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th data-i18n="name">Name</th>
-              <th data-i18n="sku">SKU</th>
-              <th data-i18n="category">Category</th>
-              <th data-i18n="qty">Qty</th>
-              <th data-i18n="price">Price</th>
-              <th data-i18n="updated">Updated</th>
-              <th data-i18n="actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
+      <!-- Sell -->
+      <section class="view hidden" id="view-sell" data-view="sell">
+        <div class="card">
+          <div class="card-title">Quick Sell</div>
+          <div class="muted">Scan or choose an item to sell quickly.</div>
+          <div style="margin-top:10px;">
+            <input id="sellSearch" placeholder="Search for item to sell" />
+            <div id="sellResults" class="list"></div>
+          </div>
+        </div>
       </section>
 
-      <section class="panel activity">
-        <div class="muted" data-i18n="activity">Activity</div>
-        <div id="activity" class="log"></div>
-      </section>
-
-      <section class="panel charts">
-        <canvas id="chartCanvas" width="800" height="240"></canvas>
+      <!-- Settings -->
+      <section class="view hidden" id="view-settings" data-view="settings">
+        <div class="card">
+          <div class="card-title">Settings</div>
+          <div class="muted">Theme & export options</div>
+          <div style="margin-top:12px;">
+            <label>Theme: <select id="themeSelect"><option value="dark">Dark</option><option value="cyber">Cyberpunk</option><option value="light">Light</option></select></label>
+          </div>
+        </div>
       </section>
     </main>
 
-    <footer class="footer muted">AtlasStock — offline • mobile-ready</footer>
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="bnav" data-view="dashboard">Dashboard</button>
+      <button class="bnav" data-view="inventory">Inventory</button>
+      <button class="bnav" data-view="sell">Sell</button>
+      <button class="bnav" data-view="settings">Settings</button>
+    </nav>
   </div>
 
-  <!-- Product Modal -->
+  <!-- Modals -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="sheet">
-      <div class="sheet-header">
-        <h3 id="modalTitle">New product</h3>
-        <button id="modalClose" class="btn ghost compact">×</button>
-      </div>
+      <div class="sheet-header"><h3 id="modalTitle">New product</h3><button id="modalClose" class="btn ghost">✕</button></div>
       <form id="productForm" class="form">
-        <label><span data-i18n="name">Name</span><input id="p_name" required></label>
-        <label><span data-i18n="sku">SKU</span><input id="p_sku"></label>
-        <label><span data-i18n="category">Category</span><input id="p_category"></label>
+        <label>Name <input id="p_name" required></label>
+        <label>SKU <input id="p_sku"></label>
+        <label>Category <input id="p_category"></input></label>
         <div class="row">
-          <label><span data-i18n="qty">Qty</span><input id="p_qty" type="number" min="0" value="0"></label>
-          <label><span data-i18n="price">Price</span><input id="p_price" type="number" min="0" step="0.01" value="0"></label>
+          <label>Qty <input id="p_qty" type="number" min="0" value="0"></label>
+          <label>Price <input id="p_price" type="number" min="0" step="0.01" value="0"></label>
         </div>
-        <label><span data-i18n="threshold">Low threshold</span><input id="p_threshold" type="number" min="0" value="5"></label>
+        <label>Low threshold <input id="p_threshold" type="number" min="0" value="5"></label>
         <div class="row actions">
-          <button type="submit" class="btn" id="modalSave" data-i18n="save">Save</button>
-          <button type="button" id="modalCancel" class="btn ghost" data-i18n="cancel">Cancel</button>
+          <button type="submit" class="btn" id="modalSave">Save</button>
+          <button type="button" id="modalCancel" class="btn ghost">Cancel</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Sell Modal -->
   <div id="sellModal" class="modal" aria-hidden="true">
     <div class="sheet">
-      <div class="sheet-header">
-        <h3 id="sellTitle">Sell item</h3>
-        <button id="sellClose" class="btn ghost compact">×</button>
-      </div>
+      <div class="sheet-header"><h3 id="sellTitle">Sell</h3><button id="sellClose" class="btn ghost">✕</button></div>
       <form id="sellForm" class="form">
         <div id="sellInfo" class="muted"></div>
-        <label><span data-i18n="sellQty">Quantity to sell</span><input id="sell_qty" type="number" min="1" value="1"></label>
+        <label>Quantity <input id="sell_qty" type="number" min="1" value="1"></label>
         <div class="row actions">
-          <button type="submit" class="btn" data-i18n="sell">Sell</button>
-          <button type="button" id="sellCancel" class="btn ghost" data-i18n="cancel">Cancel</button>
+          <button type="submit" class="btn">Sell</button>
+          <button type="button" id="sellCancel" class="btn ghost">Cancel</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Scanner Modal -->
+  <!-- Scanner -->
   <div id="scanModal" class="modal" aria-hidden="true">
     <div class="sheet">
-      <div class="sheet-header"><h3>Scanner</h3><button id="scanClose" class="btn ghost compact">×</button></div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <video id="video" autoplay playsinline style="width:100%;border-radius:8px;background:#000;"></video>
-        <div class="muted">Point the camera at a barcode / QR. If not supported, upload an image.</div>
-        <div style="display:flex;gap:8px;">
-          <input id="scanFile" type="file" accept="image/*">
-          <button id="scanStop" class="btn ghost">Stop</button>
-        </div>
+      <div class="sheet-header"><h3>Scanner</h3><button id="scanClose" class="btn ghost">✕</button></div>
+      <video id="video" autoplay playsinline style="width:100%;border-radius:8px;background:#000;"></video>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <input id="scanFile" type="file" accept="image/*">
+        <button id="scanStop" class="btn ghost">Stop</button>
       </div>
     </div>
   </div>
