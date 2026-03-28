@@ -2,21 +2,13 @@ let products = JSON.parse(localStorage.getItem("products")) || [];
 let cart = [];
 let invoices = JSON.parse(localStorage.getItem("invoices")) || [];
 
-let lang = "en";
+const langSelect = document.getElementById("language");
 
-const t = {
-  en: { add: "Add Product", search: "Search..." },
+const translations = {
+  en: { add: "Add Product", search: "Search products..." },
   fr: { add: "Ajouter Produit", search: "Rechercher..." },
   ar: { add: "إضافة منتج", search: "بحث..." }
 };
-
-function setLang(l){
-  lang = l;
-  document.getElementById("panelTitle").innerText = t[l].add;
-  document.getElementById("search").placeholder = t[l].search;
-
-  document.body.classList.toggle("rtl", l === "ar");
-}
 
 function save(){
   localStorage.setItem("products", JSON.stringify(products));
@@ -28,7 +20,7 @@ function format(n){
 }
 
 function renderProducts(list = products){
-  let container = document.getElementById("productList");
+  const container = document.getElementById("productContainer");
   container.innerHTML = "";
 
   list.forEach((p,i)=>{
@@ -45,14 +37,17 @@ function renderProducts(list = products){
 }
 
 function addProduct(){
-  products.push({
-    name: name.value,
-    buy: Number(buy.value),
-    sell: Number(sell.value),
-    stock: Number(stock.value),
-    image: image.value
-  });
+  const p = {
+    name: pName.value,
+    buy: Number(pBuy.value),
+    sell: Number(pSell.value),
+    stock: Number(pStock.value),
+    image: pImage.value
+  };
 
+  if(!p.name) return;
+
+  products.push(p);
   save();
   renderProducts();
 }
@@ -69,15 +64,15 @@ function addToCart(i){
 }
 
 function openCart(){
-  cartItems.innerHTML = "";
+  cartList.innerHTML = "";
   let total = 0;
 
   cart.forEach(i=>{
     total += i.sell;
-    cartItems.innerHTML += `<li>${i.name} - ${format(i.sell)}</li>`;
+    cartList.innerHTML += `<li>${i.name} - ${format(i.sell)}</li>`;
   });
 
-  totalEl.innerText = format(total);
+  cartTotal.innerText = format(total);
   cartModal.classList.remove("hidden");
 }
 
@@ -113,18 +108,19 @@ function checkout(){
 
   cart = [];
   cartCount.innerText = 0;
+
   closeCart();
   updateDashboard();
 }
 
 function showInvoice(inv){
-  invoiceBody.innerHTML = "";
+  invoiceTable.innerHTML = "";
 
   inv.items.forEach(i=>{
-    invoiceBody.innerHTML += `<tr><td>${i.name}</td><td>${format(i.sell)}</td></tr>`;
+    invoiceTable.innerHTML += `<tr><td>${i.name}</td><td>${format(i.sell)}</td></tr>`;
   });
 
-  invoiceInfo.innerText = inv.id + " - " + inv.date;
+  invoiceHeader.innerText = inv.id + " - " + inv.date;
   invoiceTotal.innerText = format(inv.revenue);
 
   invoiceModal.classList.remove("hidden");
@@ -132,7 +128,6 @@ function showInvoice(inv){
 
 function updateDashboard(){
   let today = new Date().toLocaleDateString();
-
   let todayInv = invoices.filter(i => i.date === today);
 
   let revenue = todayInv.reduce((a,b)=>a+b.revenue,0);
@@ -143,14 +138,26 @@ function updateDashboard(){
   profit.innerText = "Profit: " + format(profit);
 }
 
-search.addEventListener("input", e=>{
-  let v = e.target.value.toLowerCase();
+function setLanguage(){
+  const lang = langSelect.value;
 
-  renderProducts(products.filter(p =>
-    p.name.toLowerCase().includes(v)
-  ));
+  document.getElementById("panelTitle").innerText = translations[lang].add;
+  document.getElementById("search").placeholder = translations[lang].search;
+
+  document.body.classList.toggle("rtl", lang === "ar");
+}
+
+document.getElementById("search").addEventListener("input", e=>{
+  const v = e.target.value.toLowerCase();
+  renderProducts(products.filter(p => p.name.toLowerCase().includes(v)));
 });
 
-setLang("en");
+document.getElementById("cartBtn").onclick = openCart;
+document.getElementById("closeCartBtn").onclick = closeCart;
+document.getElementById("checkoutBtn").onclick = checkout;
+document.getElementById("addBtn").onclick = addProduct;
+langSelect.onchange = setLanguage;
+
+setLanguage();
 renderProducts();
 updateDashboard();

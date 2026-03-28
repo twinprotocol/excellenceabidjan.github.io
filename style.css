@@ -1,21 +1,20 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: #eef1f5;
+  background: #eef2f7;
 }
 
-header {
+.header {
   display: flex;
   justify-content: space-between;
   padding: 15px;
-  background: #222;
+  background: #1e1e2f;
   color: white;
 }
 
-.header-right {
+.controls {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
 input, select, button {
@@ -30,9 +29,9 @@ button {
   cursor: pointer;
 }
 
-#productList {
+#productContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
   gap: 15px;
   padding: 20px;
 }
