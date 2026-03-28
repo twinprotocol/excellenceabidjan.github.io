@@ -1,65 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500&display=swap');
 
-:root {
-    --primary: #00b8a9;
-}
+:root { --primary: #00b8a9; }
 
-* {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-}
+* { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
 
-body {
-    font-family: 'Inter', system_ui, sans-serif;
-}
+body { font-family: 'Inter', system_ui, sans-serif; }
+.logo-font { font-family: 'Space Grotesk', sans-serif; }
 
-.logo-font {
-    font-family: 'Space Grotesk', sans-serif;
-}
+.page { animation: fadeIn 0.3s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.page {
-    animation: fadeIn 0.3s ease forwards;
-}
+.modal { animation: modalPop 0.3s ease forwards; }
+@keyframes modalPop { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+.nav-item { transition: all 0.2s ease; }
+.nav-item:hover { background-color: white; color: #18181b; }
+.nav-item.active { background-color: #00b8a9; color: white; }
 
-.modal {
-    animation: modalPop 0.3s ease forwards;
-}
+.lang-btn.active { background-color: #00b8a9; color: white; }
 
-@keyframes modalPop {
-    0% { opacity: 0; transform: scale(0.95); }
-    100% { opacity: 1; transform: scale(1); }
-}
+.rtl { direction: rtl; text-align: right; }
 
-.nav-item {
-    transition: all 0.2s ease;
-}
-
-.nav-item:hover {
-    background-color: white;
-    color: #18181b;
-}
-
-.nav-item.active {
-    background-color: #00b8a9;
-    color: white;
-}
-
-.lang-btn.active {
-    background-color: #00b8a9;
-    color: white;
-}
-
-.cart-item {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.rtl {
-    direction: rtl;
-    text-align: right;
-}
+/* Mobile touch improvements */
+button, .nav-item { min-height: 44px; }
