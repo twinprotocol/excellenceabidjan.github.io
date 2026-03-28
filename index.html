@@ -3,73 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yamaha Shop Pro</title>
+<title>Music Store POS</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header>
-  <h1>🎹 Yamaha Shop</h1>
+  <div class="header-left">
+    <h2>Music Store POS</h2>
+  </div>
 
-  <div class="top-bar">
-    <input id="search" placeholder="Search products...">
+  <div class="header-right">
+    <input id="search" placeholder="Search...">
 
-    <select id="lang" onchange="setLanguage(this.value)">
+    <select id="lang" onchange="setLang(this.value)">
       <option value="en">EN</option>
       <option value="fr">FR</option>
       <option value="ar">AR</option>
     </select>
 
-    <button onclick="showCart()">🛒 <span id="cartCount">0</span></button>
+    <button onclick="openCart()">Cart (<span id="cartCount">0</span>)</button>
   </div>
 </header>
 
-<main id="products"></main>
+<main id="productList"></main>
 
 <section class="panel">
-  <h2 id="panelTitle">Add Product</h2>
+  <h3 id="panelTitle">Add Product</h3>
 
-  <input id="name" placeholder="Name">
-  <input id="buyPrice" type="number" placeholder="Buy Price">
-  <input id="sellPrice" type="number" placeholder="Sell Price">
+  <input id="name" placeholder="Product name">
+  <input id="buy" type="number" placeholder="Buy price">
+  <input id="sell" type="number" placeholder="Sell price">
   <input id="stock" type="number" placeholder="Stock">
   <input id="image" placeholder="Image URL">
 
   <button onclick="addProduct()">Add</button>
-  <button onclick="restockProduct()">Restock</button>
 </section>
 
 <section class="dashboard">
-  <h2>📊 Dashboard</h2>
-  <p id="salesToday"></p>
-  <p id="revenueToday"></p>
-  <p id="profitToday"></p>
+  <h3>Dashboard</h3>
+  <p id="sales"></p>
+  <p id="revenue"></p>
+  <p id="profit"></p>
 </section>
 
+<!-- CART -->
 <div id="cartModal" class="modal hidden">
-  <h2>Cart</h2>
+  <h3>Cart</h3>
   <ul id="cartItems"></ul>
-  <h3 id="cartTotal"></h3>
+  <h4 id="total"></h4>
   <button onclick="checkout()">Checkout</button>
   <button onclick="closeCart()">Close</button>
 </div>
 
-<div id="invoice" class="modal hidden">
-  <h2>Invoice</h2>
+<!-- INVOICE -->
+<div id="invoiceModal" class="modal hidden">
+  <h3>Invoice</h3>
   <p id="invoiceInfo"></p>
-
   <table>
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Price</th>
-      </tr>
-    </thead>
-    <tbody id="invoiceItems"></tbody>
+    <tbody id="invoiceBody"></tbody>
   </table>
-
-  <h3 id="totalPrice"></h3>
+  <h4 id="invoiceTotal"></h4>
   <button onclick="window.print()">Print</button>
 </div>
 

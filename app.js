@@ -2,25 +2,20 @@ let products = JSON.parse(localStorage.getItem("products")) || [];
 let cart = [];
 let invoices = JSON.parse(localStorage.getItem("invoices")) || [];
 
-let currentLang = "en";
+let lang = "en";
 
-const translations = {
-  en: { add: "Add Product", search: "Search products..." },
+const t = {
+  en: { add: "Add Product", search: "Search..." },
   fr: { add: "Ajouter Produit", search: "Rechercher..." },
   ar: { add: "إضافة منتج", search: "بحث..." }
 };
 
-function setLanguage(lang){
-  currentLang = lang;
+function setLang(l){
+  lang = l;
+  document.getElementById("panelTitle").innerText = t[l].add;
+  document.getElementById("search").placeholder = t[l].search;
 
-  document.getElementById("search").placeholder = translations[lang].search;
-  document.getElementById("panelTitle").innerText = translations[lang].add;
-
-  if(lang === "ar"){
-    document.body.classList.add("rtl");
-  } else {
-    document.body.classList.remove("rtl");
-  }
+  document.body.classList.toggle("rtl", l === "ar");
 }
 
 function save(){
@@ -32,18 +27,18 @@ function format(n){
   return n.toLocaleString() + " FCFA";
 }
 
-function displayProducts(list = products){
-  const container = document.getElementById("products");
+function renderProducts(list = products){
+  let container = document.getElementById("productList");
   container.innerHTML = "";
 
   list.forEach((p,i)=>{
     container.innerHTML += `
       <div class="card">
         <img src="${p.image || 'https://via.placeholder.com/200'}">
-        <h3>${p.name}</h3>
-        <p>${format(p.sellPrice)}</p>
+        <h4>${p.name}</h4>
+        <p>${format(p.sell)}</p>
         <p>Stock: ${p.stock}</p>
-        <button onclick="addToCart(${i})" ${p.stock<=0?'disabled':''}>Add</button>
+        <button onclick="addToCart(${i})">Add</button>
       </div>
     `;
   });
@@ -52,23 +47,14 @@ function displayProducts(list = products){
 function addProduct(){
   products.push({
     name: name.value,
-    buyPrice: Number(buyPrice.value),
-    sellPrice: Number(sellPrice.value),
+    buy: Number(buy.value),
+    sell: Number(sell.value),
     stock: Number(stock.value),
     image: image.value
   });
 
   save();
-  displayProducts();
-}
-
-function restockProduct(){
-  let p = products.find(x => x.name === name.value);
-  if(p){
-    p.stock += Number(stock.value);
-    save();
-    displayProducts();
-  }
+  renderProducts();
 }
 
 function addToCart(i){
@@ -78,20 +64,20 @@ function addToCart(i){
   products[i].stock--;
 
   save();
-  displayProducts();
+  renderProducts();
   cartCount.innerText = cart.length;
 }
 
-function showCart(){
+function openCart(){
   cartItems.innerHTML = "";
   let total = 0;
 
   cart.forEach(i=>{
-    total += i.sellPrice;
-    cartItems.innerHTML += `<li>${i.name} - ${format(i.sellPrice)}</li>`;
+    total += i.sell;
+    cartItems.innerHTML += `<li>${i.name} - ${format(i.sell)}</li>`;
   });
 
-  cartTotal.innerText = "Total: " + format(total);
+  totalEl.innerText = format(total);
   cartModal.classList.remove("hidden");
 }
 
@@ -100,14 +86,14 @@ function closeCart(){
 }
 
 function checkout(){
-  if(!cart.length) return;
+  if(cart.length === 0) return;
 
   let revenue = 0;
   let cost = 0;
 
   cart.forEach(i=>{
-    revenue += i.sellPrice;
-    cost += i.buyPrice;
+    revenue += i.sell;
+    cost += i.buy;
   });
 
   let profit = revenue - cost;
@@ -117,61 +103,54 @@ function checkout(){
     date: new Date().toLocaleDateString(),
     items: [...cart],
     revenue,
-    cost,
     profit
   };
 
   invoices.push(invoice);
   save();
 
+  showInvoice(invoice);
+
   cart = [];
   cartCount.innerText = 0;
-
-  generateInvoice(invoice);
-  updateDashboard();
   closeCart();
+  updateDashboard();
 }
 
-function generateInvoice(inv){
-  invoiceItems.innerHTML = "";
+function showInvoice(inv){
+  invoiceBody.innerHTML = "";
 
   inv.items.forEach(i=>{
-    invoiceItems.innerHTML += `
-      <tr>
-        <td>${i.name}</td>
-        <td>${format(i.sellPrice)}</td>
-      </tr>
-    `;
+    invoiceBody.innerHTML += `<tr><td>${i.name}</td><td>${format(i.sell)}</td></tr>`;
   });
 
-  invoiceInfo.innerText = inv.id + " | " + inv.date;
-  totalPrice.innerText = "Total: " + format(inv.revenue);
-  invoice.classList.remove("hidden");
+  invoiceInfo.innerText = inv.id + " - " + inv.date;
+  invoiceTotal.innerText = format(inv.revenue);
+
+  invoiceModal.classList.remove("hidden");
 }
 
 function updateDashboard(){
   let today = new Date().toLocaleDateString();
 
-  let todayInvoices = invoices.filter(i => i.date === today);
+  let todayInv = invoices.filter(i => i.date === today);
 
-  let revenue = todayInvoices.reduce((t,i)=>t+i.revenue,0);
-  let profit = todayInvoices.reduce((t,i)=>t+i.profit,0);
+  let revenue = todayInv.reduce((a,b)=>a+b.revenue,0);
+  let profit = todayInv.reduce((a,b)=>a+b.profit,0);
 
-  salesToday.innerText = "Sales: " + todayInvoices.length;
-  revenueToday.innerText = "Revenue: " + format(revenue);
-  profitToday.innerText = "Profit: " + format(profit);
+  sales.innerText = "Sales: " + todayInv.length;
+  revenue.innerText = "Revenue: " + format(revenue);
+  profit.innerText = "Profit: " + format(profit);
 }
 
 search.addEventListener("input", e=>{
   let v = e.target.value.toLowerCase();
 
-  let filtered = products.filter(p =>
+  renderProducts(products.filter(p =>
     p.name.toLowerCase().includes(v)
-  );
-
-  displayProducts(filtered);
+  ));
 });
 
-setLanguage("en");
-displayProducts();
+setLang("en");
+renderProducts();
 updateDashboard();
