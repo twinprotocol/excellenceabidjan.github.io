@@ -1,56 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AtlasStock Pro</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mini Messenger</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header>
-  <h1 id="app-title">AtlasStock Pro</h1>
-  <div class="header-controls">
-    <select id="language-selector">
-      <option value="en">English</option>
-      <option value="fr">Français</option>
-      <option value="ar">العربية</option>
-    </select>
-    <select id="currency-selector"></select>
-    <button id="theme-toggle">Dark/Light</button>
+  <div class="app">
+    <header>
+      <h1>Mini Messenger</h1>
+      <div class="top-controls">
+        <input id="myId" placeholder="your id (e.g. alice)" />
+        <input id="peerId" placeholder="peer id (e.g. bob) - leave blank to broadcast" />
+        <button id="connectBtn">Connect</button>
+      </div>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <h3>Online</h3>
+        <ul id="onlineList"></ul>
+      </aside>
+
+      <section class="chat">
+        <div id="messages" class="messages"></div>
+
+        <div class="composer">
+          <input id="textInput" placeholder="Type a message..." />
+          <input id="fileInput" type="file" accept="image/*" />
+          <button id="sendBtn">Send</button>
+        </div>
+      </section>
+    </main>
   </div>
-</header>
 
-<main>
-  <section id="dashboard">
-    <div>Total Products: <span id="total-products">0</span></div>
-    <div>Total Stock Value: <span id="total-value">0</span></div>
-    <div>Total Profit: <span id="total-profit">0</span></div>
-  </section>
-
-  <section id="products-section">
-    <h2>Products</h2>
-    <button id="add-product-btn">Add Product</button>
-    <div id="product-cards" class="cards-container"></div>
-  </section>
-
-  <section id="clients-section">
-    <h2>Clients</h2>
-    <button id="add-client-btn">Add Client</button>
-    <div id="client-cards" class="cards-container"></div>
-  </section>
-
-  <section id="invoices-section">
-    <h2>Invoices</h2>
-    <button id="export-csv">Export CSV</button>
-    <div id="invoice-list" class="cards-container"></div>
-  </section>
-</main>
-
-<!-- Modal -->
-<div id="modal-overlay">
-  <div id="modal-content"></div>
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
