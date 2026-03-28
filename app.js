@@ -2,65 +2,83 @@ let products = JSON.parse(localStorage.getItem("products")) || [];
 let cart = [];
 let invoices = JSON.parse(localStorage.getItem("invoices")) || [];
 
-function saveData(){
+let currentLang = "en";
+
+const translations = {
+  en: { add: "Add Product", search: "Search products..." },
+  fr: { add: "Ajouter Produit", search: "Rechercher..." },
+  ar: { add: "إضافة منتج", search: "بحث..." }
+};
+
+function setLanguage(lang){
+  currentLang = lang;
+
+  document.getElementById("search").placeholder = translations[lang].search;
+  document.getElementById("panelTitle").innerText = translations[lang].add;
+
+  if(lang === "ar"){
+    document.body.classList.add("rtl");
+  } else {
+    document.body.classList.remove("rtl");
+  }
+}
+
+function save(){
   localStorage.setItem("products", JSON.stringify(products));
   localStorage.setItem("invoices", JSON.stringify(invoices));
 }
 
-function format(p){
-  return p.toLocaleString() + " FCFA";
+function format(n){
+  return n.toLocaleString() + " FCFA";
 }
 
-function displayProducts(){
+function displayProducts(list = products){
   const container = document.getElementById("products");
   container.innerHTML = "";
 
-  products.forEach((p,i)=>{
+  list.forEach((p,i)=>{
     container.innerHTML += `
-    <div class="card">
-      <img src="${p.image || 'https://via.placeholder.com/200'}">
-      <h3>${p.name}</h3>
-      <p>Sell: ${format(p.sellPrice)}</p>
-      <p>Buy: ${format(p.buyPrice)}</p>
-      <p>Stock: ${p.stock}</p>
-      <button onclick="addToCart(${i})" ${p.stock<=0?'disabled':''}>Add</button>
-    </div>`;
+      <div class="card">
+        <img src="${p.image || 'https://via.placeholder.com/200'}">
+        <h3>${p.name}</h3>
+        <p>${format(p.sellPrice)}</p>
+        <p>Stock: ${p.stock}</p>
+        <button onclick="addToCart(${i})" ${p.stock<=0?'disabled':''}>Add</button>
+      </div>
+    `;
   });
 }
 
 function addProduct(){
   products.push({
-    name:name.value,
-    buyPrice:+buyPrice.value,
-    sellPrice:+sellPrice.value,
-    stock:+stock.value,
-    image:image.value
+    name: name.value,
+    buyPrice: Number(buyPrice.value),
+    sellPrice: Number(sellPrice.value),
+    stock: Number(stock.value),
+    image: image.value
   });
-  saveData();
+
+  save();
   displayProducts();
 }
 
 function restockProduct(){
-  const pname = name.value;
-  const qty = Number(stock.value);
-  let p = products.find(x => x.name === pname);
+  let p = products.find(x => x.name === name.value);
   if(p){
-    p.stock += qty;
-    saveData();
+    p.stock += Number(stock.value);
+    save();
     displayProducts();
   }
 }
 
 function addToCart(i){
   if(products[i].stock <= 0) return;
+
   cart.push(products[i]);
   products[i].stock--;
-  saveData();
-  displayProducts();
-  updateCartCount();
-}
 
-function updateCartCount(){
+  save();
+  displayProducts();
   cartCount.innerText = cart.length;
 }
 
@@ -94,7 +112,7 @@ function checkout(){
 
   let profit = revenue - cost;
 
-  const invoice = {
+  let invoice = {
     id: "INV-" + Date.now(),
     date: new Date().toLocaleDateString(),
     items: [...cart],
@@ -104,13 +122,14 @@ function checkout(){
   };
 
   invoices.push(invoice);
-  saveData();
+  save();
+
+  cart = [];
+  cartCount.innerText = 0;
 
   generateInvoice(invoice);
-  cart = [];
-  updateCartCount();
-  closeCart();
   updateDashboard();
+  closeCart();
 }
 
 function generateInvoice(inv){
@@ -121,16 +140,18 @@ function generateInvoice(inv){
       <tr>
         <td>${i.name}</td>
         <td>${format(i.sellPrice)}</td>
-      </tr>`;
+      </tr>
+    `;
   });
 
-  totalPrice.innerText = "Total: " + format(inv.revenue);
   invoiceInfo.innerText = inv.id + " | " + inv.date;
+  totalPrice.innerText = "Total: " + format(inv.revenue);
   invoice.classList.remove("hidden");
 }
 
 function updateDashboard(){
   let today = new Date().toLocaleDateString();
+
   let todayInvoices = invoices.filter(i => i.date === today);
 
   let revenue = todayInvoices.reduce((t,i)=>t+i.revenue,0);
@@ -143,18 +164,14 @@ function updateDashboard(){
 
 search.addEventListener("input", e=>{
   let v = e.target.value.toLowerCase();
-  const container = document.getElementById("products");
-  container.innerHTML = "";
 
-  products.filter(p => p.name.toLowerCase().includes(v))
-  .forEach((p,i)=>{
-    container.innerHTML += `
-    <div class="card">
-      <h3>${p.name}</h3>
-      <p>${format(p.sellPrice)}</p>
-    </div>`;
-  });
+  let filtered = products.filter(p =>
+    p.name.toLowerCase().includes(v)
+  );
+
+  displayProducts(filtered);
 });
 
-updateDashboard();
+setLanguage("en");
 displayProducts();
+updateDashboard();

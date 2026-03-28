@@ -6,24 +6,37 @@
 <title>Yamaha Shop Pro</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <header>
   <h1>🎹 Yamaha Shop</h1>
-  <input type="text" id="search" placeholder="Search...">
-  <button onclick="showCart()">🛒 <span id="cartCount">0</span></button>
+
+  <div class="top-bar">
+    <input id="search" placeholder="Search products...">
+
+    <select id="lang" onchange="setLanguage(this.value)">
+      <option value="en">EN</option>
+      <option value="fr">FR</option>
+      <option value="ar">AR</option>
+    </select>
+
+    <button onclick="showCart()">🛒 <span id="cartCount">0</span></button>
+  </div>
 </header>
 
 <main id="products"></main>
 
 <section class="panel">
-  <h2>Add / Restock Product</h2>
+  <h2 id="panelTitle">Add Product</h2>
+
   <input id="name" placeholder="Name">
-  <input id="buyPrice" type="number" placeholder="Buy Price (FCFA)">
-  <input id="sellPrice" type="number" placeholder="Sell Price (FCFA)">
+  <input id="buyPrice" type="number" placeholder="Buy Price">
+  <input id="sellPrice" type="number" placeholder="Sell Price">
   <input id="stock" type="number" placeholder="Stock">
   <input id="image" placeholder="Image URL">
-  <button onclick="addProduct()">Add Product</button>
+
+  <button onclick="addProduct()">Add</button>
   <button onclick="restockProduct()">Restock</button>
 </section>
 
