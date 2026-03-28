@@ -1,175 +1,160 @@
-let lang = "en";
-
-const translations = {
-  en: {
-    title: "🎹 Yamaha Shop",
-    search: "Search...",
-    sell: "Sell Product",
-    add: "Add",
-    cart: "Cart",
-    checkout: "Checkout",
-    close: "Close",
-    product: "Product",
-    price: "Price",
-    print: "Print",
-    all: "All",
-    keyboards: "Keyboards",
-    guitars: "Guitars",
-    drums: "Drums"
-  },
-  fr: {
-    title: "🎹 Boutique Yamaha",
-    search: "Rechercher...",
-    sell: "Vendre un produit",
-    add: "Ajouter",
-    cart: "Panier",
-    checkout: "Paiement",
-    close: "Fermer",
-    product: "Produit",
-    price: "Prix",
-    print: "Imprimer",
-    all: "Tous",
-    keyboards: "Claviers",
-    guitars: "Guitares",
-    drums: "Batteries"
-  },
-  ar: {
-    title: "🎹 متجر ياماها",
-    search: "بحث...",
-    sell: "بيع منتج",
-    add: "إضافة",
-    cart: "السلة",
-    checkout: "الدفع",
-    close: "إغلاق",
-    product: "منتج",
-    price: "السعر",
-    print: "طباعة",
-    all: "الكل",
-    keyboards: "بيانو",
-    guitars: "قيتار",
-    drums: "طبول"
-  }
-};
-
-document.getElementById("langSelect").addEventListener("change", changeLang);
-
-function changeLang() {
-  lang = document.getElementById("langSelect").value;
-  const t = translations[lang];
-
-  document.getElementById("title").innerText = t.title;
-  document.getElementById("search").placeholder = t.search;
-  document.getElementById("sellTitle").innerText = t.sell;
-  document.getElementById("addBtn").innerText = t.add;
-  document.getElementById("cartTitle").innerText = t.cart;
-  document.getElementById("checkoutBtn").innerText = t.checkout;
-  document.getElementById("closeBtn").innerText = t.close;
-  document.getElementById("prodCol").innerText = t.product;
-  document.getElementById("priceCol").innerText = t.price;
-  document.getElementById("printBtn").innerText = t.print;
-  document.getElementById("allBtn").innerText = t.all;
-  document.getElementById("keyBtn").innerText = t.keyboards;
-  document.getElementById("guitarBtn").innerText = t.guitars;
-  document.getElementById("drumBtn").innerText = t.drums;
-
-  document.body.style.direction = (lang === "ar") ? "rtl" : "ltr";
-}
-
-let products = JSON.parse(localStorage.getItem("products")) || [
-  { name:"Yamaha PSR-E373", price:250000, image:"https://via.placeholder.com/200", category:"keyboard" },
-  { name:"Yamaha Guitar F310", price:150000, image:"https://via.placeholder.com/200", category:"guitar" }
-];
-
+let products = JSON.parse(localStorage.getItem("products")) || [];
 let cart = [];
+let invoices = JSON.parse(localStorage.getItem("invoices")) || [];
 
-function formatPrice(price) {
-  return price.toLocaleString() + " FCFA";
+function saveData(){
+  localStorage.setItem("products", JSON.stringify(products));
+  localStorage.setItem("invoices", JSON.stringify(invoices));
 }
 
-function displayProducts(list = products) {
-  const c = document.getElementById("products");
-  c.innerHTML = "";
+function format(p){
+  return p.toLocaleString() + " FCFA";
+}
 
-  list.forEach((p, i) => {
-    c.innerHTML += `
-      <div class="card">
-        <img src="${p.image}">
-        <h3>${p.name}</h3>
-        <p>${formatPrice(p.price)}</p>
-        <button onclick="addToCart(${i})">+</button>
-      </div>
-    `;
+function displayProducts(){
+  const container = document.getElementById("products");
+  container.innerHTML = "";
+
+  products.forEach((p,i)=>{
+    container.innerHTML += `
+    <div class="card">
+      <img src="${p.image || 'https://via.placeholder.com/200'}">
+      <h3>${p.name}</h3>
+      <p>Sell: ${format(p.sellPrice)}</p>
+      <p>Buy: ${format(p.buyPrice)}</p>
+      <p>Stock: ${p.stock}</p>
+      <button onclick="addToCart(${i})" ${p.stock<=0?'disabled':''}>Add</button>
+    </div>`;
   });
 }
 
-function addProduct() {
-  const p = {
-    name: name.value,
-    price: Number(price.value),
-    image: image.value,
-    category: category.value
-  };
-
-  products.push(p);
-  localStorage.setItem("products", JSON.stringify(products));
+function addProduct(){
+  products.push({
+    name:name.value,
+    buyPrice:+buyPrice.value,
+    sellPrice:+sellPrice.value,
+    stock:+stock.value,
+    image:image.value
+  });
+  saveData();
   displayProducts();
 }
 
-function addToCart(i) {
-  cart.push(products[i]);
+function restockProduct(){
+  const pname = name.value;
+  const qty = Number(stock.value);
+  let p = products.find(x => x.name === pname);
+  if(p){
+    p.stock += qty;
+    saveData();
+    displayProducts();
+  }
 }
 
-function showCart() {
-  const list = document.getElementById("cartItems");
-  list.innerHTML = "";
+function addToCart(i){
+  if(products[i].stock <= 0) return;
+  cart.push(products[i]);
+  products[i].stock--;
+  saveData();
+  displayProducts();
+  updateCartCount();
+}
 
-  cart.forEach(i => {
-    list.innerHTML += `<li>${i.name} - ${formatPrice(i.price)}</li>`;
+function updateCartCount(){
+  cartCount.innerText = cart.length;
+}
+
+function showCart(){
+  cartItems.innerHTML = "";
+  let total = 0;
+
+  cart.forEach(i=>{
+    total += i.sellPrice;
+    cartItems.innerHTML += `<li>${i.name} - ${format(i.sellPrice)}</li>`;
   });
 
+  cartTotal.innerText = "Total: " + format(total);
   cartModal.classList.remove("hidden");
 }
 
-function closeCart() {
+function closeCart(){
   cartModal.classList.add("hidden");
 }
 
-function checkout() {
-  if (!cart.length) return;
-  generateInvoice();
-  cart = [];
-  closeCart();
-}
+function checkout(){
+  if(!cart.length) return;
 
-function generateInvoice() {
-  let total = 0;
-  const items = document.getElementById("invoiceItems");
-  items.innerHTML = "";
+  let revenue = 0;
+  let cost = 0;
 
-  cart.forEach(i => {
-    total += i.price;
-    items.innerHTML += `<tr><td>${i.name}</td><td>${formatPrice(i.price)}</td></tr>`;
+  cart.forEach(i=>{
+    revenue += i.sellPrice;
+    cost += i.buyPrice;
   });
 
-  totalPrice.innerText = "Total: " + formatPrice(total);
-  invoiceDate.innerText = "Date: " + new Date().toLocaleDateString();
-  invoiceNumber.innerText = "INV-" + Date.now();
+  let profit = revenue - cost;
 
+  const invoice = {
+    id: "INV-" + Date.now(),
+    date: new Date().toLocaleDateString(),
+    items: [...cart],
+    revenue,
+    cost,
+    profit
+  };
+
+  invoices.push(invoice);
+  saveData();
+
+  generateInvoice(invoice);
+  cart = [];
+  updateCartCount();
+  closeCart();
+  updateDashboard();
+}
+
+function generateInvoice(inv){
+  invoiceItems.innerHTML = "";
+
+  inv.items.forEach(i=>{
+    invoiceItems.innerHTML += `
+      <tr>
+        <td>${i.name}</td>
+        <td>${format(i.sellPrice)}</td>
+      </tr>`;
+  });
+
+  totalPrice.innerText = "Total: " + format(inv.revenue);
+  invoiceInfo.innerText = inv.id + " | " + inv.date;
   invoice.classList.remove("hidden");
 }
 
-function printInvoice() {
-  window.print();
+function updateDashboard(){
+  let today = new Date().toLocaleDateString();
+  let todayInvoices = invoices.filter(i => i.date === today);
+
+  let revenue = todayInvoices.reduce((t,i)=>t+i.revenue,0);
+  let profit = todayInvoices.reduce((t,i)=>t+i.profit,0);
+
+  salesToday.innerText = "Sales: " + todayInvoices.length;
+  revenueToday.innerText = "Revenue: " + format(revenue);
+  profitToday.innerText = "Profit: " + format(profit);
 }
 
-function filterCategory(cat) {
-  if (cat === "all") return displayProducts();
-  displayProducts(products.filter(p => p.category === cat));
-}
+search.addEventListener("input", e=>{
+  let v = e.target.value.toLowerCase();
+  const container = document.getElementById("products");
+  container.innerHTML = "";
 
-search.addEventListener("input", e => {
-  const v = e.target.value.toLowerCase();
-  displayProducts(products.filter(p => p.name.toLowerCase().includes(v)));
+  products.filter(p => p.name.toLowerCase().includes(v))
+  .forEach((p,i)=>{
+    container.innerHTML += `
+    <div class="card">
+      <h3>${p.name}</h3>
+      <p>${format(p.sellPrice)}</p>
+    </div>`;
+  });
 });
 
+updateDashboard();
 displayProducts();
