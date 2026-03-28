@@ -1,40 +1,78 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mini Messenger</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yamaha Shop</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>Mini Messenger</h1>
-      <div class="top-controls">
-        <input id="myId" placeholder="your id (e.g. alice)" />
-        <input id="peerId" placeholder="peer id (e.g. bob) - leave blank to broadcast" />
-        <button id="connectBtn">Connect</button>
-      </div>
-    </header>
 
-    <main>
-      <aside class="sidebar">
-        <h3>Online</h3>
-        <ul id="onlineList"></ul>
-      </aside>
+<header>
+  <h1 id="title">🎹 Yamaha Shop</h1>
 
-      <section class="chat">
-        <div id="messages" class="messages"></div>
+  <input type="text" id="search" placeholder="Search...">
 
-        <div class="composer">
-          <input id="textInput" placeholder="Type a message..." />
-          <input id="fileInput" type="file" accept="image/*" />
-          <button id="sendBtn">Send</button>
-        </div>
-      </section>
-    </main>
+  <div>
+    <select id="langSelect">
+      <option value="en">EN</option>
+      <option value="fr">FR</option>
+      <option value="ar">AR</option>
+    </select>
+
+    <button onclick="showCart()">🛒</button>
   </div>
+</header>
 
-  <script src="app.js"></script>
+<div class="filters">
+  <button onclick="filterCategory('all')" id="allBtn">All</button>
+  <button onclick="filterCategory('keyboard')" id="keyBtn">Keyboards</button>
+  <button onclick="filterCategory('guitar')" id="guitarBtn">Guitars</button>
+  <button onclick="filterCategory('drums')" id="drumBtn">Drums</button>
+</div>
+
+<main id="products"></main>
+
+<section class="sell">
+  <h2 id="sellTitle">Sell Product</h2>
+  <input id="name" placeholder="Name">
+  <input id="price" type="number" placeholder="Price">
+  <input id="image" placeholder="Image URL">
+  <select id="category">
+    <option value="keyboard">Keyboard</option>
+    <option value="guitar">Guitar</option>
+    <option value="drums">Drums</option>
+  </select>
+  <button onclick="addProduct()" id="addBtn">Add</button>
+</section>
+
+<div id="cartModal" class="hidden">
+  <h2 id="cartTitle">Cart</h2>
+  <ul id="cartItems"></ul>
+  <button onclick="checkout()" id="checkoutBtn">Checkout</button>
+  <button onclick="closeCart()" id="closeBtn">Close</button>
+</div>
+
+<div id="invoice" class="hidden">
+  <h2>Yamaha Music Shop</h2>
+  <p id="invoiceNumber"></p>
+  <p id="invoiceDate"></p>
+  <input id="customerName" placeholder="Customer Name">
+
+  <table>
+    <thead>
+      <tr>
+        <th id="prodCol">Product</th>
+        <th id="priceCol">Price</th>
+      </tr>
+    </thead>
+    <tbody id="invoiceItems"></tbody>
+  </table>
+
+  <h3 id="totalPrice"></h3>
+  <button onclick="printInvoice()" id="printBtn">Print</button>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

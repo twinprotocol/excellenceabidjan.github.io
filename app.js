@@ -1,119 +1,175 @@
-let ws;
-let myIdInput = document.getElementById('myId');
-let peerIdInput = document.getElementById('peerId');
-const connectBtn = document.getElementById('connectBtn');
-const sendBtn = document.getElementById('sendBtn');
-const textInput = document.getElementById('textInput');
-const fileInput = document.getElementById('fileInput');
-const messagesEl = document.getElementById('messages');
-const onlineList = document.getElementById('onlineList');
+let lang = "en";
 
-function appendMessage(text, meta = '') {
-  const el = document.createElement('div');
-  el.className = 'msg';
-  if (meta && meta.startsWith('me:')) el.classList.add('me');
-  el.innerHTML = `<div class="meta">${meta}</div><div class="body">${text}</div>`;
-  messagesEl.appendChild(el);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-function connect() {
-  const myId = (myIdInput.value || '').trim();
-  if (!myId) return alert('Enter your id first (e.g. alice)');
-
-  const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/?id=${encodeURIComponent(myId)}`;
-  ws = new WebSocket(wsUrl);
-
-  ws.addEventListener('open', () => {
-    appendMessage('Connected to server', 'system');
-  });
-
-  ws.addEventListener('message', (ev) => {
-    let data;
-    try {
-      data = JSON.parse(ev.data);
-    } catch (e) {
-      console.log('non JSON message', ev.data);
-      return;
-    }
-
-    if (data.type === 'presence') {
-      renderOnline(data.online);
-      return;
-    }
-
-    if (data.type === 'text') {
-      appendMessage(escapeHtml(data.payload), `${data.from}`);
-      return;
-    }
-
-    if (data.type === 'image') {
-      // payload is DataURL
-      const imgHtml = `<img src="${data.payload}" alt="image" />`;
-      appendMessage(imgHtml, `${data.from}`);
-      return;
-    }
-
-    if (data.type === 'delivery-failed') {
-      appendMessage(`Delivery to ${data.to} failed (offline)`, 'system');
-    }
-  });
-
-  ws.addEventListener('close', () => {
-    appendMessage('Disconnected from server', 'system');
-  });
-
-  ws.addEventListener('error', (e) => {
-    console.error('ws error', e);
-  });
-}
-
-connectBtn.onclick = () => {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.close();
-    connectBtn.textContent = 'Connect';
-    return;
-  }
-  connect();
-  connectBtn.textContent = 'Disconnect';
-};
-
-sendBtn.onclick = () => {
-  if (!ws || ws.readyState !== WebSocket.OPEN) return alert('Not connected');
-  const text = textInput.value.trim();
-  const to = (peerIdInput.value || '').trim() || null;
-
-  if (fileInput.files && fileInput.files[0]) {
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataURL = reader.result;
-      const payload = { type: 'image', to, payload: dataURL };
-      ws.send(JSON.stringify(payload));
-      appendMessage(`<img src="${dataURL}" />`, `me:${to || 'all'}`);
-      fileInput.value = '';
-    };
-    reader.readAsDataURL(file);
-  } else if (text) {
-    const payload = { type: 'text', to, payload: text };
-    ws.send(JSON.stringify(payload));
-    appendMessage(escapeHtml(text), `me:${to || 'all'}`);
-    textInput.value = '';
+const translations = {
+  en: {
+    title: "🎹 Yamaha Shop",
+    search: "Search...",
+    sell: "Sell Product",
+    add: "Add",
+    cart: "Cart",
+    checkout: "Checkout",
+    close: "Close",
+    product: "Product",
+    price: "Price",
+    print: "Print",
+    all: "All",
+    keyboards: "Keyboards",
+    guitars: "Guitars",
+    drums: "Drums"
+  },
+  fr: {
+    title: "🎹 Boutique Yamaha",
+    search: "Rechercher...",
+    sell: "Vendre un produit",
+    add: "Ajouter",
+    cart: "Panier",
+    checkout: "Paiement",
+    close: "Fermer",
+    product: "Produit",
+    price: "Prix",
+    print: "Imprimer",
+    all: "Tous",
+    keyboards: "Claviers",
+    guitars: "Guitares",
+    drums: "Batteries"
+  },
+  ar: {
+    title: "🎹 متجر ياماها",
+    search: "بحث...",
+    sell: "بيع منتج",
+    add: "إضافة",
+    cart: "السلة",
+    checkout: "الدفع",
+    close: "إغلاق",
+    product: "منتج",
+    price: "السعر",
+    print: "طباعة",
+    all: "الكل",
+    keyboards: "بيانو",
+    guitars: "قيتار",
+    drums: "طبول"
   }
 };
 
-function renderOnline(list) {
-  onlineList.innerHTML = '';
-  list.forEach(id => {
-    const li = document.createElement('li');
-    li.textContent = id;
-    li.onclick = () => {
-      peerIdInput.value = id;
-    };
-    onlineList.appendChild(li);
+document.getElementById("langSelect").addEventListener("change", changeLang);
+
+function changeLang() {
+  lang = document.getElementById("langSelect").value;
+  const t = translations[lang];
+
+  document.getElementById("title").innerText = t.title;
+  document.getElementById("search").placeholder = t.search;
+  document.getElementById("sellTitle").innerText = t.sell;
+  document.getElementById("addBtn").innerText = t.add;
+  document.getElementById("cartTitle").innerText = t.cart;
+  document.getElementById("checkoutBtn").innerText = t.checkout;
+  document.getElementById("closeBtn").innerText = t.close;
+  document.getElementById("prodCol").innerText = t.product;
+  document.getElementById("priceCol").innerText = t.price;
+  document.getElementById("printBtn").innerText = t.print;
+  document.getElementById("allBtn").innerText = t.all;
+  document.getElementById("keyBtn").innerText = t.keyboards;
+  document.getElementById("guitarBtn").innerText = t.guitars;
+  document.getElementById("drumBtn").innerText = t.drums;
+
+  document.body.style.direction = (lang === "ar") ? "rtl" : "ltr";
+}
+
+let products = JSON.parse(localStorage.getItem("products")) || [
+  { name:"Yamaha PSR-E373", price:250000, image:"https://via.placeholder.com/200", category:"keyboard" },
+  { name:"Yamaha Guitar F310", price:150000, image:"https://via.placeholder.com/200", category:"guitar" }
+];
+
+let cart = [];
+
+function formatPrice(price) {
+  return price.toLocaleString() + " FCFA";
+}
+
+function displayProducts(list = products) {
+  const c = document.getElementById("products");
+  c.innerHTML = "";
+
+  list.forEach((p, i) => {
+    c.innerHTML += `
+      <div class="card">
+        <img src="${p.image}">
+        <h3>${p.name}</h3>
+        <p>${formatPrice(p.price)}</p>
+        <button onclick="addToCart(${i})">+</button>
+      </div>
+    `;
   });
 }
 
-function escapeHtml(unsafe) {
-  return unsafe.replace(/[&<"'>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]);
+function addProduct() {
+  const p = {
+    name: name.value,
+    price: Number(price.value),
+    image: image.value,
+    category: category.value
+  };
+
+  products.push(p);
+  localStorage.setItem("products", JSON.stringify(products));
+  displayProducts();
 }
+
+function addToCart(i) {
+  cart.push(products[i]);
+}
+
+function showCart() {
+  const list = document.getElementById("cartItems");
+  list.innerHTML = "";
+
+  cart.forEach(i => {
+    list.innerHTML += `<li>${i.name} - ${formatPrice(i.price)}</li>`;
+  });
+
+  cartModal.classList.remove("hidden");
+}
+
+function closeCart() {
+  cartModal.classList.add("hidden");
+}
+
+function checkout() {
+  if (!cart.length) return;
+  generateInvoice();
+  cart = [];
+  closeCart();
+}
+
+function generateInvoice() {
+  let total = 0;
+  const items = document.getElementById("invoiceItems");
+  items.innerHTML = "";
+
+  cart.forEach(i => {
+    total += i.price;
+    items.innerHTML += `<tr><td>${i.name}</td><td>${formatPrice(i.price)}</td></tr>`;
+  });
+
+  totalPrice.innerText = "Total: " + formatPrice(total);
+  invoiceDate.innerText = "Date: " + new Date().toLocaleDateString();
+  invoiceNumber.innerText = "INV-" + Date.now();
+
+  invoice.classList.remove("hidden");
+}
+
+function printInvoice() {
+  window.print();
+}
+
+function filterCategory(cat) {
+  if (cat === "all") return displayProducts();
+  displayProducts(products.filter(p => p.category === cat));
+}
+
+search.addEventListener("input", e => {
+  const v = e.target.value.toLowerCase();
+  displayProducts(products.filter(p => p.name.toLowerCase().includes(v)));
+});
+
+displayProducts();
