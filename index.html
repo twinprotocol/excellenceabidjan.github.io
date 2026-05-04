@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
     <title>YamahaBidjan Stock Manager</title>
     <link rel="stylesheet" href="styles.css">
     <script defer src="script.js"></script>
@@ -10,35 +11,42 @@
 <body>
     <header class="topbar">
         <div class="brand">
-            <div class="brand-mark">YB</div>
-            <div>
+            <div class="brand-mark">
+                <span>YB</span>
+            </div>
+            <div class="brand-copy">
                 <h1>YamahaBidjan</h1>
                 <p>Stock Manager • Abidjan</p>
             </div>
         </div>
 
-        <div class="lang-switch">
-            <button id="lang-en" onclick="switchLanguage('en')">EN</button>
-            <button id="lang-fr" onclick="switchLanguage('fr')">FR</button>
-            <button id="lang-ar" onclick="switchLanguage('ar')">AR</button>
+        <div class="top-actions">
+            <div class="lang-switch" aria-label="Language switcher">
+                <button id="lang-en" type="button" onclick="switchLanguage('en')">EN</button>
+                <button id="lang-fr" type="button" onclick="switchLanguage('fr')">FR</button>
+                <button id="lang-ar" type="button" onclick="switchLanguage('ar')">AR</button>
+            </div>
+            <button class="cart-chip" type="button" onclick="showCart()">
+                <span class="icon">🧾</span>
+                <span id="cart-count">0</span>
+            </button>
         </div>
     </header>
 
-    <div class="layout">
+    <div class="app-shell">
         <aside id="sidebar" class="sidebar"></aside>
         <main id="main" class="main">
-            <div class="loading">Loading YamahaBidjan...</div>
+            <div class="loading-card">
+                <div class="loader"></div>
+                <p>Loading YamahaBidjan...</p>
+            </div>
         </main>
     </div>
 
-    <nav id="mobile-nav" class="mobile-nav"></nav>
+    <nav id="mobile-nav" class="mobile-nav" aria-label="Main navigation"></nav>
 
     <div id="modal" class="modal hidden"></div>
     <div id="cart-drawer" class="drawer hidden"></div>
     <div id="toast" class="toast hidden"></div>
-
-    <noscript>
-        <div class="noscript">Please enable JavaScript to use YamahaBidjan.</div>
-    </noscript>
 </body>
 </html>
