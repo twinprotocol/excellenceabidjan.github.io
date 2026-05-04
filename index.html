@@ -1,52 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
-    <title>YamahaBidjan Stock Manager</title>
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="script.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Store POS</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-mark">
-                <span>YB</span>
-            </div>
-            <div class="brand-copy">
-                <h1>YamahaBidjan</h1>
-                <p>Stock Manager • Abidjan</p>
-            </div>
-        </div>
 
-        <div class="top-actions">
-            <div class="lang-switch" aria-label="Language switcher">
-                <button id="lang-en" type="button" onclick="switchLanguage('en')">EN</button>
-                <button id="lang-fr" type="button" onclick="switchLanguage('fr')">FR</button>
-                <button id="lang-ar" type="button" onclick="switchLanguage('ar')">AR</button>
-            </div>
-            <button class="cart-chip" type="button" onclick="showCart()">
-                <span class="icon">🧾</span>
-                <span id="cart-count">0</span>
-            </button>
-        </div>
-    </header>
+<header class="header">
+  <h2 id="title">Music Store POS</h2>
 
-    <div class="app-shell">
-        <aside id="sidebar" class="sidebar"></aside>
-        <main id="main" class="main">
-            <div class="loading-card">
-                <div class="loader"></div>
-                <p>Loading YamahaBidjan...</p>
-            </div>
-        </main>
-    </div>
+  <div class="controls">
+    <input id="search" placeholder="Search products...">
 
-    <nav id="mobile-nav" class="mobile-nav" aria-label="Main navigation"></nav>
+    <select id="language">
+      <option value="en">EN</option>
+      <option value="fr">FR</option>
+      <option value="ar">AR</option>
+    </select>
 
-    <div id="modal" class="modal hidden"></div>
-    <div id="cart-drawer" class="drawer hidden"></div>
-    <div id="toast" class="toast hidden"></div>
+    <button id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
+  </div>
+</header>
+
+<main id="productContainer"></main>
+
+<section class="panel">
+  <h3 id="panelTitle">Add Product</h3>
+
+  <input id="pName" placeholder="Name">
+  <input id="pBuy" type="number" placeholder="Buy Price">
+  <input id="pSell" type="number" placeholder="Sell Price">
+  <input id="pStock" type="number" placeholder="Stock">
+  <input id="pImage" placeholder="Image URL">
+
+  <button id="addBtn">Add</button>
+</section>
+
+<section class="dashboard">
+  <h3>Dashboard</h3>
+  <p id="sales"></p>
+  <p id="revenue"></p>
+  <p id="profit"></p>
+</section>
+
+<!-- CART -->
+<div id="cartModal" class="modal hidden">
+  <h3>Cart</h3>
+  <ul id="cartList"></ul>
+  <h4 id="cartTotal"></h4>
+  <button id="checkoutBtn">Checkout</button>
+  <button id="closeCartBtn">Close</button>
+</div>
+
+<!-- INVOICE -->
+<div id="invoiceModal" class="modal hidden">
+  <h3>Invoice</h3>
+  <p id="invoiceHeader"></p>
+  <table>
+    <tbody id="invoiceTable"></tbody>
+  </table>
+  <h4 id="invoiceTotal"></h4>
+  <button onclick="window.print()">Print</button>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
