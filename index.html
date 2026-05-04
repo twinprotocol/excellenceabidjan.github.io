@@ -1,71 +1,258 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Music Store POS</title>
-<link rel="stylesheet" href="style.css">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yamaha Music Shop</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Shop navigation">
+        <div class="brand-block">
+          <div class="brand-mark">Y</div>
+          <div>
+            <p>Yamaha</p>
+            <span>Music Shop</span>
+          </div>
+        </div>
 
-<body>
+        <nav class="nav-list">
+          <button class="nav-item active" data-view="catalog" type="button" title="Catalog">
+            <span aria-hidden="true">C</span>
+            <b>Catalog</b>
+          </button>
+          <button class="nav-item" data-view="cashier" type="button" title="Cashier">
+            <span aria-hidden="true">$</span>
+            <b>Cashier</b>
+          </button>
+          <button class="nav-item" data-view="buyback" type="button" title="Buy Used">
+            <span aria-hidden="true">B</span>
+            <b>Buy Used</b>
+          </button>
+          <button class="nav-item" data-view="records" type="button" title="Records">
+            <span aria-hidden="true">R</span>
+            <b>Records</b>
+          </button>
+        </nav>
 
-<header class="header">
-  <h2 id="title">Music Store POS</h2>
+        <div class="cash-only">
+          <span>Cash only</span>
+          <strong>No card, no credit</strong>
+        </div>
+      </aside>
 
-  <div class="controls">
-    <input id="search" placeholder="Search products...">
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Daily instrument sales and purchasing</p>
+            <h1>Yamaha Musical Instrument Shop</h1>
+          </div>
+          <div class="top-actions">
+            <button class="ghost-button" id="resetDemo" type="button">Reset Demo</button>
+            <button class="primary-button" data-view-jump="cashier" type="button">Open Invoice</button>
+          </div>
+        </header>
 
-    <select id="language">
-      <option value="en">EN</option>
-      <option value="fr">FR</option>
-      <option value="ar">AR</option>
-    </select>
+        <section class="stats-row" aria-label="Shop summary">
+          <article>
+            <span>Cash sales today</span>
+            <strong id="statSales">$0.00</strong>
+          </article>
+          <article>
+            <span>Items in stock</span>
+            <strong id="statStock">0</strong>
+          </article>
+          <article>
+            <span>Cart total</span>
+            <strong id="statCart">$0.00</strong>
+          </article>
+          <article>
+            <span>Used purchases</span>
+            <strong id="statBuybacks">0</strong>
+          </article>
+        </section>
 
-    <button id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
-  </div>
-</header>
+        <section class="view-panel active" id="catalogView">
+          <div class="toolbar">
+            <label class="search-field">
+              <span>Search</span>
+              <input id="searchInput" type="search" placeholder="Piano, guitar, speaker..." />
+            </label>
+            <label class="select-field">
+              <span>Category</span>
+              <select id="categoryFilter">
+                <option value="All">All products</option>
+              </select>
+            </label>
+            <label class="select-field">
+              <span>Sort</span>
+              <select id="sortSelect">
+                <option value="featured">Featured</option>
+                <option value="priceLow">Price: low to high</option>
+                <option value="priceHigh">Price: high to low</option>
+                <option value="stock">Stock available</option>
+              </select>
+            </label>
+          </div>
+          <div class="product-grid" id="productGrid" aria-live="polite"></div>
+        </section>
 
-<main id="productContainer"></main>
+        <section class="view-panel" id="cashierView">
+          <div class="split-layout">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Point of sale</p>
+                  <h2>Cart</h2>
+                </div>
+                <button class="ghost-button" id="clearCart" type="button">Clear</button>
+              </div>
+              <div class="cart-list" id="cartList"></div>
+            </div>
 
-<section class="panel">
-  <h3 id="panelTitle">Add Product</h3>
+            <form class="panel checkout-panel" id="checkoutForm">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Cash invoice</p>
+                  <h2>Client details</h2>
+                </div>
+              </div>
+              <label>
+                Client name
+                <input id="clientName" required placeholder="Client full name" />
+              </label>
+              <label>
+                Phone
+                <input id="clientPhone" placeholder="+213 ..." />
+              </label>
+              <label>
+                Address
+                <input id="clientAddress" placeholder="Client address" />
+              </label>
+              <div class="money-box">
+                <span>Subtotal</span>
+                <strong id="subtotalValue">$0.00</strong>
+                <span>Discount</span>
+                <input id="discountInput" type="number" min="0" step="1" value="0" />
+                <span>Cash received</span>
+                <input id="cashReceived" type="number" min="0" step="1" value="0" required />
+                <span>Change</span>
+                <strong id="changeValue">$0.00</strong>
+              </div>
+              <button class="primary-button full" type="submit">Create Printable Invoice</button>
+              <p class="fine-print">Payment method is fixed to cash only. The invoice is prepared for client printing.</p>
+            </form>
+          </div>
+        </section>
 
-  <input id="pName" placeholder="Name">
-  <input id="pBuy" type="number" placeholder="Buy Price">
-  <input id="pSell" type="number" placeholder="Sell Price">
-  <input id="pStock" type="number" placeholder="Stock">
-  <input id="pImage" placeholder="Image URL">
+        <section class="view-panel" id="buybackView">
+          <div class="split-layout">
+            <form class="panel" id="buybackForm">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Shop buys from client</p>
+                  <h2>Used instrument intake</h2>
+                </div>
+              </div>
+              <label>
+                Seller name
+                <input id="sellerName" required placeholder="Seller full name" />
+              </label>
+              <label>
+                Instrument
+                <input id="usedName" required placeholder="Yamaha model or instrument" />
+              </label>
+              <label>
+                Category
+                <select id="usedCategory">
+                  <option>Keyboards</option>
+                  <option>Guitars</option>
+                  <option>Drums</option>
+                  <option>Brass & Woodwind</option>
+                  <option>Audio</option>
+                  <option>Accessories</option>
+                </select>
+              </label>
+              <label>
+                Condition
+                <select id="usedCondition">
+                  <option>Excellent</option>
+                  <option>Good</option>
+                  <option>Fair</option>
+                  <option>Needs service</option>
+                </select>
+              </label>
+              <label>
+                Cash paid to seller
+                <input id="buyPrice" required type="number" min="0" step="1" />
+              </label>
+              <label>
+                Resale price
+                <input id="resalePrice" required type="number" min="0" step="1" />
+              </label>
+              <label>
+                Notes
+                <textarea id="usedNotes" rows="4" placeholder="Serial number, included accessories, service notes"></textarea>
+              </label>
+              <button class="primary-button full" type="submit">Add Used Product to Stock</button>
+            </form>
 
-  <button id="addBtn">Add</button>
-</section>
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Recent intakes</p>
+                  <h2>Used purchases</h2>
+                </div>
+              </div>
+              <div class="record-list" id="buybackList"></div>
+            </div>
+          </div>
+        </section>
 
-<section class="dashboard">
-  <h3>Dashboard</h3>
-  <p id="sales"></p>
-  <p id="revenue"></p>
-  <p id="profit"></p>
-</section>
+        <section class="view-panel" id="recordsView">
+          <div class="split-layout">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Completed cash sales</p>
+                  <h2>Invoices</h2>
+                </div>
+              </div>
+              <div class="record-list" id="invoiceList"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Inventory control</p>
+                  <h2>Low stock</h2>
+                </div>
+              </div>
+              <div class="record-list" id="stockList"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
 
-<!-- CART -->
-<div id="cartModal" class="modal hidden">
-  <h3>Cart</h3>
-  <ul id="cartList"></ul>
-  <h4 id="cartTotal"></h4>
-  <button id="checkoutBtn">Checkout</button>
-  <button id="closeCartBtn">Close</button>
-</div>
+    <dialog id="invoiceDialog" class="invoice-dialog">
+      <div class="invoice-sheet" id="invoiceSheet"></div>
+      <div class="dialog-actions">
+        <button class="ghost-button" id="closeInvoice" type="button">Close</button>
+        <button class="primary-button" id="printInvoice" type="button">Print Invoice</button>
+      </div>
+    </dialog>
 
-<!-- INVOICE -->
-<div id="invoiceModal" class="modal hidden">
-  <h3>Invoice</h3>
-  <p id="invoiceHeader"></p>
-  <table>
-    <tbody id="invoiceTable"></tbody>
-  </table>
-  <h4 id="invoiceTotal"></h4>
-  <button onclick="window.print()">Print</button>
-</div>
+    <template id="emptyTemplate">
+      <div class="empty-state">
+        <strong>Nothing here yet</strong>
+        <span>Add products to the cart or create shop records to see them here.</span>
+      </div>
+    </template>
 
-<script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
