@@ -3,60 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProMusic • Stock Manager</title>
+    <title>YamahaBidjan • Stock Manager</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-zinc-950 text-zinc-100">
-    <!-- HEADER -->
-    <header class="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
-        <div class="max-w-screen-2xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-x-3">
-                <div class="w-10 h-10 bg-[#00b8a9] rounded-2xl flex items-center justify-center text-3xl">🎸</div>
+
+<body class="bg-zinc-950 text-zinc-100 min-h-screen">
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-icon">🎹</div>
                 <div>
-                    <h1 class="logo-font text-3xl tracking-tighter">ProMusic</h1>
-                    <p class="text-[10px] text-zinc-400 -mt-1">YAMAHA • INSTRUMENTS</p>
+                    <h1>YamahaBidjan</h1>
+                    <p>Music Stock • Abidjan</p>
                 </div>
             </div>
 
-            <!-- Language -->
-            <div class="flex items-center gap-x-1 bg-zinc-800 rounded-3xl p-1">
-                <button onclick="switchLanguage('en')" id="lang-en" class="lang-btn px-6 py-2 rounded-3xl text-sm font-medium">🇬🇧 EN</button>
-                <button onclick="switchLanguage('fr')" id="lang-fr" class="lang-btn px-6 py-2 rounded-3xl text-sm font-medium">🇫🇷 FR</button>
-                <button onclick="switchLanguage('ar')" id="lang-ar" class="lang-btn px-6 py-2 rounded-3xl text-sm font-medium">🇨🇮 AR</button>
+            <div class="language-switcher">
+                <button onclick="switchLanguage('en')" id="lang-en" class="lang-btn">EN</button>
+                <button onclick="switchLanguage('fr')" id="lang-fr" class="lang-btn">FR</button>
+                <button onclick="switchLanguage('ar')" id="lang-ar" class="lang-btn">AR</button>
             </div>
 
-            <div class="flex items-center gap-x-6">
-                <div class="flex items-center gap-x-2">
-                    <i class="fas fa-store text-[#00b8a9]"></i>
-                    <span id="store-name" class="font-semibold">Abidjan Music Store</span>
-                </div>
-                <div class="flex items-center gap-x-3">
-                    <div class="text-right">
-                        <div id="user-name" class="text-sm font-medium">Ahmed Koné</div>
-                        <div id="user-role" class="text-xs text-zinc-400">Store Manager</div>
-                    </div>
-                    <div class="w-9 h-9 bg-zinc-700 rounded-2xl flex items-center justify-center text-xl">👷‍♂️</div>
-                </div>
+            <div class="store-badge">
+                <i class="fas fa-store"></i>
+                <span>Yamaha Abidjan</span>
             </div>
         </div>
     </header>
 
-    <div class="flex max-w-screen-2xl mx-auto">
-        <!-- SIDEBAR -->
-        <aside id="sidebar" class="w-72 bg-zinc-900 border-r border-zinc-800 min-h-[calc(100vh-73px)] px-6 py-8 flex flex-col"></aside>
+    <div class="app-shell">
+        <aside id="sidebar" class="sidebar"></aside>
 
-        <!-- MAIN -->
-        <main id="main-content" class="flex-1 p-6 md:p-8 overflow-auto"></main>
+        <main id="main-content" class="main-content"></main>
     </div>
 
-    <!-- MODALS (injected by JS) -->
-    <div id="add-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]"></div>
-    <div id="cart-panel" class="hidden fixed inset-0 bg-black/60 z-[9999] flex justify-end"></div>
+    <nav id="mobile-nav" class="mobile-nav"></nav>
 
-    <!-- TOAST -->
-    <div id="toast" onclick="this.classList.add('hidden')" class="hidden fixed bottom-6 right-6 bg-emerald-600 text-white shadow-2xl rounded-3xl px-6 py-4 flex items-center gap-x-3 text-sm font-medium"></div>
+    <div id="add-modal" class="hidden modal-backdrop"></div>
+
+    <div id="cart-panel" class="hidden cart-backdrop"></div>
+
+    <div id="toast" onclick="this.classList.add('hidden')" class="hidden toast"></div>
 
     <script src="script.js"></script>
 </body>
