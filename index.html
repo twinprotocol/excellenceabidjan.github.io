@@ -2,53 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YamahaBidjan • Stock Manager</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YamahaBidjan Stock Manager</title>
     <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
 </head>
-
-<body class="bg-zinc-950 text-zinc-100 min-h-screen">
-    <header class="app-header">
-        <div class="header-inner">
-            <div class="brand">
-                <div class="brand-icon">🎹</div>
-                <div>
-                    <h1>YamahaBidjan</h1>
-                    <p>Music Stock • Abidjan</p>
-                </div>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">YB</div>
+            <div>
+                <h1>YamahaBidjan</h1>
+                <p>Stock Manager • Abidjan</p>
             </div>
+        </div>
 
-            <div class="language-switcher">
-                <button onclick="switchLanguage('en')" id="lang-en" class="lang-btn">EN</button>
-                <button onclick="switchLanguage('fr')" id="lang-fr" class="lang-btn">FR</button>
-                <button onclick="switchLanguage('ar')" id="lang-ar" class="lang-btn">AR</button>
-            </div>
-
-            <div class="store-badge">
-                <i class="fas fa-store"></i>
-                <span>Yamaha Abidjan</span>
-            </div>
+        <div class="lang-switch">
+            <button id="lang-en" onclick="switchLanguage('en')">EN</button>
+            <button id="lang-fr" onclick="switchLanguage('fr')">FR</button>
+            <button id="lang-ar" onclick="switchLanguage('ar')">AR</button>
         </div>
     </header>
 
-    <div class="app-shell">
+    <div class="layout">
         <aside id="sidebar" class="sidebar"></aside>
-
-        <main id="main-content" class="main-content"></main>
+        <main id="main" class="main">
+            <div class="loading">Loading YamahaBidjan...</div>
+        </main>
     </div>
 
     <nav id="mobile-nav" class="mobile-nav"></nav>
 
-    <div id="add-modal" class="hidden modal-backdrop"></div>
+    <div id="modal" class="modal hidden"></div>
+    <div id="cart-drawer" class="drawer hidden"></div>
+    <div id="toast" class="toast hidden"></div>
 
-    <div id="cart-panel" class="hidden cart-backdrop"></div>
-
-    <div id="toast" onclick="this.classList.add('hidden')" class="hidden toast"></div>
-
-    <script src="script.js"></script>
+    <noscript>
+        <div class="noscript">Please enable JavaScript to use YamahaBidjan.</div>
+    </noscript>
 </body>
 </html>
