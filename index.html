@@ -3,57 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yamaha Shop Pro</title>
+<title>Music Store POS</title>
+
 <link rel="stylesheet" href="style.css">
+
+<!-- PDF LIB -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
+
 <body>
 
 <header>
-  <h1>🎹 Yamaha Shop</h1>
-  <input type="text" id="search" placeholder="Search...">
-  <div>
-    <button onclick="showCart()">🛒 <span id="cartCount">0</span></button>
+  <h2>Music Store</h2>
+
+  <div class="controls">
+    <input id="search" placeholder="Search...">
+    <button id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
   </div>
 </header>
 
 <main id="products"></main>
 
 <section class="panel">
-  <h2>Add / Restock Product</h2>
+  <h3>Add Product</h3>
+
   <input id="name" placeholder="Name">
-  <input id="buyPrice" type="number" placeholder="Buy Price (FCFA)">
-  <input id="sellPrice" type="number" placeholder="Sell Price (FCFA)">
+  <input id="buy" type="number" placeholder="Buy price">
+  <input id="sell" type="number" placeholder="Sell price">
   <input id="stock" type="number" placeholder="Stock">
   <input id="image" placeholder="Image URL">
-  <button onclick="addProduct()">Add Product</button>
-  <button onclick="restockProduct()">Restock</button>
+
+  <button onclick="addProduct()">Add</button>
 </section>
 
 <section class="dashboard">
-  <h2>📊 Dashboard</h2>
-  <p id="salesToday"></p>
-  <p id="revenueToday"></p>
-  <p id="profitToday"></p>
+  <h3>Dashboard</h3>
+  <p id="sales"></p>
+  <p id="revenue"></p>
+  <p id="profit"></p>
 </section>
 
+<section class="history">
+  <h3>Invoice History</h3>
+  <ul id="historyList"></ul>
+</section>
+
+<!-- CART -->
 <div id="cartModal" class="modal hidden">
-  <h2>Cart</h2>
+  <h3>Cart</h3>
   <ul id="cartItems"></ul>
-  <h3 id="cartTotal"></h3>
+  <h4 id="cartTotal"></h4>
   <button onclick="checkout()">Checkout</button>
   <button onclick="closeCart()">Close</button>
 </div>
 
-<div id="invoice" class="modal hidden">
-  <h2>Invoice</h2>
+<!-- INVOICE -->
+<div id="invoiceModal" class="modal hidden">
+  <h3>Invoice</h3>
   <p id="invoiceInfo"></p>
+
   <table>
-    <thead>
-      <tr><th>Product</th><th>Price</th></tr>
-    </thead>
-    <tbody id="invoiceItems"></tbody>
+    <tbody id="invoiceTable"></tbody>
   </table>
-  <h3 id="totalPrice"></h3>
+
+  <h4 id="invoiceTotal"></h4>
+
+  <button onclick="downloadPDF()">Download PDF</button>
   <button onclick="window.print()">Print</button>
 </div>
 
