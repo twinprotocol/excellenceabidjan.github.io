@@ -3,25 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Music Store POS</title>
-
+<title>Shop POS</title>
 <link rel="stylesheet" href="style.css">
-
-<!-- PDF LIB -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </head>
 
 <body>
 
 <header>
-  <h2>Music Store</h2>
+  <h2>Shop POS</h2>
 
   <div class="controls">
-    <input id="search" placeholder="Search...">
+    <input id="search" placeholder="Search product">
+    <select id="currency">
+      <option value="FCFA">FCFA</option>
+      <option value="DZD">DZD</option>
+    </select>
     <button id="cartBtn">Cart (<span id="cartCount">0</span>)</button>
   </div>
 </header>
+
+<div class="categories">
+  <button onclick="filterCat('all')">All</button>
+  <button onclick="filterCat('keyboard')">Keyboards</button>
+  <button onclick="filterCat('guitar')">Guitars</button>
+  <button onclick="filterCat('drums')">Drums</button>
+  <button onclick="filterCat('accessory')">Accessories</button>
+</div>
 
 <main id="products"></main>
 
@@ -34,26 +41,26 @@
   <input id="stock" type="number" placeholder="Stock">
   <input id="image" placeholder="Image URL">
 
+  <select id="category">
+    <option value="keyboard">Keyboard</option>
+    <option value="guitar">Guitar</option>
+    <option value="drums">Drums</option>
+    <option value="accessory">Accessory</option>
+  </select>
+
   <button onclick="addProduct()">Add</button>
-</section>
-
-<section class="dashboard">
-  <h3>Dashboard</h3>
-  <p id="sales"></p>
-  <p id="revenue"></p>
-  <p id="profit"></p>
-</section>
-
-<section class="history">
-  <h3>Invoice History</h3>
-  <ul id="historyList"></ul>
 </section>
 
 <!-- CART -->
 <div id="cartModal" class="modal hidden">
   <h3>Cart</h3>
   <ul id="cartItems"></ul>
-  <h4 id="cartTotal"></h4>
+
+  <p>Total: <span id="total"></span></p>
+
+  <input id="cash" type="number" placeholder="Cash received">
+  <p>Change: <span id="change"></span></p>
+
   <button onclick="checkout()">Checkout</button>
   <button onclick="closeCart()">Close</button>
 </div>
@@ -61,15 +68,17 @@
 <!-- INVOICE -->
 <div id="invoiceModal" class="modal hidden">
   <h3>Invoice</h3>
-  <p id="invoiceInfo"></p>
+  <p id="invInfo"></p>
+
+  <input id="custName" placeholder="Customer name">
+  <input id="custPhone" placeholder="Phone">
+  <input id="notes" placeholder="Notes">
 
   <table>
-    <tbody id="invoiceTable"></tbody>
+    <tbody id="invTable"></tbody>
   </table>
 
-  <h4 id="invoiceTotal"></h4>
-
-  <button onclick="downloadPDF()">Download PDF</button>
+  <h4 id="invTotal"></h4>
   <button onclick="window.print()">Print</button>
 </div>
 
