@@ -1,71 +1,55 @@
- ```javascript
 let products = JSON.parse(localStorage.getItem("products")) || [];
 let cart = [];
 let invoices = JSON.parse(localStorage.getItem("invoices")) || [];
 
-function saveData(){
+function save(){
   localStorage.setItem("products", JSON.stringify(products));
   localStorage.setItem("invoices", JSON.stringify(invoices));
 }
 
-function format(p){ return p.toLocaleString()+" FCFA"; }
+function format(n){
+  return n.toLocaleString() + " FCFA";
+}
 
-function displayProducts(){
-  const container = document.getElementById("products");
-  container.innerHTML="";
+function renderProducts(list = products){
+  productsDiv.innerHTML = "";
 
-  products.forEach((p,i)=>{
-    container.innerHTML+=`
-    <div class="card">
-      <img src="${p.image || 'https://via.placeholder.com/200'}">
-      <h3>${p.name}</h3>
-      <p>Sell: ${format(p.sellPrice)}</p>
-      <p>Stock: ${p.stock}</p>
-      <p>Buy: ${format(p.buyPrice)}</p>
-      <button onclick="addToCart(${i})" ${p.stock<=0?'disabled':''}>Add</button>
-    </div>`;
+  list.forEach((p,i)=>{
+    productsDiv.innerHTML += `
+      <div class="card">
+        <img src="${p.image || 'https://via.placeholder.com/200'}">
+        <h4>${p.name}</h4>
+        <p>${format(p.sell)}</p>
+        <p>Stock: ${p.stock}</p>
+        <button onclick="addToCart(${i})">Add</button>
+      </div>
+    `;
   });
 }
 
 function addProduct(){
   products.push({
     name:name.value,
-    buyPrice:+buyPrice.value,
-    sellPrice:+sellPrice.value,
+    buy:+buy.value,
+    sell:+sell.value,
     stock:+stock.value,
     image:image.value
   });
-  saveData(); displayProducts();
-}
 
-function restockProduct(){
-  const pname = name.value;
-  const qty = Number(stock.value);
-  let p = products.find(x=>x.name===pname);
-  if(p){ p.stock += qty; saveData(); displayProducts(); }
+  save();
+  renderProducts();
 }
 
 function addToCart(i){
-  if(products[i].stock<=0) return;
+  if(products[i].stock <= 0) return;
+
   cart.push(products[i]);
   products[i].stock--;
-  saveData(); displayProducts(); updateCartCount();
+
+  save();
+  renderProducts();
+  cartCount.innerText = cart.length;
 }
-
-function updateCartCount(){ cartCount.innerText = cart.length; }
-
-function showCart(){
-  cartItems.innerHTML="";
-  let total=0;
-  cart.forEach(i=>{
-    total+=i.sellPrice;
-    cartItems.innerHTML+=`<li>${i.name} - ${format(i.sellPrice)}</li>`;
-  });
-  cartTotal.innerText="Total: "+format(total);
-  cartModal.classList.remove("hidden");
-}
-
-function closeCart(){ cartModal.classList.add("hidden"); }
 
 function checkout(){
   if(!cart.length) return;
@@ -74,63 +58,95 @@ function checkout(){
   let cost = 0;
 
   cart.forEach(i=>{
-    revenue += i.sellPrice;
-    cost += i.buyPrice;
+    revenue += i.sell;
+    cost += i.buy;
   });
 
   let profit = revenue - cost;
 
-  const invoice = {
+  let inv = {
     id:"INV-"+Date.now(),
-    date:new Date().toLocaleDateString(),
+    date:new Date().toLocaleString(),
     items:[...cart],
     revenue,
-    cost,
     profit
   };
 
-  invoices.push(invoice);
-  saveData();
+  invoices.push(inv);
+  save();
 
-  generateInvoice(invoice);
+  showInvoice(inv);
+  updateHistory();
+
   cart=[];
-  updateCartCount();
-  closeCart();
-  updateDashboard();
+  cartCount.innerText=0;
 }
 
-function generateInvoice(inv){
-  invoiceItems.innerHTML="";
+function showInvoice(inv){
+  invoiceTable.innerHTML="";
+
   inv.items.forEach(i=>{
-    invoiceItems.innerHTML+=`<tr><td>${i.name}</td><td>${format(i.sellPrice)}</td></tr>`;
+    invoiceTable.innerHTML += `<tr><td>${i.name}</td><td>${format(i.sell)}</td></tr>`;
   });
-  totalPrice.innerText="Total: "+format(inv.revenue);
+
   invoiceInfo.innerText = inv.id + " | " + inv.date;
-  invoice.classList.remove("hidden");
+  invoiceTotal.innerText = format(inv.revenue);
+
+  invoiceModal.classList.remove("hidden");
 }
 
 function updateDashboard(){
   let today = new Date().toLocaleDateString();
-  let todayInvoices = invoices.filter(i=>i.date===today);
 
-  let revenue = todayInvoices.reduce((t,i)=>t+i.revenue,0);
-  let profit = todayInvoices.reduce((t,i)=>t+i.profit,0);
+  let todayInv = invoices.filter(i => i.date.includes(today));
 
-  salesToday.innerText = "Sales: "+todayInvoices.length;
-  revenueToday.innerText = "Revenue: "+format(revenue);
-  profitToday.innerText = "Profit: "+format(profit);
+  let revenue = todayInv.reduce((a,b)=>a+b.revenue,0);
+  let profit = todayInv.reduce((a,b)=>a+b.profit,0);
+
+  sales.innerText = "Sales: " + todayInv.length;
+  revenue.innerText = "Revenue: " + format(revenue);
+  profit.innerText = "Profit: " + format(profit);
 }
 
+function updateHistory(){
+  historyList.innerHTML="";
+
+  invoices.slice().reverse().forEach(inv=>{
+    historyList.innerHTML += `
+      <li>
+        ${inv.id} - ${format(inv.revenue)}
+        <button onclick='showInvoice(${JSON.stringify(inv)})'>View</button>
+      </li>
+    `;
+  });
+}
+
+/* PDF EXPORT */
+function downloadPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.text("Invoice", 10, 10);
+  doc.text(invoiceInfo.innerText, 10, 20);
+  doc.text(invoiceTotal.innerText, 10, 30);
+
+  doc.save("invoice.pdf");
+}
+
+/* SEARCH */
 search.addEventListener("input", e=>{
   let v = e.target.value.toLowerCase();
-  const container = document.getElementById("products");
-  container.innerHTML="";
-  products.filter(p=>p.name.toLowerCase().includes(v)).forEach((p,i)=>{
-    container.innerHTML+=`<div class="card"><h3>${p.name}</h3></div>`;
-  });
+
+  renderProducts(products.filter(p =>
+    p.name.toLowerCase().includes(v)
+  ));
 });
 
+/* CART UI */
+cartBtn.onclick = ()=> cartModal.classList.remove("hidden");
+closeCart = ()=> cartModal.classList.add("hidden");
+
+/* INIT */
+renderProducts();
 updateDashboard();
-displayProducts();
-```
-```
+updateHistory();
