@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
-  <rect width="192" height="192" rx="42" fill="#07151f"/>
-  <path d="M24 126c34-35 58 28 93-6 23-22 32-44 51-32v58H24z" fill="#00a6a6"/>
-  <circle cx="149" cy="48" r="18" fill="#ffc857"/>
-  <text x="96" y="104" text-anchor="middle" font-family="Arial" font-size="46" font-weight="900" fill="white">MW</text>
-</svg>
