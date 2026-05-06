@@ -15,13 +15,28 @@ interface CRMProps {
   currency: Currency;
 }
 
-export default function CRM({ customers, onUpdateStatus, lang, currency }: CRMProps) {
+export default function CRM({ customers, onAddCustomer, lang, currency }: CRMProps & { onAddCustomer: (c: Omit<Customer, 'id'>) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newCustomer, setNewCustomer] = useState<Omit<Customer, 'id'>>({
+    name: '',
+    email: '',
+    company: '',
+    status: 'lead',
+    lastContact: new Date().toISOString().split('T')[0],
+    revenue: 0
+  });
 
   const filtered = customers.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.company.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAddCustomer(newCustomer);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -30,12 +45,15 @@ export default function CRM({ customers, onUpdateStatus, lang, currency }: CRMPr
           <h1 className="text-2xl font-bold tracking-tight text-white uppercase italic">{t('crm', lang)}</h1>
           <p className="text-[10px] text-brand-text-secondary uppercase tracking-[0.2em] mt-1">Client Management & Relations</p>
         </div>
-        <button className="bg-brand-accent text-white px-4 py-2 rounded-xl flex items-center justify-center gap-2 font-bold uppercase text-[10px] hover:opacity-90 transition-all shadow-lg shadow-brand-accent/20">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-brand-accent text-white px-4 py-2 rounded-xl flex items-center justify-center gap-2 font-bold uppercase text-[10px] hover:opacity-90 transition-all shadow-lg shadow-brand-accent/20"
+        >
           <Users size={14} /> {t('add_contact', lang)}
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-text-secondary group-focus-within:text-brand-accent transition-colors" size={16} />
           <input 
@@ -85,7 +103,7 @@ export default function CRM({ customers, onUpdateStatus, lang, currency }: CRMPr
           <div className="bg-brand-accent p-6 rounded-2xl flex items-center justify-between text-black border border-white/10 shadow-xl shadow-brand-accent/20">
             <div>
               <p className="text-[10px] uppercase font-bold tracking-[0.2em] opacity-80">Win Probability</p>
-              <p className="text-2xl font-bold font-mono mt-1">42.8%</p>
+              <p className="text-2xl font-bold font-mono mt-1">{customers.length > 0 ? '42.8%' : '0.0%'}</p>
             </div>
             <TrendingUp size={24} className="opacity-40" />
           </div>
@@ -135,6 +153,80 @@ export default function CRM({ customers, onUpdateStatus, lang, currency }: CRMPr
           </div>
         </div>
       </div>
+
+      {/* Add Customer Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-brand-sidebar border border-brand-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-brand-border flex justify-between items-center text-white">
+              <h2 className="text-sm font-bold uppercase tracking-widest italic">{t('add_customer' as any, lang)}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-brand-text-secondary hover:text-white transition-colors">
+                <MoreHorizontal size={20} className="rotate-45" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-brand-text-secondary uppercase">Full Name</label>
+                <input 
+                  required
+                  type="text" 
+                  className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-accent"
+                  value={newCustomer.name}
+                  onChange={e => setNewCustomer({...newCustomer, name: e.target.value})}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-brand-text-secondary uppercase">{t('company' as any, lang)}</label>
+                <input 
+                  required
+                  type="text" 
+                  className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-accent"
+                  value={newCustomer.company}
+                  onChange={e => setNewCustomer({...newCustomer, company: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-text-secondary uppercase">{t('status' as any, lang)}</label>
+                  <select 
+                    className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-xs font-bold uppercase text-white focus:outline-none focus:border-brand-accent"
+                    value={newCustomer.status}
+                    onChange={e => setNewCustomer({...newCustomer, status: e.target.value as any})}
+                  >
+                    <option value="lead">Lead</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-text-secondary uppercase">Revenue</label>
+                  <input 
+                    type="number" 
+                    className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-accent"
+                    value={newCustomer.revenue || ''}
+                    onChange={e => setNewCustomer({...newCustomer, revenue: parseFloat(e.target.value)})}
+                  />
+                </div>
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 px-4 py-2.5 border border-brand-border rounded-xl text-xs font-bold uppercase text-brand-text-secondary hover:text-white transition-all"
+                >
+                  {t('cancel', lang)}
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 px-4 py-2.5 bg-brand-accent text-white rounded-xl text-xs font-bold uppercase hover:opacity-90 transition-all shadow-lg shadow-brand-accent/20"
+                >
+                  {t('save', lang)}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

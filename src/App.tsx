@@ -25,6 +25,7 @@ export default function App() {
   const [lang, setLang] = useState<Language>('en');
   const [currency, setCurrency] = useState<Currency>('USD');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   // Persistence
   useEffect(() => {
@@ -67,6 +68,22 @@ export default function App() {
     setTransactions(prev => [transaction, ...prev]);
   };
 
+  const handleAddProduct = (newP: Omit<Product, 'id'>) => {
+    const product: Product = {
+      ...newP,
+      id: `PRD-${Date.now()}`
+    };
+    setProducts(prev => [...prev, product]);
+  };
+
+  const handleAddCustomer = (newC: Omit<Customer, 'id'>) => {
+    const customer: Customer = {
+      ...newC,
+      id: `CST-${Date.now()}`
+    };
+    setCustomers(prev => [...prev, customer]);
+  };
+
   const exportToExcel = () => {
     const today = new Date().toISOString().split('T')[0];
     const dataToExport = transactions.length > 0 ? transactions : [{ status: 'No data' }];
@@ -86,9 +103,9 @@ export default function App() {
       case 'accounting': 
         return <Accounting transactions={transactions} onAddTransaction={handleAddTransaction} {...commonProps} />;
       case 'inventory': 
-        return <Inventory products={products} onUpdateStock={handleUpdateStock} {...commonProps} />;
+        return <Inventory products={products} onUpdateStock={handleUpdateStock} onAddProduct={handleAddProduct} {...commonProps} />;
       case 'crm': 
-        return <CRM customers={customers} onUpdateStatus={() => {}} {...commonProps} />;
+        return <CRM customers={customers} onAddCustomer={handleAddCustomer} onUpdateStatus={() => {}} {...commonProps} />;
       default: 
         return <Dashboard transactions={transactions} products={products} customers={customers} {...commonProps} />;
     }
@@ -178,9 +195,31 @@ export default function App() {
               Excel
             </button>
 
-            <button className="p-2 text-brand-text-secondary hover:text-white relative">
+            <button 
+              onClick={() => setIsNotifOpen(!isNotifOpen)}
+              className="p-2 text-brand-text-secondary hover:text-white relative transition-colors"
+            >
               <Bell size={18} />
               <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-brand-accent rounded-full border border-brand-sidebar"></span>
+              
+              {/* Notification Dropdown */}
+              <AnimatePresence>
+                {isNotifOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className={`absolute top-full ${lang === 'ar' ? 'left-0' : 'right-0'} mt-2 w-72 bg-brand-sidebar border border-brand-border rounded-2xl shadow-2xl z-50 overflow-hidden`}
+                  >
+                    <div className="p-4 border-b border-brand-border flex justify-between items-center bg-brand-surface/50">
+                      <h3 className="text-xs font-bold text-white uppercase tracking-widest">{t('notifications' as any, lang)}</h3>
+                    </div>
+                    <div className="p-6 text-center text-[10px] text-brand-text-secondary uppercase tracking-widest italic">
+                      {t('no_notifications' as any, lang)}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </header>

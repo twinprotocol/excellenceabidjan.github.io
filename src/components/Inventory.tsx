@@ -15,8 +15,17 @@ interface InventoryProps {
   currency: Currency;
 }
 
-export default function Inventory({ products, onUpdateStock, lang, currency }: InventoryProps) {
+export default function Inventory({ products, onUpdateStock, onAddProduct, lang, currency }: InventoryProps & { onAddProduct: (p: Omit<Product, 'id'>) => void }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
+    name: '',
+    sku: '',
+    quantity: 0,
+    unitPrice: 0,
+    category: 'General',
+    minThreshold: 5
+  });
 
   const filtered = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -24,6 +33,20 @@ export default function Inventory({ products, onUpdateStock, lang, currency }: I
   );
 
   const totalValue = products.reduce((acc, p) => acc + (p.quantity * p.unitPrice), 0);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAddProduct(newProduct);
+    setIsModalOpen(false);
+    setNewProduct({
+      name: '',
+      sku: '',
+      quantity: 0,
+      unitPrice: 0,
+      category: 'General',
+      minThreshold: 5
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -36,7 +59,10 @@ export default function Inventory({ products, onUpdateStock, lang, currency }: I
           <button className="bg-brand-surface border border-brand-border text-brand-text-secondary px-4 py-2 rounded-xl flex items-center gap-2 font-bold uppercase text-[10px] hover:text-white transition-all">
             <Layers size={14} /> {t('stock_health', lang)}
           </button>
-          <button className="bg-brand-accent text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold uppercase text-[10px] hover:opacity-90 transition-all shadow-lg shadow-brand-accent/20">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="bg-brand-accent text-white px-4 py-2 rounded-xl flex items-center gap-2 font-bold uppercase text-[10px] hover:opacity-90 transition-all shadow-lg shadow-brand-accent/20"
+          >
             <Plus size={14} /> {t('add_product', lang)}
           </button>
         </div>
@@ -106,7 +132,7 @@ export default function Inventory({ products, onUpdateStock, lang, currency }: I
                       "h-full transition-all duration-700",
                       isLow ? "bg-amber-500" : "bg-brand-accent"
                     )}
-                    style={{ width: `${Math.min((product.quantity / 50) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((product.quantity / (product.minThreshold * 4)) * 100, 100)}%` }}
                   />
                 </div>
                 
@@ -139,6 +165,91 @@ export default function Inventory({ products, onUpdateStock, lang, currency }: I
           </div>
         )}
       </div>
+
+      {/* Add Product Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-brand-sidebar border border-brand-border w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 border-b border-brand-border flex justify-between items-center text-white">
+              <h2 className="text-sm font-bold uppercase tracking-widest italic">{t('add_product', lang)}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-brand-text-secondary hover:text-white transition-colors">
+                <Minus size={20} className="rotate-45" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-brand-text-secondary uppercase">Product Name</label>
+                <input 
+                  required
+                  type="text" 
+                  className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-accent"
+                  value={newProduct.name}
+                  onChange={e => setNewProduct({...newProduct, name: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-text-secondary uppercase">SKU / ID</label>
+                  <input 
+                    required
+                    type="text" 
+                    className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-accent"
+                    value={newProduct.sku}
+                    onChange={e => setNewProduct({...newProduct, sku: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-text-secondary uppercase">Initial Qty</label>
+                  <input 
+                    required
+                    type="number" 
+                    className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-accent"
+                    value={newProduct.quantity || ''}
+                    onChange={e => setNewProduct({...newProduct, quantity: parseFloat(e.target.value)})}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-text-secondary uppercase">Unit Price</label>
+                  <input 
+                    required
+                    type="number" 
+                    className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-accent"
+                    value={newProduct.unitPrice || ''}
+                    onChange={e => setNewProduct({...newProduct, unitPrice: parseFloat(e.target.value)})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-text-secondary uppercase">Min Threshold</label>
+                  <input 
+                    required
+                    type="number" 
+                    className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-2.5 text-sm font-mono text-white focus:outline-none focus:border-brand-accent"
+                    value={newProduct.minThreshold || ''}
+                    onChange={e => setNewProduct({...newProduct, minThreshold: parseFloat(e.target.value)})}
+                  />
+                </div>
+              </div>
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 px-4 py-2.5 border border-brand-border rounded-xl text-xs font-bold uppercase text-brand-text-secondary hover:text-white transition-all"
+                >
+                  {t('cancel', lang)}
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 px-4 py-2.5 bg-brand-accent text-white rounded-xl text-xs font-bold uppercase hover:opacity-90 transition-all shadow-lg shadow-brand-accent/20"
+                >
+                  {t('save', lang)}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
