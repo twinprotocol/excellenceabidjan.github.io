@@ -1,58 +1,13 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAKEWAVES ERP | Yamaha Music</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="logo">MAKEWAVES</div>
-        <ul>
-            <li onclick="showSection('inventory')">Inventory</li>
-            <li onclick="showSection('sales')">Sales</li>
-            <li onclick="showSection('maintenance')">Maintenance</li>
-        </ul>
-        <div class="lang-switch">
-            <button onclick="setLanguage('en')">EN</button>
-            <button onclick="setLanguage('fr')">FR</button>
-            <button onclick="setLanguage('ar')">AR</button>
-        </div>
-    </nav>
-
-    <main class="content">
-        <header>
-            <h1 id="page-title">Inventory Management</h1>
-            <div class="currency-toggle">
-                <span>Currency: </span>
-                <select id="currency-select">
-                    <option value="XOF">CFA (Franc)</option>
-                    <option value="DZD">DZD (Dinar)</option>
-                </select>
-            </div>
-        </header>
-
-        <section id="inventory-section">
-            <div class="card">
-                <h3>Add New Product</h3>
-                <input type="text" placeholder="Product Name (e.g. Yamaha P-45)">
-                <input type="number" placeholder="Base Price">
-                <input type="file" id="product-img" accept="image/*">
-                <button class="btn-primary">Save Product</button>
-            </div>
-        </section>
-
-        <section id="sales-section" style="display:none;">
-            <div class="card">
-                <h3>New Sale</h3>
-                <p>Adjust price for this client:</p>
-                <input type="number" id="negotiated-price" placeholder="Negotiated Price">
-                <button class="btn-success">Complete Sale</button>
-            </div>
-        </section>
-    </main>
-
-    <script src="script.js"></script>
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Google AI Studio App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
+
