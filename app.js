@@ -1,5 +1,8 @@
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 const todayKey = new Date().toISOString().slice(0, 10);
+const STORAGE_KEY = "makewaves-erp-v1";
+const today = new Date().toISOString().slice(0, 10);
+let installPrompt = null;
 
 const art = (kind, primary, secondary) => {
   const icons = {
@@ -10,9 +13,14 @@ const art = (kind, primary, secondary) => {
     audio: '<rect x="70" y="45" width="180" height="165" rx="14" fill="#202733"/><circle cx="160" cy="106" r="42" fill="#3b4657"/><circle cx="160" cy="106" r="20" fill="#121721"/><circle cx="160" cy="172" r="22" fill="#c71931"/><rect x="105" y="62" width="110" height="10" rx="5" fill="#eef2f8"/>',
     accessory: '<rect x="66" y="64" width="188" height="128" rx="18" fill="#2e3542"/><path d="M96 97h128M96 128h128M96 159h84" stroke="#fff" stroke-width="14" stroke-linecap="round"/><circle cx="221" cy="158" r="18" fill="#c71931"/>'
   };
+const state = loadState();
+const els = {};
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240"><defs><linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="${primary}"/><stop offset="1" stop-color="${secondary}"/></linearGradient></defs><rect width="320" height="240" fill="url(#bg)"/><circle cx="45" cy="45" r="24" fill="#fff" opacity=".24"/><circle cx="278" cy="198" r="54" fill="#fff" opacity=".14"/>${icons[kind]}<text x="24" y="218" font-family="Arial" font-size="22" font-weight="800" fill="#fff">YAMAHA</text></svg>`;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+const currencyMeta = {
+  XOF: { label: "Franc CFA", suffix: "FCFA" },
+  DZD: { label: "Dinar", suffix: "DZD" }
 };
 
 const seedProducts = [
@@ -25,6 +33,20 @@ const seedProducts = [
   { id: "p7", name: "Yamaha HS8 Studio Monitor", category: "Audio", condition: "New", price: 399, stock: 7, image: art("audio", "#202733", "#596575"), details: "Accurate powered monitor for production, mixing, and shop demos." },
   { id: "p8", name: "Yamaha Keyboard Stand", category: "Accessories", condition: "New", price: 79, stock: 18, image: art("accessory", "#6f7a89", "#111823"), details: "Stable folding stand for digital pianos and stage keyboards." }
 ];
+function fallbackImage(name, category) {
+  const palette = {
+    Keyboards: ["#07151f", "#00a6a6"],
+    Guitars: ["#842f5b", "#f05d5e"],
+    Drums: ["#263238", "#ffc857"],
+    Audio: ["#1b3553", "#2fbf71"],
+    Accessories: ["#39424e", "#9bd8d8"],
+    "Spare Parts": ["#4a4f59", "#f7ba45"]
+  };
+  const colors = palette[category] || palette.Accessories;
+  const initials = name.split(" ").map((word) => word[0]).join("").slice(0, 3).toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[1]}"/></linearGradient></defs><rect width="320" height="240" fill="url(#g)"/><path d="M0 170 C70 120 130 210 200 160 S285 115 320 145 V240 H0Z" fill="#fff" opacity=".18"/><circle cx="258" cy="60" r="42" fill="#fff" opacity=".18"/><text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="54" font-weight="900" fill="#fff">${initials}</text><text x="24" y="218" font-family="Arial" font-size="20" font-weight="900" fill="#fff">MAKEWAVES</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
 
 const store = {
   products: load("yamaha-products", seedProducts),
@@ -32,6 +54,17 @@ const store = {
   invoices: load("yamaha-invoices", []),
   buybacks: load("yamaha-buybacks", [])
 };
+function demoState() {
+  const products = [
+    product("Yamaha PSR-SX900", "Keyboards", 900000, 640000, 4, "KB-SX900", "Arranger workstation for performance and studio use."),
+    product("Yamaha P-125A Digital Piano", "Keyboards", 430000, 310000, 7, "KB-P125A", "Weighted digital piano for home, school, and stage."),
+    product("Yamaha FG800 Acoustic Guitar", "Guitars", 145000, 89000, 12, "GT-FG800", "Solid-top acoustic guitar with balanced tone."),
+    product("Yamaha Pacifica 112V", "Guitars", 265000, 182000, 5, "GT-PAC112", "Versatile electric guitar for modern players."),
+    product("Yamaha Stage Custom Birch", "Drums", 650000, 480000, 2, "DR-SCB", "Birch acoustic drum kit for live and rehearsal rooms."),
+    product("Yamaha HS8 Monitor", "Audio", 260000, 190000, 6, "AU-HS8", "Studio monitor for accurate mixing and production."),
+    product("Sustain Pedal", "Accessories", 25000, 11000, 25, "AC-PEDAL", "Universal sustain pedal for keyboards."),
+    product("Keyboard Power Adapter", "Spare Parts", 18000, 7000, 3, "SP-ADAPT", "Replacement adapter for Yamaha keyboards.")
+  ];
 
 const els = {
   productGrid: document.querySelector("#productGrid"),
@@ -55,12 +88,58 @@ const els = {
   statCart: document.querySelector("#statCart"),
   statBuybacks: document.querySelector("#statBuybacks")
 };
+  return {
+    currency: "XOF",
+    products,
+    cart: [],
+    sales: [],
+    repairs: [
+      {
+        id: uid("REP"),
+        client: "Studio Atlas",
+        instrument: "Yamaha MG12XU Mixer",
+        technician: "Karim",
+        problem: "One channel has noise and the USB output drops.",
+        estimate: 45000,
+        status: "Diagnosing",
+        date: today
+      }
+    ],
+    purchases: [],
+    customers: [
+      { id: uid("CUS"), name: "Studio Atlas", phone: "+213 555 100 200", segment: "Studio", notes: "Often asks for audio equipment and repair service." },
+      { id: uid("CUS"), name: "Ecole Harmonie", phone: "+213 555 220 300", segment: "School", notes: "Keyboard and guitar lessons, prefers school pricing." }
+    ]
+  };
+}
 
 function load(key, fallback) {
+function product(name, category, price, cost, stock, sku, details) {
+  return {
+    id: uid("PRD"),
+    name,
+    category,
+    price,
+    cost,
+    stock,
+    sku,
+    details,
+    image: fallbackImage(name, category),
+    created: today
+  };
+}
+
+function uid(prefix) {
+  return `${prefix}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+}
+
+function loadState() {
   try {
     return JSON.parse(localStorage.getItem(key)) ?? fallback;
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || demoState();
   } catch {
     return fallback;
+    return demoState();
   }
 }
 
@@ -69,10 +148,45 @@ function save() {
   localStorage.setItem("yamaha-cart", JSON.stringify(store.cart));
   localStorage.setItem("yamaha-invoices", JSON.stringify(store.invoices));
   localStorage.setItem("yamaha-buybacks", JSON.stringify(store.buybacks));
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function money(value) {
+  const amount = Number(value || 0).toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+  return `${amount} ${currencyMeta[state.currency].suffix}`;
+}
+
+function byId(id) {
+  return document.getElementById(id);
+}
+
+function cacheElements() {
+  [
+    "currencySelect", "screenTitle", "todaySales", "inventoryValue", "openRepairs", "lowStockCount",
+    "activityList", "repairQueue", "saleSearch", "saleCategory", "saleProductList", "cartTable",
+    "saleTotal", "saleDiscount", "saleClient", "salePhone", "saleStatus", "saleNotes", "saleForm",
+    "productForm", "productName", "productCategory", "productPrice", "productCost", "productStock",
+    "productSku", "productImage", "productDetails", "productSearch", "inventoryGrid", "repairForm",
+    "repairClient", "repairInstrument", "repairTech", "repairProblem", "repairEstimate", "repairStatus",
+    "ticketList", "purchaseForm", "supplierName", "purchaseProduct", "purchaseQty", "purchaseCost",
+    "purchaseList", "customerForm", "customerName", "customerPhone", "customerSegment", "customerNotes",
+    "customerList", "customerNames", "reportGrid", "invoiceDialog", "invoiceContent", "installBtn"
+  ].forEach((id) => {
+    els[id] = byId(id);
+  });
 }
 
 function emptyNode() {
   return document.querySelector("#emptyTemplate").content.cloneNode(true);
+  return byId("emptyTemplate").content.cloneNode(true);
+}
+
+function switchView(view) {
+  document.querySelectorAll(".view").forEach((panel) => panel.classList.toggle("active", panel.id === `${view}View`));
+  document.querySelectorAll(".nav-btn").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+  els.screenTitle.textContent = document.querySelector(`[data-view="${view}"]`).textContent;
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderCategories() {
@@ -84,6 +198,8 @@ function renderCategories() {
     option.textContent = category;
     els.categoryFilter.append(option);
   });
+function productCategories() {
+  return ["All", ...new Set(state.products.map((item) => item.category))];
 }
 
 function renderProducts() {
@@ -93,25 +209,81 @@ function renderProducts() {
     const matchesTerm = [product.name, product.category, product.condition, product.details].join(" ").toLowerCase().includes(term);
     const matchesCategory = category === "All" || product.category === category;
     return matchesTerm && matchesCategory;
+function renderSelectors() {
+  const categoryOptions = productCategories().map((category) => `<option>${category}</option>`).join("");
+  els.saleCategory.innerHTML = categoryOptions;
+  els.purchaseProduct.innerHTML = state.products.map((item) => `<option value="${item.id}">${item.name}</option>`).join("");
+  els.customerNames.innerHTML = state.customers.map((item) => `<option value="${item.name}"></option>`).join("");
+  els.currencySelect.value = state.currency;
+}
+
+function renderDashboard() {
+  const todayTotal = state.sales.filter((sale) => sale.date === today).reduce((sum, sale) => sum + sale.total, 0);
+  const inventoryValue = state.products.reduce((sum, item) => sum + item.price * item.stock, 0);
+  const openRepairs = state.repairs.filter((ticket) => ticket.status !== "Delivered").length;
+  const lowStock = state.products.filter((item) => item.stock <= 3).length;
+
+  els.todaySales.textContent = money(todayTotal);
+  els.inventoryValue.textContent = money(inventoryValue);
+  els.openRepairs.textContent = openRepairs;
+  els.lowStockCount.textContent = lowStock;
+
+  const activities = [
+    ...state.sales.slice(-5).map((sale) => ({ title: `Sale ${sale.id}`, meta: `${sale.client || "Walk-in client"} - ${sale.items.length} item(s)`, value: money(sale.total) })),
+    ...state.purchases.slice(-3).map((purchase) => ({ title: `Purchase from ${purchase.supplier}`, meta: `${purchase.qty} received`, value: money(purchase.total) }))
+  ].reverse();
+  renderActivity(els.activityList, activities);
+
+  const queue = state.repairs.filter((ticket) => ticket.status !== "Delivered").slice(0, 5).map((ticket) => ({
+    title: ticket.instrument,
+    meta: `${ticket.client} - ${ticket.status}`,
+    value: money(ticket.estimate)
+  }));
+  renderActivity(els.repairQueue, queue);
+}
+
+function renderActivity(container, items) {
+  container.innerHTML = "";
+  if (!items.length) {
+    container.append(emptyNode());
+    return;
+  }
+  items.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "activity-card";
+    card.innerHTML = `<div><strong>${item.title}</strong><div class="card-meta">${item.meta}</div></div><b>${item.value}</b>`;
+    container.append(card);
   });
+}
 
   products = products.sort((a, b) => {
     if (els.sortSelect.value === "priceLow") return a.price - b.price;
     if (els.sortSelect.value === "priceHigh") return b.price - a.price;
     if (els.sortSelect.value === "stock") return b.stock - a.stock;
     return a.id.localeCompare(b.id);
+function renderSaleProducts() {
+  const term = els.saleSearch.value.trim().toLowerCase();
+  const category = els.saleCategory.value || "All";
+  const products = state.products.filter((item) => {
+    const text = `${item.name} ${item.category} ${item.sku} ${item.details}`.toLowerCase();
+    return text.includes(term) && (category === "All" || item.category === category);
   });
 
   els.productGrid.innerHTML = "";
+  els.saleProductList.innerHTML = "";
   if (!products.length) {
     els.productGrid.append(emptyNode());
+    els.saleProductList.append(emptyNode());
     return;
   }
 
   products.forEach((product) => {
     const stockClass = product.stock === 0 ? "stock-out" : product.stock <= 3 ? "stock-low" : "";
+  products.forEach((item) => {
+    const badge = item.stock <= 0 ? "bad" : item.stock <= 3 ? "warn" : "";
     const card = document.createElement("article");
     card.className = "product-card";
+    card.className = "pick-card";
     card.innerHTML = `
       <img class="product-art" src="${product.image}" alt="${product.name}">
       <div class="product-body">
@@ -126,9 +298,16 @@ function renderProducts() {
           <span class="badge ${stockClass}">${product.stock} in stock</span>
         </div>
         <button class="primary-button" type="button" ${product.stock === 0 ? "disabled" : ""} data-add="${product.id}">Add to Cart</button>
+      <img src="${item.image}" alt="${item.name}">
+      <div>
+        <h3>${item.name}</h3>
+        <div class="card-meta">${item.sku || "No SKU"} - ${money(item.price)}</div>
+        <div class="badge-row"><span class="badge">${item.category}</span><span class="badge ${badge}">${item.stock} stock</span></div>
+        <div class="card-actions"><button class="small-btn" data-add-cart="${item.id}" ${item.stock <= 0 ? "disabled" : ""} type="button">Add</button></div>
       </div>
     `;
     els.productGrid.append(card);
+    els.saleProductList.append(card);
   });
 }
 
@@ -163,8 +342,33 @@ function renderCart() {
       `;
       els.cartList.append(row);
     });
+  els.cartTable.innerHTML = "";
+  if (!state.cart.length) {
+    els.cartTable.append(emptyNode());
+    els.saleTotal.textContent = money(0);
+    return;
   }
   updateMoney();
+  const header = document.createElement("div");
+  header.className = "cart-row header";
+  header.innerHTML = "<span>Product</span><span>Price</span><span>Qty</span><span>Total</span><span></span>";
+  els.cartTable.append(header);
+
+  state.cart.forEach((line) => {
+    const item = state.products.find((productItem) => productItem.id === line.productId);
+    if (!item) return;
+    const row = document.createElement("div");
+    row.className = "cart-row";
+    row.innerHTML = `
+      <strong>${item.name}</strong>
+      <input data-cart-price="${line.productId}" type="number" min="0" step="1" value="${line.price}" aria-label="Editable price for ${item.name}">
+      <input data-cart-qty="${line.productId}" type="number" min="1" max="${item.stock}" step="1" value="${line.qty}" aria-label="Quantity for ${item.name}">
+      <b>${money(line.price * line.qty)}</b>
+      <button class="small-btn danger" data-cart-remove="${line.productId}" type="button">Remove</button>
+    `;
+    els.cartTable.append(row);
+  });
+  updateSaleTotal();
 }
 
 function updateMoney() {
@@ -175,12 +379,43 @@ function updateMoney() {
   els.subtotalValue.textContent = money.format(subtotal);
   els.changeValue.textContent = money.format(Math.max(0, cash - total));
   els.statCart.textContent = money.format(total);
+function updateSaleTotal() {
+  const subtotal = state.cart.reduce((sum, line) => sum + line.price * line.qty, 0);
+  const discount = Number(els.saleDiscount.value || 0);
+  els.saleTotal.textContent = money(Math.max(0, subtotal - discount));
 }
 
 function renderRecords() {
   els.buybackList.innerHTML = "";
   els.invoiceList.innerHTML = "";
   els.stockList.innerHTML = "";
+function renderInventory() {
+  const term = els.productSearch.value.trim().toLowerCase();
+  const products = state.products.filter((item) => `${item.name} ${item.category} ${item.sku}`.toLowerCase().includes(term));
+  els.inventoryGrid.innerHTML = "";
+  if (!products.length) {
+    els.inventoryGrid.append(emptyNode());
+    return;
+  }
+  products.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "inventory-card";
+    card.innerHTML = `
+      <img src="${item.image}" alt="${item.name}">
+      <div>
+        <h3>${item.name}</h3>
+        <div class="card-meta">${item.details || "No extra details"}</div>
+        <div class="badge-row">
+          <span class="badge">${item.category}</span>
+          <span class="badge">${item.sku || "No SKU"}</span>
+          <span class="badge ${item.stock <= 3 ? "warn" : ""}">${item.stock} in stock</span>
+          <span class="badge">${money(item.price)}</span>
+        </div>
+      </div>
+    `;
+    els.inventoryGrid.append(card);
+  });
+}
 
   if (!store.buybacks.length) {
     els.buybackList.append(emptyNode());
@@ -191,7 +426,29 @@ function renderRecords() {
       row.innerHTML = `<div><strong>${entry.instrument}</strong><div class="record-meta">${entry.seller} &middot; ${entry.condition} &middot; ${entry.date}</div></div><b>${money.format(entry.buyPrice)}</b>`;
       els.buybackList.append(row);
     });
+function renderRepairs() {
+  els.ticketList.innerHTML = "";
+  if (!state.repairs.length) {
+    els.ticketList.append(emptyNode());
+    return;
   }
+  state.repairs.slice().reverse().forEach((ticket) => {
+    const card = document.createElement("article");
+    card.className = "ticket-card";
+    card.innerHTML = `
+      <div>
+        <h3>${ticket.instrument}</h3>
+        <div class="card-meta">${ticket.client} - ${ticket.technician || "No technician"} - ${ticket.date}</div>
+        <p class="subtle">${ticket.problem}</p>
+        <strong>${money(ticket.estimate)}</strong>
+      </div>
+      <select data-repair-status="${ticket.id}">
+        ${["Received", "Diagnosing", "Waiting parts", "Repairing", "Ready", "Delivered"].map((status) => `<option ${status === ticket.status ? "selected" : ""}>${status}</option>`).join("")}
+      </select>
+    `;
+    els.ticketList.append(card);
+  });
+}
 
   if (!store.invoices.length) {
     els.invoiceList.append(emptyNode());
@@ -204,7 +461,39 @@ function renderRecords() {
       row.innerHTML = `<div><strong>${invoice.id}</strong><div class="record-meta">${invoice.client.name} &middot; ${invoice.date}</div></div><b>${money.format(invoice.total)}</b>`;
       els.invoiceList.append(row);
     });
+function renderPurchases() {
+  const items = state.purchases.slice().reverse().map((purchase) => {
+    const productItem = state.products.find((item) => item.id === purchase.productId);
+    return {
+      title: purchase.supplier,
+      meta: `${productItem ? productItem.name : "Deleted product"} - ${purchase.qty} units - ${purchase.date}`,
+      value: money(purchase.total)
+    };
+  });
+  renderActivity(els.purchaseList, items);
+}
+
+function renderCustomers() {
+  els.customerList.innerHTML = "";
+  if (!state.customers.length) {
+    els.customerList.append(emptyNode());
+    return;
   }
+  state.customers.forEach((customer) => {
+    const salesTotal = state.sales.filter((sale) => sale.client === customer.name).reduce((sum, sale) => sum + sale.total, 0);
+    const card = document.createElement("article");
+    card.className = "customer-card";
+    card.innerHTML = `
+      <div>
+        <h3>${customer.name}</h3>
+        <div class="card-meta">${customer.phone || "No phone"} - ${customer.segment}</div>
+        <p class="subtle">${customer.notes || "No notes"}</p>
+      </div>
+      <strong>${money(salesTotal)}</strong>
+    `;
+    els.customerList.append(card);
+  });
+}
 
   const lowStock = store.products.filter((product) => product.stock <= 3);
   if (!lowStock.length) {
@@ -217,6 +506,23 @@ function renderRecords() {
       els.stockList.append(row);
     });
   }
+function renderReports() {
+  const salesTotal = state.sales.reduce((sum, sale) => sum + sale.total, 0);
+  const profit = state.sales.reduce((sum, sale) => {
+    const cost = sale.items.reduce((itemSum, line) => itemSum + (line.cost || 0) * line.qty, 0);
+    return sum + sale.total - cost;
+  }, 0);
+  const stockUnits = state.products.reduce((sum, item) => sum + item.stock, 0);
+  const repairValue = state.repairs.reduce((sum, ticket) => sum + Number(ticket.estimate || 0), 0);
+  const cards = [
+    ["Sales revenue", money(salesTotal)],
+    ["Estimated gross profit", money(profit)],
+    ["Stock units", stockUnits],
+    ["Repair pipeline", money(repairValue)],
+    ["Customers", state.customers.length],
+    ["Products", state.products.length]
+  ];
+  els.reportGrid.innerHTML = cards.map(([label, value]) => `<article class="report-card"><span class="card-meta">${label}</span><strong>${value}</strong></article>`).join("");
 }
 
 function updateStats() {
@@ -224,6 +530,16 @@ function updateStats() {
   els.statSales.textContent = money.format(todaySales);
   els.statStock.textContent = store.products.reduce((sum, product) => sum + product.stock, 0);
   els.statBuybacks.textContent = store.buybacks.length;
+function renderAll() {
+  renderSelectors();
+  renderDashboard();
+  renderSaleProducts();
+  renderCart();
+  renderInventory();
+  renderRepairs();
+  renderPurchases();
+  renderCustomers();
+  renderReports();
 }
 
 function addToCart(id) {
@@ -232,10 +548,18 @@ function addToCart(id) {
   const item = store.cart.find((candidate) => candidate.id === id);
   if (item) {
     if (item.qty < product.stock) item.qty += 1;
+function addToCart(productId) {
+  const productItem = state.products.find((item) => item.id === productId);
+  if (!productItem || productItem.stock <= 0) return;
+  const existing = state.cart.find((line) => line.productId === productId);
+  if (existing) {
+    existing.qty = Math.min(productItem.stock, existing.qty + 1);
   } else {
     store.cart.push({ id, qty: 1 });
+    state.cart.push({ productId, price: productItem.price, qty: 1 });
   }
   save();
+  saveState();
   renderCart();
   renderProducts();
 }
@@ -247,35 +571,103 @@ function changeQuantity(id, delta) {
   item.qty += delta;
   if (item.qty <= 0) {
     store.cart = store.cart.filter((candidate) => candidate.id !== id);
+function saveSale(event) {
+  event.preventDefault();
+  if (!state.cart.length) {
+    alert("Add at least one product to the sale.");
+    return;
   }
   if (item.qty > product.stock) item.qty = product.stock;
   save();
   renderCart();
+  const items = state.cart.map((line) => {
+    const productItem = state.products.find((item) => item.id === line.productId);
+    return {
+      productId: line.productId,
+      name: productItem.name,
+      sku: productItem.sku,
+      cost: productItem.cost,
+      price: line.price,
+      qty: line.qty
+    };
+  });
+  const subtotal = items.reduce((sum, line) => sum + line.price * line.qty, 0);
+  const discount = Number(els.saleDiscount.value || 0);
+  const sale = {
+    id: uid("SAL"),
+    date: today,
+    createdAt: new Date().toLocaleString(),
+    client: els.saleClient.value.trim() || "Walk-in client",
+    phone: els.salePhone.value.trim(),
+    status: els.saleStatus.value,
+    notes: els.saleNotes.value.trim(),
+    items,
+    discount,
+    total: Math.max(0, subtotal - discount)
+  };
+
+  items.forEach((line) => {
+    const productItem = state.products.find((item) => item.id === line.productId);
+    productItem.stock -= line.qty;
+  });
+  ensureCustomer(sale.client, sale.phone);
+  state.sales.push(sale);
+  state.cart = [];
+  els.saleForm.reset();
+  els.saleDiscount.value = 0;
+  saveState();
+  buildInvoice(sale);
+  els.invoiceDialog.showModal();
+  renderAll();
 }
 
 function buildInvoice(invoice) {
   const rows = invoice.items.map((item) => `
+function ensureCustomer(name, phone) {
+  if (!name || name === "Walk-in client") return;
+  const existing = state.customers.find((item) => item.name.toLowerCase() === name.toLowerCase());
+  if (existing) {
+    if (phone && !existing.phone) existing.phone = phone;
+    return;
+  }
+  state.customers.push({ id: uid("CUS"), name, phone, segment: "Retail", notes: "Created from sale." });
+}
+
+function buildInvoice(sale) {
+  const rows = sale.items.map((line) => `
     <tr>
       <td>${item.name}</td>
       <td>${item.qty}</td>
       <td>${money.format(item.price)}</td>
       <td>${money.format(item.price * item.qty)}</td>
+      <td>${line.name}<br><span class="card-meta">${line.sku || ""}</span></td>
+      <td>${line.qty}</td>
+      <td>${money(line.price)}</td>
+      <td>${money(line.price * line.qty)}</td>
     </tr>
   `).join("");
 
   els.invoiceSheet.innerHTML = `
     <div class="invoice-header">
+  const subtotal = sale.items.reduce((sum, line) => sum + line.price * line.qty, 0);
+  els.invoiceContent.innerHTML = `
+    <div class="invoice-head">
       <div>
         <h2>Yamaha Musical Instrument Shop</h2>
         <p>Cash sales and instrument buyback desk</p>
         <p>Payment: <strong>Cash only</strong></p>
+        <h2>MAKEWAVES ERP</h2>
+        <p>Yamaha musical shop - sales invoice</p>
       </div>
       <div>
         <strong>Invoice ${invoice.id}</strong>
         <p>${invoice.date}</p>
+        <strong>${sale.id}</strong>
+        <p>${sale.createdAt}</p>
       </div>
     </div>
     <p><strong>Client:</strong> ${invoice.client.name}<br><strong>Phone:</strong> ${invoice.client.phone || "Not provided"}<br><strong>Address:</strong> ${invoice.client.address || "Not provided"}</p>
+    <p><strong>Client:</strong> ${sale.client}<br><strong>Phone:</strong> ${sale.phone || "Not provided"}<br><strong>Status:</strong> ${sale.status}</p>
     <table class="invoice-table">
       <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -286,10 +678,30 @@ function buildInvoice(invoice) {
     <div class="invoice-total-row"><span>Cash received</span><strong>${money.format(invoice.cashReceived)}</strong></div>
     <div class="invoice-total-row"><span>Change</span><strong>${money.format(invoice.change)}</strong></div>
     <p class="fine-print">Thank you for your purchase. Please keep this invoice for service, exchange, and warranty reference.</p>
+    <div class="invoice-totals">
+      <div><span>Subtotal</span><strong>${money(subtotal)}</strong></div>
+      <div><span>Discount</span><strong>${money(sale.discount)}</strong></div>
+      <div class="grand"><span>Total</span><strong>${money(sale.total)}</strong></div>
+    </div>
+    <p class="subtle">Prices may be adjusted per client. Keep this invoice for warranty, exchange, or maintenance follow-up.</p>
   `;
 }
 
 function createInvoice(event) {
+function readImage(input) {
+  return new Promise((resolve) => {
+    const file = input.files && input.files[0];
+    if (!file) {
+      resolve("");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function saveProduct(event) {
   event.preventDefault();
   if (!store.cart.length) {
     alert("Add at least one product to the cart before creating an invoice.");
@@ -323,10 +735,40 @@ function createInvoice(event) {
     change: cashReceived - total,
     payment: "Cash"
   };
+  const name = els.productName.value.trim();
+  const category = els.productCategory.value;
+  const image = await readImage(els.productImage);
+  state.products.push({
+    id: uid("PRD"),
+    name,
+    category,
+    price: Number(els.productPrice.value || 0),
+    cost: Number(els.productCost.value || 0),
+    stock: Number(els.productStock.value || 0),
+    sku: els.productSku.value.trim(),
+    image: image || fallbackImage(name, category),
+    details: els.productDetails.value.trim(),
+    created: today
+  });
+  els.productForm.reset();
+  saveState();
+  renderAll();
+}
 
   invoice.items.forEach((item) => {
     const product = store.products.find((candidate) => candidate.id === item.id);
     product.stock -= item.qty;
+function saveRepair(event) {
+  event.preventDefault();
+  state.repairs.push({
+    id: uid("REP"),
+    client: els.repairClient.value.trim(),
+    instrument: els.repairInstrument.value.trim(),
+    technician: els.repairTech.value.trim(),
+    problem: els.repairProblem.value.trim(),
+    estimate: Number(els.repairEstimate.value || 0),
+    status: els.repairStatus.value,
+    date: today
   });
   store.invoices.push(invoice);
   store.cart = [];
@@ -336,10 +778,13 @@ function createInvoice(event) {
   els.checkoutForm.reset();
   els.discountInput.value = 0;
   els.cashReceived.value = 0;
+  els.repairForm.reset();
+  saveState();
   renderAll();
 }
 
 function createBuyback(event) {
+function savePurchase(event) {
   event.preventDefault();
   const name = document.querySelector("#usedName").value.trim();
   const category = document.querySelector("#usedCategory").value;
@@ -367,9 +812,26 @@ function createBuyback(event) {
     stock: 1,
     image: art(category.includes("Guitar") ? "guitar" : category.includes("Drum") ? "drums" : category.includes("Audio") ? "audio" : category.includes("Brass") ? "brass" : "piano", "#3b4657", "#9e1024"),
     details: entry.notes || `Used Yamaha instrument bought for ${money.format(buyPrice)} cash.`
+  const productId = els.purchaseProduct.value;
+  const qty = Number(els.purchaseQty.value || 0);
+  const cost = Number(els.purchaseCost.value || 0);
+  const productItem = state.products.find((item) => item.id === productId);
+  productItem.stock += qty;
+  productItem.cost = cost;
+  state.purchases.push({
+    id: uid("PUR"),
+    supplier: els.supplierName.value.trim(),
+    productId,
+    qty,
+    cost,
+    total: qty * cost,
+    date: today
   });
   save();
   els.buybackForm.reset();
+  els.purchaseForm.reset();
+  els.purchaseQty.value = 1;
+  saveState();
   renderAll();
 }
 
@@ -377,6 +839,18 @@ function switchView(view) {
   document.querySelectorAll(".nav-item").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
   document.querySelectorAll(".view-panel").forEach((panel) => panel.classList.remove("active"));
   document.querySelector(`#${view}View`).classList.add("active");
+function saveCustomer(event) {
+  event.preventDefault();
+  state.customers.push({
+    id: uid("CUS"),
+    name: els.customerName.value.trim(),
+    phone: els.customerPhone.value.trim(),
+    segment: els.customerSegment.value,
+    notes: els.customerNotes.value.trim()
+  });
+  els.customerForm.reset();
+  saveState();
+  renderAll();
 }
 
 function renderAll() {
@@ -385,6 +859,14 @@ function renderAll() {
   renderCart();
   renderRecords();
   updateStats();
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `makewaves-erp-${today}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 document.addEventListener("click", (event) => {
@@ -398,6 +880,68 @@ document.addEventListener("click", (event) => {
   if (button.dataset.remove) {
     store.cart = store.cart.filter((item) => item.id !== button.dataset.remove);
     save();
+function registerEvents() {
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    if (button.dataset.view) switchView(button.dataset.view);
+    if (button.dataset.jump) switchView(button.dataset.jump);
+    if (button.dataset.addCart) addToCart(button.dataset.addCart);
+    if (button.dataset.cartRemove) {
+      state.cart = state.cart.filter((line) => line.productId !== button.dataset.cartRemove);
+      saveState();
+      renderCart();
+    }
+  });
+
+  document.addEventListener("input", (event) => {
+    const target = event.target;
+    if (target.matches("[data-cart-price]")) {
+      const line = state.cart.find((item) => item.productId === target.dataset.cartPrice);
+      line.price = Number(target.value || 0);
+      saveState();
+      updateSaleTotal();
+    }
+    if (target.matches("[data-cart-qty]")) {
+      const line = state.cart.find((item) => item.productId === target.dataset.cartQty);
+      const productItem = state.products.find((item) => item.id === line.productId);
+      line.qty = Math.min(productItem.stock, Math.max(1, Number(target.value || 1)));
+      saveState();
+      updateSaleTotal();
+    }
+  });
+
+  document.addEventListener("change", (event) => {
+    const target = event.target;
+    if (target.matches("[data-repair-status]")) {
+      const ticket = state.repairs.find((item) => item.id === target.dataset.repairStatus);
+      ticket.status = target.value;
+      saveState();
+      renderAll();
+    }
+    if (target.matches("[data-cart-price], [data-cart-qty]")) {
+      renderCart();
+    }
+  });
+
+  els.currencySelect.addEventListener("change", () => {
+    state.currency = els.currencySelect.value;
+    saveState();
+    renderAll();
+  });
+  els.saleSearch.addEventListener("input", renderSaleProducts);
+  els.saleCategory.addEventListener("change", renderSaleProducts);
+  els.saleDiscount.addEventListener("input", updateSaleTotal);
+  els.productSearch.addEventListener("input", renderInventory);
+  els.saleForm.addEventListener("submit", saveSale);
+  els.productForm.addEventListener("submit", saveProduct);
+  els.repairForm.addEventListener("submit", saveRepair);
+  els.purchaseForm.addEventListener("submit", savePurchase);
+  els.customerForm.addEventListener("submit", saveCustomer);
+
+  byId("clearCartBtn").addEventListener("click", () => {
+    state.cart = [];
+    saveState();
     renderCart();
   }
   if (button.dataset.invoice) {
@@ -406,6 +950,15 @@ document.addEventListener("click", (event) => {
     els.invoiceDialog.showModal();
   }
 });
+  });
+  byId("closeInvoiceBtn").addEventListener("click", () => els.invoiceDialog.close());
+  byId("printInvoiceBtn").addEventListener("click", () => window.print());
+  byId("exportBtn").addEventListener("click", exportData);
+  byId("resetBtn").addEventListener("click", () => {
+    if (!confirm("Reset MAKEWAVES demo data?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  });
 
 els.searchInput.addEventListener("input", renderProducts);
 els.categoryFilter.addEventListener("change", renderProducts);
@@ -429,5 +982,23 @@ document.querySelector("#resetDemo").addEventListener("click", () => {
   localStorage.removeItem("yamaha-buybacks");
   location.reload();
 });
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    installPrompt = event;
+    els.installBtn.hidden = false;
+  });
+  els.installBtn.addEventListener("click", async () => {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    installPrompt = null;
+    els.installBtn.hidden = true;
+  });
+}
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+cacheElements();
+registerEvents();
 renderAll();
