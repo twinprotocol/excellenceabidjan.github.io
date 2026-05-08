@@ -1,8 +1,0 @@
-node_modules/
-build/
-# dist/ removed so it can be uploaded
-coverage/
-.DS_Store
-*.log
-.env*
-!.env.example
