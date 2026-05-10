@@ -1,90 +1,103 @@
 <!DOCTYPE html>
-<html lang="fr" id="site-root">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkCoin | Luxury Boutique</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body id="main-body">
-
-    <div class="top-bar">
-        <div id="ship-info">Livraison gratuite sur 58 Wilayas</div>
-        <div class="lang-selector">
-            <span onclick="updateLang('fr')">FR</span>
-            <span onclick="updateLang('en')">EN</span>
-            <span onclick="updateLang('ar')">العربية</span>
-        </div>
-    </div>
-
-    <header>
-        <a href="#" class="brand-logo">
-            <!-- Note: Placez votre image nommée 'logo.jpg' dans le même dossier -->
-            <img src="logo.jpg" alt="PinkCoin Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/60/C08081/ffffff?text=PC'"> 
-            <span class="pinkcoin-text">PinkCoin</span>
-        </a>
+    <title>PinkCoin | L'Élégance Parisienne</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dusty-rose: #D4A5A5;
+            --champagne: #F7E7CE;
+            --gold: #C5A059;
+        }
+        body { font-family: 'Montserrat', sans-serif; background-color: #fffafb; }
+        h1, h2, .font-paris { font-family: 'Playfair Display', serif; }
         
-        <nav>
-            <ul class="nav-links">
-                <!-- FEMME -->
-                <li class="nav-item">
-                    <a href="#" id="nav-f">Femme</a>
-                    <div class="hanger-dropdown">
-                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
-                        <div class="garment-container">
-                            <a href="#" class="t-sub-robes">Robes</a>
-                            <a href="#" class="t-sub-jupes">Jupes</a>
-                            <a href="#" class="t-sub-ensembles">Ensembles</a>
-                            <a href="#" class="t-sub-accessoires">Accessoires</a>
-                        </div>
-                    </div>
-                </li>
-                <!-- HOMME -->
-                <li class="nav-item">
-                    <a href="#" id="nav-h">Homme</a>
-                    <div class="hanger-dropdown">
-                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
-                        <div class="garment-container">
-                            <a href="#" class="t-sub-chemises">Chemises</a>
-                            <a href="#" class="t-sub-pantalons">Pantalons</a>
-                            <a href="#" class="t-sub-costumes">Costumes</a>
-                            <a href="#" class="t-sub-montres">Montres</a>
-                        </div>
-                    </div>
-                </li>
-                <!-- ENFANTS -->
-                <li class="nav-item">
-                    <a href="#" id="nav-e">Enfants</a>
-                    <div class="hanger-dropdown">
-                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
-                        <div class="garment-container">
-                            <a href="#" class="t-sub-bebe">Bébé</a>
-                            <a href="#" class="t-sub-garcon">Garçon</a>
-                            <a href="#" class="t-sub-fille">Fille</a>
-                            <a href="#" class="t-sub-jouets">Jouets</a>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item"><a href="#" id="nav-b">Beauté</a></li>
-                <li onclick="toggleAdmin()"><i class="fa fa-cog"></i></li>
-            </ul>
-        </nav>
-    </header>
+        /* The "Hanging Garment" Animation */
+        .garment-item {
+            transform-origin: top center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .garment-item:hover {
+            transform: rotate(3deg) translateY(5px);
+        }
+        .gold-gradient {
+            background: linear-gradient(45deg, #C5A059, #F7E7CE, #C5A059);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
 
-    <section id="admin-panel">
-        <h3>Gestionnaire d'Articles PinkCoin[cite: 1]</h3>
-        <div class="admin-grid">
-            <input type="text" id="p-name" placeholder="Nom de l'article">
-            <input type="number" id="p-price" placeholder="Prix (DZD)">
-            <input type="text" id="p-img" placeholder="Lien de l'image">
-            <button class="btn-post" onclick="addNewItem()">PUBLIER</button>
+    <!-- Multilingual & Currency Header -->
+    <nav class="border-b border-gray-100 py-2 bg-white sticky top-0 z-50">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex space-x-4 text-xs font-semibold uppercase tracking-widest">
+                <button onclick="setLanguage('fr')" class="hover:text-rose-400">FR</button>
+                <button onclick="setLanguage('en')" class="hover:text-rose-400">EN</button>
+                <button onclick="setLanguage('ar')" class="hover:text-rose-400">AR</button>
+                <span class="border-l pl-4 text-gold">DZD - د.ج</span>
+            </div>
+            <div class="text-3xl font-paris font-bold gold-gradient tracking-tighter">PinkCoin</div>
+            <div class="flex items-center space-x-5">
+                <i data-lucide="search" class="w-5 h-5 cursor-pointer hover:text-rose-400"></i>
+                <i data-lucide="user" class="w-5 h-5 cursor-pointer"></i>
+                <div class="relative cursor-pointer">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                    <span class="absolute -top-2 -right-2 bg-rose-400 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center" id="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hanging Category Navigation -->
+    <section class="bg-champagne/20 py-12 border-b border-rose-100">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-center space-x-12">
+                <!-- Category 1 -->
+                <div class="garment-item text-center cursor-pointer group">
+                    <div class="w-1 bg-gray-300 h-8 mx-auto mb-1 rounded-full group-hover:bg-gold transition-colors"></div>
+                    <div class="px-6 py-4 bg-white border border-rose-100 shadow-sm rounded-b-lg group-hover:shadow-md transition-all">
+                        <span class="uppercase text-xs tracking-widest font-bold text-rose-800" data-i18n="women">Femmes</span>
+                    </div>
+                </div>
+                <!-- Category 2 -->
+                <div class="garment-item text-center cursor-pointer group">
+                    <div class="w-1 bg-gray-300 h-12 mx-auto mb-1 rounded-full group-hover:bg-gold transition-colors"></div>
+                    <div class="px-6 py-4 bg-white border border-rose-100 shadow-sm rounded-b-lg group-hover:shadow-md transition-all">
+                        <span class="uppercase text-xs tracking-widest font-bold text-rose-800" data-i18n="men">Hommes</span>
+                    </div>
+                </div>
+                <!-- Category 3 -->
+                <div class="garment-item text-center cursor-pointer group">
+                    <div class="w-1 bg-gray-300 h-10 mx-auto mb-1 rounded-full group-hover:bg-gold transition-colors"></div>
+                    <div class="px-6 py-4 bg-white border border-rose-100 shadow-sm rounded-b-lg group-hover:shadow-md transition-all">
+                        <span class="uppercase text-xs tracking-widest font-bold text-rose-800" data-i18n="beauty">Beauté</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <main class="product-grid" id="shop-container"></main>
+    <!-- Hero Section -->
+    <main class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 space-y-6">
+            <h2 class="text-6xl font-paris leading-tight text-gray-900" data-i18n="hero-title">L'Art de Vivre <br><span class="italic text-rose-400">À la Parisienne</span></h2>
+            <p class="text-gray-500 max-w-md leading-relaxed" data-i18n="hero-desc">Découvrez notre collection exclusive de pièces de luxe, soigneusement sélectionnées pour l'élégance moderne d'Alger.</p>
+            <button class="bg-gray-900 text-white px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gold transition-all duration-500 shadow-xl">
+                Shop Collection
+            </button>
+        </div>
+        <div class="md:w-1/2 mt-12 md:mt-0 relative">
+            <div class="absolute -inset-4 border border-gold opacity-30 translate-x-4 translate-y-4"></div>
+            <img src="https://images.unsplash.com/photo-1549439602-43ebcb232811?auto=format&fit=crop&q=80&w=800" alt="Fashion" class="relative z-10 w-full object-cover shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
+        </div>
+    </main>
 
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
