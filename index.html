@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr" id="site-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinkCoin | Luxury Boutique</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="main-body">
+
+    <div class="top-bar">
+        <div id="ship-info">Livraison gratuite sur 58 Wilayas</div>
+        <div class="lang-selector">
+            <span onclick="updateLang('fr')">FR</span>
+            <span onclick="updateLang('en')">EN</span>
+            <span onclick="updateLang('ar')">العربية</span>
+        </div>
+    </div>
+
+    <header>
+        <a href="#" class="brand-logo">
+            <!-- Note: Placez votre image nommée 'logo.jpg' dans le même dossier -->
+            <img src="logo.jpg" alt="PinkCoin Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/60/C08081/ffffff?text=PC'"> 
+            <span class="pinkcoin-text">PinkCoin</span>
+        </a>
+        
+        <nav>
+            <ul class="nav-links">
+                <!-- FEMME -->
+                <li class="nav-item">
+                    <a href="#" id="nav-f">Femme</a>
+                    <div class="hanger-dropdown">
+                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
+                        <div class="garment-container">
+                            <a href="#" class="t-sub-robes">Robes</a>
+                            <a href="#" class="t-sub-jupes">Jupes</a>
+                            <a href="#" class="t-sub-ensembles">Ensembles</a>
+                            <a href="#" class="t-sub-accessoires">Accessoires</a>
+                        </div>
+                    </div>
+                </li>
+                <!-- HOMME -->
+                <li class="nav-item">
+                    <a href="#" id="nav-h">Homme</a>
+                    <div class="hanger-dropdown">
+                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
+                        <div class="garment-container">
+                            <a href="#" class="t-sub-chemises">Chemises</a>
+                            <a href="#" class="t-sub-pantalons">Pantalons</a>
+                            <a href="#" class="t-sub-costumes">Costumes</a>
+                            <a href="#" class="t-sub-montres">Montres</a>
+                        </div>
+                    </div>
+                </li>
+                <!-- ENFANTS -->
+                <li class="nav-item">
+                    <a href="#" id="nav-e">Enfants</a>
+                    <div class="hanger-dropdown">
+                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
+                        <div class="garment-container">
+                            <a href="#" class="t-sub-bebe">Bébé</a>
+                            <a href="#" class="t-sub-garcon">Garçon</a>
+                            <a href="#" class="t-sub-fille">Fille</a>
+                            <a href="#" class="t-sub-jouets">Jouets</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="#" id="nav-b">Beauté</a></li>
+                <li onclick="toggleAdmin()"><i class="fa fa-cog"></i></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="admin-panel">
+        <h3>Gestionnaire d'Articles PinkCoin[cite: 1]</h3>
+        <div class="admin-grid">
+            <input type="text" id="p-name" placeholder="Nom de l'article">
+            <input type="number" id="p-price" placeholder="Prix (DZD)">
+            <input type="text" id="p-img" placeholder="Lien de l'image">
+            <button class="btn-post" onclick="addNewItem()">PUBLIER</button>
+        </div>
+    </section>
+
+    <main class="product-grid" id="shop-container"></main>
+
+    <script src="script.js"></script>
+</body>
+</html>
