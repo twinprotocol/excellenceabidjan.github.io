@@ -1,211 +1,86 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr" id="site-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkCoin | Maison de Couture</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --rose: #D4A5A5; --gold: #C5A059; --dark: #1a1a1a; }
-        body { font-family: 'Montserrat', sans-serif; background: #fff; scroll-behavior: smooth; }
-        .font-paris { font-family: 'Playfair Display', serif; }
-        
-        /* Premium Scrolling Effect */
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        /* The Hanger Interaction (Refined) */
-        .hanger-container { perspective: 1000px; }
-        .hanger-item { 
-            transform-origin: top center; 
-            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .category-group:hover .hanger-item { transform: rotateY(0deg) rotateX(0deg); }
-        
-        .gold-border { border-image: linear-gradient(to right, #C5A059, #F7E7CE) 1; }
-        
-        /* Glassmorphism for a modern look */
-        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
-    </style>
+    <title>PinkCoin | Luxury Boutique</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body id="main-body">
 
-    <!-- Cinematic Intro Section -->
-    <header class="relative h-screen w-full overflow-hidden flex items-center justify-center">
-        <!-- Replace with your actual video or high-res gif -->
-        <div class="absolute inset-0 bg-black">
-            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000" class="w-full h-full object-cover opacity-60 scale-110 animate-[pulse_10s_infinite]" alt="Paris Fashion">
+    <div class="top-bar">
+        <div id="ship-info">Livraison gratuite sur 58 Wilayas</div>
+        <div class="lang-selector">
+            <span onclick="updateLang('fr')">FR</span>
+            <span onclick="updateLang('en')">EN</span>
+            <span onclick="updateLang('ar')">العربية</span>
         </div>
+    </div>
+
+    <header>
+        <a href="#" class="brand-logo">
+            <img src="Elegant 'PINK COIN' Logo with Quartz Element.jpg" alt="PinkCoin Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/60/C08081/ffffff?text=PC'"> 
+            <span class="pinkcoin-text">PinkCoin</span>
+        </a>
         
-        <nav class="absolute top-0 w-full glass z-50 py-6 px-12 flex justify-between items-center border-b border-white/20">
-            <div class="flex space-x-4 text-[10px] tracking-widest uppercase font-bold text-gray-800">
-                <button onclick="setLang('fr')" class="hover:text-gold transition">FR</button>
-                <span class="text-gray-300">|</span>
-                <button onclick="setLang('ar')" class="hover:text-gold transition">AR</button>
-            </div>
-            
-            <!-- YOUR LOGO HERE -->
-            <div class="text-center group cursor-pointer">
-                <h1 class="text-4xl font-paris font-bold tracking-tighter text-gray-900 group-hover:scale-105 transition-transform">PinkCoin</h1>
-                <p class="text-[7px] uppercase tracking-[0.5em] text-gold">Paris • Alger</p>
-            </div>
-
-            <div class="flex items-center space-x-6">
-                <i data-lucide="search" class="w-5 h-5"></i>
-                <div class="relative cursor-pointer">
-                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                    <span class="absolute -top-2 -right-2 bg-gold text-white text-[9px] px-1 rounded-full">0</span>
-                </div>
-            </div>
-        </nav>
-
-        <div class="relative z-10 text-center text-white space-y-6">
-            <h2 class="text-7xl md:text-9xl font-paris italic" data-i18n="hero-head">L'Éternel</h2>
-            <p class="text-xs uppercase tracking-[1em] opacity-80" data-i18n="hero-sub">Collection Printemps 2026</p>
-            <div class="pt-10">
-                <a href="#collection" class="inline-block border border-white px-12 py-4 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all duration-500">Découvrir</a>
-            </div>
-        </div>
-    </header>
-
-    <!-- The Realistic Closet (Navigation) -->
-    <section class="sticky top-[88px] z-40 bg-white border-b border-gray-100 overflow-visible">
-        <div class="container mx-auto flex justify-center space-x-12 lg:space-x-24 py-4">
-            <!-- Dynamic Hanger Item -->
-            <div class="category-group relative group">
-                <span class="text-[11px] uppercase tracking-[0.3em] font-semibold cursor-pointer py-2 block border-b-2 border-transparent group-hover:border-gold transition-all">Femme</span>
-                <!-- The Hanger Dropdown -->
-                <div class="absolute top-full left-1/2 -translate-x-1/2 hidden group-hover:flex pt-6 flex-col items-center space-y-4">
-                    <div class="w-[1px] h-10 bg-gold/30"></div>
-                    <div class="p-6 bg-white shadow-2xl border border-gray-50 flex space-x-8 min-w-[300px] justify-center animate-in fade-in zoom-in duration-300">
-                        <div class="text-center">
-                            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-2 hover:bg-rose-50 transition"><i data-lucide="sparkles" class="w-5 h-5 text-gold"></i></div>
-                            <span class="text-[9px] uppercase tracking-tighter">Robes</span>
-                        </div>
-                        <div class="text-center">
-                            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-2 hover:bg-rose-50 transition"><i data-lucide="layers" class="w-5 h-5 text-gold"></i></div>
-                            <span class="text-[9px] uppercase tracking-tighter">Vestes</span>
+        <nav>
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="#" id="nav-f">Femme</a>
+                    <div class="hanger-dropdown">
+                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
+                        <div class="garment-container">
+                            <a href="femme-robes.html" class="t-sub-robes">Robes</a>
+                            <a href="femme-jupes.html" class="t-sub-jupes">Jupes</a>
+                            <a href="femme-ensembles.html" class="t-sub-ensembles">Ensembles</a>
+                            <a href="femme-accessoires.html" class="t-sub-accessoires">Accessoires</a>
                         </div>
                     </div>
-                </div>
-            </div>
-            <!-- Repeat for Homme, Enfant, Accessoires -->
-            <div class="category-group relative group"><span class="text-[11px] uppercase tracking-[0.3em] font-semibold cursor-pointer py-2 block border-b-2 border-transparent group-hover:border-gold transition-all">Homme</span></div>
-            <div class="category-group relative group"><span class="text-[11px] uppercase tracking-[0.3em] font-semibold cursor-pointer py-2 block border-b-2 border-transparent group-hover:border-gold transition-all">Enfant</span></div>
-            <div class="category-group relative group"><span class="text-[11px] uppercase tracking-[0.3em] font-semibold cursor-pointer py-2 block border-b-2 border-transparent group-hover:border-gold transition-all">Accessoires</span></div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" id="nav-h">Homme</a>
+                    <div class="hanger-dropdown">
+                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
+                        <div class="garment-container">
+                            <a href="homme-chemises.html" class="t-sub-chemises">Chemises</a>
+                            <a href="homme-pantalons.html" class="t-sub-pantalons">Pantalons</a>
+                            <a href="homme-costumes.html" class="t-sub-costumes">Costumes</a>
+                            <a href="homme-montres.html" class="t-sub-montres">Montres</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" id="nav-e">Enfants</a>
+                    <div class="hanger-dropdown">
+                        <svg class="hanger-svg" viewBox="0 0 100 50"><path d="M50 10C55 5 65 5 65 10C65 15 55 18 50 22M10 45C10 35 30 30 50 30C70 30 90 35 90 45" stroke="#D4AF37" fill="none" stroke-width="2"/></svg>
+                        <div class="garment-container">
+                            <a href="enfants-bebe.html" class="t-sub-bebe">Bébé</a>
+                            <a href="enfants-garcon.html" class="t-sub-garcon">Garçon</a>
+                            <a href="enfants-fille.html" class="t-sub-fille">Fille</a>
+                            <a href="enfants-jouets.html" class="t-sub-jouets">Jouets</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="beaute.html" id="nav-b">Beauté</a></li>
+                <li onclick="toggleAdmin()"><i class="fa fa-cog"></i></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="admin-panel">
+        <h3>Espace Vendeur - PinkCoin</h3>
+        <div class="admin-grid">
+            <input type="text" id="p-name" placeholder="Nom de l'article">
+            <input type="number" id="p-price" placeholder="Prix (DZD)">
+            <input type="text" id="p-img" placeholder="URL de l'image">
+            <button class="btn-post" onclick="addNewItem()">PUBLIER</button>
         </div>
     </section>
 
-    <!-- Professional Grid Section -->
-    <section id="collection" class="py-32 px-12 container mx-auto">
-        <div class="flex justify-between items-end mb-16 reveal">
-            <div class="space-y-4">
-                <span class="text-gold text-xs font-bold uppercase tracking-widest">Le Choix de la Maison</span>
-                <h3 class="text-5xl font-paris italic">Sélection Exclusive</h3>
-            </div>
-            <a href="#" class="text-[10px] uppercase tracking-widest border-b border-gray-400 pb-1 hover:border-gold transition">Voir Tout</a>
-        </div>
+    <main class="product-grid" id="shop-container"></main>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <!-- Product Card -->
-            <div class="reveal space-y-6 group cursor-pointer">
-                <div class="relative aspect-[3/4] overflow-hidden bg-gray-50">
-                    <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <button class="absolute bottom-6 left-1/2 -translate-x-1/2 w-[80%] bg-white/90 py-3 text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all">Quick View</button>
-                </div>
-                <div class="text-center">
-                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">Prêt-à-porter</p>
-                    <h4 class="font-medium">Veste Oversize "Paris"</h4>
-                    <p class="text-gold text-sm mt-2">45,000 DZD</p>
-                </div>
-            </div>
-            <!-- More product cards here -->
-        </div>
-    </section>
-
-    <!-- The "Editorial" Section (Makes it feel like a Brand) -->
-    <section class="bg-gray-50 py-32 overflow-hidden">
-        <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 p-24 space-y-8 reveal">
-                <h4 class="text-6xl font-paris leading-tight">La Qualité au <br><span class="italic text-gold">Cœur du Luxe</span></h4>
-                <p class="text-gray-500 leading-loose text-sm font-light">Chaque pièce PinkCoin est le fruit d'une collaboration entre les meilleurs ateliers parisiens et la vision moderne de la femme algérienne.</p>
-                <button class="text-[11px] uppercase tracking-[0.4em] font-bold flex items-center space-x-4">
-                    <span>Notre Histoire</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <div class="md:w-1/2 relative h-[600px] overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=1000" class="w-full h-full object-cover" data-speed="0.5">
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white pt-24 pb-12 px-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20 border-b border-white/10 pb-20">
-            <div class="space-y-6">
-                <h5 class="text-3xl font-paris italic">PinkCoin</h5>
-                <p class="text-gray-500 text-xs leading-relaxed">L'excellence parisienne livrée chez vous en Algérie. Service client disponible 7j/7.</p>
-            </div>
-            <div>
-                <h6 class="text-[10px] uppercase tracking-widest font-bold mb-6 text-gold">Collections</h6>
-                <ul class="text-gray-400 text-xs space-y-4">
-                    <li><a href="#" class="hover:text-white transition">Nouveautés</a></li>
-                    <li><a href="#" class="hover:text-white transition">Meilleures Ventes</a></li>
-                    <li><a href="#" class="hover:text-white transition">Archives</a></li>
-                </ul>
-            </div>
-            <div>
-                <h6 class="text-[10px] uppercase tracking-widest font-bold mb-6 text-gold">Aide</h6>
-                <ul class="text-gray-400 text-xs space-y-4">
-                    <li><a href="#" class="hover:text-white transition">Livraison Alger</a></li>
-                    <li><a href="#" class="hover:text-white transition">Retours</a></li>
-                    <li><a href="#" class="hover:text-white transition">Contact</a></li>
-                </ul>
-            </div>
-            <div>
-                <h6 class="text-[10px] uppercase tracking-widest font-bold mb-6 text-gold">Newsletter</h6>
-                <div class="flex border-b border-gray-600 pb-2">
-                    <input type="email" placeholder="Votre Email" class="bg-transparent border-none text-[10px] focus:ring-0 w-full">
-                    <button class="text-gold text-[10px] uppercase font-bold">OK</button>
-                </div>
-            </div>
-        </div>
-        <div class="flex justify-between text-[9px] text-gray-600 uppercase tracking-[0.3em]">
-            <p>&copy; 2026 PinkCoin. All Rights Reserved.</p>
-            <div class="flex space-x-6">
-                <a href="#">Instagram</a>
-                <a href="#">Tiktok</a>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        lucide.createIcons();
-
-        // Scroll Reveal Logic
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 150;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
-            }
-        }
-        window.addEventListener("scroll", reveal);
-
-        // Language toggle (Demo version)
-        function setLang(lang) {
-            document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
-            alert('Switching to: ' + lang);
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

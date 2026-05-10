@@ -1,0 +1,79 @@
+:root {
+    --pink: #C08081;
+    --gold: #D4AF37;
+    --dark: #2B1F24;
+    --bg: #FAF3F3;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); transition: 0.3s; }
+
+/* Protection du nom PinkCoin */
+.pinkcoin-text { 
+    font-family: 'Playfair Display', serif !important; 
+    direction: ltr !important; 
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.top-bar { background: var(--dark); color: white; padding: 8px 5%; display: flex; justify-content: space-between; font-size: 12px; }
+.lang-selector span { cursor: pointer; margin: 0 10px; transition: 0.2s; }
+.lang-selector span:hover { color: var(--pink); }
+
+header {
+    background: #fff;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; top: 0; z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.logo-img { height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid var(--bg); }
+
+/* Navigation & Cintres */
+.nav-links { display: flex; list-style: none; gap: 20px; align-items: center; }
+.nav-item { position: relative; }
+.nav-item > a { text-decoration: none; color: var(--dark); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; padding: 15px 0; display: block; }
+
+.hanger-dropdown {
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0; visibility: hidden;
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    width: 180px; text-align: center; padding-top: 10px;
+}
+
+.nav-item:hover .hanger-dropdown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+.hanger-svg { width: 75px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+.garment-container {
+    background: var(--pink);
+    padding: 15px;
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.garment-container a { color: white; text-decoration: none; display: block; margin: 10px 0; font-style: italic; font-size: 0.85rem; transition: 0.2s; }
+.garment-container a:hover { color: var(--gold); transform: scale(1.05); }
+
+/* Grille de Produits */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; padding: 40px 5%; }
+.card { background: white; padding: 15px; border-radius: 10px; text-align: center; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+.card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+.card img { width: 100%; height: 360px; object-fit: cover; border-radius: 6px; }
+.price { color: var(--pink); font-weight: 700; margin: 12px 0; font-size: 1.15rem; }
+.btn-buy { background: var(--dark); color: white; width: 100%; padding: 12px; border: none; cursor: pointer; font-weight: bold; border-radius: 5px; transition: 0.3s; }
+.btn-buy:hover { background: var(--pink); }
+
+/* Admin Panel */
+#admin-panel { background: white; margin: 20px 5%; padding: 25px; border: 2px dashed var(--gold); display: none; border-radius: 12px; }
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+input { padding: 12px; border: 1px solid #ddd; border-radius: 5px; outline: none; }
+input:focus { border-color: var(--pink); }
+
+/* RTL Support */
+.rtl { direction: rtl; font-family: 'Cairo', sans-serif; }
