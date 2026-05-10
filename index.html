@@ -3,100 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkCoin | L'Élégance Parisienne</title>
+    <title>PinkCoin | Boutique Parisienne</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --dusty-rose: #D4A5A5;
-            --champagne: #F7E7CE;
-            --gold: #C5A059;
-        }
-        body { font-family: 'Montserrat', sans-serif; background-color: #fffafb; }
-        h1, h2, .font-paris { font-family: 'Playfair Display', serif; }
-        
-        /* The "Hanging Garment" Animation */
-        .garment-item {
+        :root { --rose: #D4A5A5; --gold: #C5A059; --champagne: #F7E7CE; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #fffafb; overflow-x: hidden; }
+        .font-paris { font-family: 'Playfair Display', serif; }
+
+        /* Hanger Physics */
+        .hanger-link {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: top center;
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(-20px) rotate(-5deg);
+            pointer-events: none;
         }
-        .garment-item:hover {
-            transform: rotate(3deg) translateY(5px);
+
+        .category-group:hover .hanger-link {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg);
+            pointer-events: auto;
         }
-        .gold-gradient {
-            background: linear-gradient(45deg, #C5A059, #F7E7CE, #C5A059);
+
+        @keyframes swing {
+            0% { transform: rotate(3deg); }
+            50% { transform: rotate(-3deg); }
+            100% { transform: rotate(3deg); }
+        }
+
+        .category-group:hover .hanger-icon {
+            animation: swing 2s ease-in-out infinite;
+        }
+
+        .gold-text {
+            background: linear-gradient(to right, #C5A059, #F7E7CE, #C5A059);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body>
 
-    <!-- Multilingual & Currency Header -->
-    <nav class="border-b border-gray-100 py-2 bg-white sticky top-0 z-50">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <div class="flex space-x-4 text-xs font-semibold uppercase tracking-widest">
-                <button onclick="setLanguage('fr')" class="hover:text-rose-400">FR</button>
-                <button onclick="setLanguage('en')" class="hover:text-rose-400">EN</button>
-                <button onclick="setLanguage('ar')" class="hover:text-rose-400">AR</button>
-                <span class="border-l pl-4 text-gold">DZD - د.ج</span>
-            </div>
-            <div class="text-3xl font-paris font-bold gold-gradient tracking-tighter">PinkCoin</div>
-            <div class="flex items-center space-x-5">
-                <i data-lucide="search" class="w-5 h-5 cursor-pointer hover:text-rose-400"></i>
-                <i data-lucide="user" class="w-5 h-5 cursor-pointer"></i>
-                <div class="relative cursor-pointer">
-                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                    <span class="absolute -top-2 -right-2 bg-rose-400 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center" id="cart-count">0</span>
-                </div>
+    <!-- Upper Nav -->
+    <nav class="bg-white border-b border-rose-100 py-4 px-8 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex space-x-6 text-[10px] font-bold tracking-widest uppercase">
+            <button onclick="setLang('fr')" class="hover:text-rose-400">FR</button>
+            <button onclick="setLang('en')" class="hover:text-rose-400">EN</button>
+            <button onclick="setLang('ar')" class="hover:text-rose-400">AR</button>
+        </div>
+        
+        <div class="text-4xl font-paris font-bold gold-text tracking-tighter">PinkCoin</div>
+
+        <div class="flex space-x-6">
+            <i data-lucide="search" class="w-5 h-5 cursor-pointer"></i>
+            <div class="relative cursor-pointer">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-rose-400 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
             </div>
         </div>
     </nav>
 
-    <!-- Hanging Category Navigation -->
-    <section class="bg-champagne/20 py-12 border-b border-rose-100">
-        <div class="container mx-auto px-6">
-            <div class="flex justify-center space-x-12">
-                <!-- Category 1 -->
-                <div class="garment-item text-center cursor-pointer group">
-                    <div class="w-1 bg-gray-300 h-8 mx-auto mb-1 rounded-full group-hover:bg-gold transition-colors"></div>
-                    <div class="px-6 py-4 bg-white border border-rose-100 shadow-sm rounded-b-lg group-hover:shadow-md transition-all">
-                        <span class="uppercase text-xs tracking-widest font-bold text-rose-800" data-i18n="women">Femmes</span>
-                    </div>
-                </div>
-                <!-- Category 2 -->
-                <div class="garment-item text-center cursor-pointer group">
-                    <div class="w-1 bg-gray-300 h-12 mx-auto mb-1 rounded-full group-hover:bg-gold transition-colors"></div>
-                    <div class="px-6 py-4 bg-white border border-rose-100 shadow-sm rounded-b-lg group-hover:shadow-md transition-all">
-                        <span class="uppercase text-xs tracking-widest font-bold text-rose-800" data-i18n="men">Hommes</span>
-                    </div>
-                </div>
-                <!-- Category 3 -->
-                <div class="garment-item text-center cursor-pointer group">
-                    <div class="w-1 bg-gray-300 h-10 mx-auto mb-1 rounded-full group-hover:bg-gold transition-colors"></div>
-                    <div class="px-6 py-4 bg-white border border-rose-100 shadow-sm rounded-b-lg group-hover:shadow-md transition-all">
-                        <span class="uppercase text-xs tracking-widest font-bold text-rose-800" data-i18n="beauty">Beauté</span>
-                    </div>
+    <!-- Hanger Closet Navigation -->
+    <div class="bg-white/80 backdrop-blur-md border-b border-rose-50 py-2 relative">
+        <div class="container mx-auto flex justify-center space-x-16">
+            
+            <!-- Category: Femme -->
+            <div class="category-group relative py-4">
+                <button class="uppercase text-xs tracking-[0.3em] font-semibold text-gray-600 hover:text-rose-400" data-i18n="femme">Femme</button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-4 pt-4">
+                    <a href="#" class="hanger-link text-center group">
+                        <div class="hanger-icon">
+                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
+                            <img src="https://cdn-icons-png.flaticon.com/512/3534/3534312.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Dress">
+                        </div>
+                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="dresses">Robes</span>
+                    </a>
+                    <a href="#" class="hanger-link text-center group" style="transition-delay: 0.1s;">
+                        <div class="hanger-icon">
+                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
+                            <img src="https://cdn-icons-png.flaticon.com/512/1785/1785311.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Skirt">
+                        </div>
+                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="skirts">Jupes</span>
+                    </a>
                 </div>
             </div>
+
+            <!-- Category: Homme -->
+            <div class="category-group relative py-4">
+                <button class="uppercase text-xs tracking-[0.3em] font-semibold text-gray-600 hover:text-rose-400" data-i18n="homme">Homme</button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-4 pt-4">
+                    <a href="#" class="hanger-link text-center group">
+                        <div class="hanger-icon">
+                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
+                            <img src="https://cdn-icons-png.flaticon.com/512/3531/3531821.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Blazer">
+                        </div>
+                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="blazers">Blazers</span>
+                    </a>
+                    <a href="#" class="hanger-link text-center group" style="transition-delay: 0.1s;">
+                        <div class="hanger-icon">
+                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
+                            <img src="https://cdn-icons-png.flaticon.com/512/2503/2503380.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Trouser">
+                        </div>
+                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="trousers">Pantalons</span>
+                    </a>
+                </div>
+            </div>
+
         </div>
-    </section>
+    </div>
 
     <!-- Hero Section -->
-    <main class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center">
-        <div class="md:w-1/2 space-y-6">
-            <h2 class="text-6xl font-paris leading-tight text-gray-900" data-i18n="hero-title">L'Art de Vivre <br><span class="italic text-rose-400">À la Parisienne</span></h2>
-            <p class="text-gray-500 max-w-md leading-relaxed" data-i18n="hero-desc">Découvrez notre collection exclusive de pièces de luxe, soigneusement sélectionnées pour l'élégance moderne d'Alger.</p>
-            <button class="bg-gray-900 text-white px-10 py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-gold transition-all duration-500 shadow-xl">
-                Shop Collection
+    <header class="h-[80vh] flex items-center justify-center text-center px-6">
+        <div class="max-w-3xl space-y-8">
+            <h1 class="text-7xl font-paris italic gold-text" data-i18n="hero-title">L'Élégance Pure</h1>
+            <p class="text-gray-500 tracking-widest text-sm leading-relaxed" data-i18n="hero-sub">Directement de Paris à votre dressing à Alger.</p>
+            <button class="px-12 py-4 bg-gray-900 text-white text-[10px] tracking-[0.3em] uppercase hover:bg-gold transition-colors duration-500 shadow-2xl">
+                Explore Now
             </button>
         </div>
-        <div class="md:w-1/2 mt-12 md:mt-0 relative">
-            <div class="absolute -inset-4 border border-gold opacity-30 translate-x-4 translate-y-4"></div>
-            <img src="https://images.unsplash.com/photo-1549439602-43ebcb232811?auto=format&fit=crop&q=80&w=800" alt="Fashion" class="relative z-10 w-full object-cover shadow-2xl grayscale hover:grayscale-0 transition-all duration-700">
-        </div>
-    </main>
+    </header>
 
     <script src="app.js"></script>
 </body>

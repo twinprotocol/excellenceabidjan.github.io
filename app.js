@@ -1,48 +1,29 @@
-// Initialize Icons
 lucide.createIcons();
 
-// Localization Data
-const translations = {
+const dictionary = {
     fr: {
-        "women": "Femmes",
-        "men": "Hommes",
-        "beauty": "Beauté",
-        "hero-title": "L'Art de Vivre À la Parisienne",
-        "hero-desc": "Découvrez notre collection exclusive de pièces de luxe pour Alger."
+        femme: "Femme", homme: "Homme", dresses: "Robes", skirts: "Jupes",
+        blazers: "Blazers", trousers: "Pantalons", "hero-title": "L'Élégance Pure",
+        "hero-sub": "Directement de Paris à votre dressing à Alger."
     },
     en: {
-        "women": "Women",
-        "men": "Men",
-        "beauty": "Beauty",
-        "hero-title": "The Art of Living Parisian Style",
-        "hero-desc": "Discover our exclusive collection of luxury pieces for modern Algiers."
+        femme: "Women", homme: "Men", dresses: "Dresses", skirts: "Skirts",
+        blazers: "Blazers", trousers: "Trousers", "hero-title": "Pure Elegance",
+        "hero-sub": "Directly from Paris to your wardrobe in Algiers."
     },
     ar: {
-        "women": "نسائي",
-        "men": "رجالي",
-        "beauty": "جمال",
-        "hero-title": "فن العيش على الطريقة الباريسية",
-        "hero-desc": "اكتشفوا مجموعتنا الحصرية من القطع الفاخرة للجزائر العاصمة."
+        femme: "نسائي", homme: "رجالي", dresses: "فساتين", skirts: "تنانير",
+        blazers: "سترات", trousers: "سراويل", "hero-title": "الأناقة الخالصة",
+        "hero-sub": "مباشرة من باريس إلى خزانتك في الجزائر."
     }
 };
 
-function setLanguage(lang) {
+function setLang(lang) {
     document.documentElement.lang = lang;
     document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
     
-    // Update all elements with data-i18n attribute
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        element.textContent = translations[lang][key];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = dictionary[lang][key];
     });
-}
-
-// Cart System (Simple Mockup)
-let cart = 0;
-function addToCart() {
-    cart++;
-    document.getElementById('cart-count').textContent = cart;
-    // Add subtle animation to the count
-    document.getElementById('cart-count').classList.add('scale-125');
-    setTimeout(() => document.getElementById('cart-count').classList.remove('scale-125'), 200);
 }
