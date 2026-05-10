@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkCoin | Boutique Parisienne</title>
+    <title>PinkCoin | Luxe & Élégance</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
@@ -12,31 +12,26 @@
         body { font-family: 'Montserrat', sans-serif; background-color: #fffafb; overflow-x: hidden; }
         .font-paris { font-family: 'Playfair Display', serif; }
 
-        /* Hanger Physics */
+        /* Realistic Hanger Animation */
         .hanger-link {
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-origin: top center;
             opacity: 0;
-            transform: translateY(-20px) rotate(-5deg);
+            transform: translateY(-20px) rotate(-8deg);
             pointer-events: none;
         }
-
         .category-group:hover .hanger-link {
             opacity: 1;
             transform: translateY(0) rotate(0deg);
             pointer-events: auto;
         }
-
         @keyframes swing {
-            0% { transform: rotate(3deg); }
-            50% { transform: rotate(-3deg); }
-            100% { transform: rotate(3deg); }
+            0% { transform: rotate(2deg); }
+            50% { transform: rotate(-2deg); }
+            100% { transform: rotate(2deg); }
         }
-
-        .category-group:hover .hanger-icon {
-            animation: swing 2s ease-in-out infinite;
-        }
-
+        .category-group:hover .hanger-icon { animation: swing 3s ease-in-out infinite; }
+        
         .gold-text {
             background: linear-gradient(to right, #C5A059, #F7E7CE, #C5A059);
             -webkit-background-clip: text;
@@ -44,87 +39,146 @@
         }
     </style>
 </head>
-<body>
+<body class="text-gray-900">
 
-    <!-- Upper Nav -->
-    <nav class="bg-white border-b border-rose-100 py-4 px-8 flex justify-between items-center sticky top-0 z-50">
+    <!-- Top Bar -->
+    <nav class="bg-white/90 backdrop-blur-md border-b border-rose-100 py-4 px-8 flex justify-between items-center sticky top-0 z-50">
         <div class="flex space-x-6 text-[10px] font-bold tracking-widest uppercase">
             <button onclick="setLang('fr')" class="hover:text-rose-400">FR</button>
             <button onclick="setLang('en')" class="hover:text-rose-400">EN</button>
-            <button onclick="setLang('ar')" class="hover:text-rose-400">AR</button>
+            <button onclick="setLang('ar')" class="hover:text-rose-400 font-serif">AR</button>
         </div>
         
-        <div class="text-4xl font-paris font-bold gold-text tracking-tighter">PinkCoin</div>
+        <!-- LOGO AREA -->
+        <div class="flex flex-col items-center">
+            <div class="text-4xl font-paris font-bold gold-text tracking-tighter">PinkCoin</div>
+            <span class="text-[8px] uppercase tracking-[0.4em] text-gray-400 mt-1">Excellence Parisienne</span>
+        </div>
 
         <div class="flex space-x-6">
-            <i data-lucide="search" class="w-5 h-5 cursor-pointer"></i>
-            <div class="relative cursor-pointer">
-                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <i data-lucide="search" class="w-5 h-5 cursor-pointer hover:text-gold transition-colors"></i>
+            <div class="relative cursor-pointer group">
+                <i data-lucide="shopping-bag" class="w-5 h-5 group-hover:text-gold transition-colors"></i>
                 <span id="cart-count" class="absolute -top-2 -right-2 bg-rose-400 text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
             </div>
         </div>
     </nav>
 
     <!-- Hanger Closet Navigation -->
-    <div class="bg-white/80 backdrop-blur-md border-b border-rose-50 py-2 relative">
-        <div class="container mx-auto flex justify-center space-x-16">
+    <div class="bg-white border-b border-rose-50 py-2 relative shadow-sm">
+        <div class="container mx-auto flex justify-center space-x-12 lg:space-x-24">
             
-            <!-- Category: Femme -->
+            <!-- Femme -->
             <div class="category-group relative py-4">
-                <button class="uppercase text-xs tracking-[0.3em] font-semibold text-gray-600 hover:text-rose-400" data-i18n="femme">Femme</button>
-                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-4 pt-4">
+                <button class="uppercase text-[11px] tracking-[0.3em] font-semibold text-gray-500 hover:text-rose-400" data-i18n="femme">Femme</button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-6 pt-4">
                     <a href="#" class="hanger-link text-center group">
-                        <div class="hanger-icon">
-                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
-                            <img src="https://cdn-icons-png.flaticon.com/512/3534/3534312.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Dress">
-                        </div>
-                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="dresses">Robes</span>
-                    </a>
-                    <a href="#" class="hanger-link text-center group" style="transition-delay: 0.1s;">
-                        <div class="hanger-icon">
-                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
-                            <img src="https://cdn-icons-png.flaticon.com/512/1785/1785311.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Skirt">
-                        </div>
-                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="skirts">Jupes</span>
+                        <div class="hanger-icon"><svg class="w-10 h-10 mx-auto text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg></div>
+                        <span class="text-[9px] uppercase tracking-widest mt-1 block" data-i18n="dresses">Robes</span>
                     </a>
                 </div>
             </div>
 
-            <!-- Category: Homme -->
+            <!-- Homme -->
             <div class="category-group relative py-4">
-                <button class="uppercase text-xs tracking-[0.3em] font-semibold text-gray-600 hover:text-rose-400" data-i18n="homme">Homme</button>
-                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-4 pt-4">
+                <button class="uppercase text-[11px] tracking-[0.3em] font-semibold text-gray-500 hover:text-rose-400" data-i18n="homme">Homme</button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-6 pt-4">
                     <a href="#" class="hanger-link text-center group">
-                        <div class="hanger-icon">
-                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
-                            <img src="https://cdn-icons-png.flaticon.com/512/3531/3531821.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Blazer">
-                        </div>
-                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="blazers">Blazers</span>
-                    </a>
-                    <a href="#" class="hanger-link text-center group" style="transition-delay: 0.1s;">
-                        <div class="hanger-icon">
-                            <svg class="w-12 h-12 mx-auto text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg>
-                            <img src="https://cdn-icons-png.flaticon.com/512/2503/2503380.png" class="w-10 h-10 mx-auto opacity-60 group-hover:opacity-100 transition-opacity" alt="Trouser">
-                        </div>
-                        <span class="text-[9px] uppercase tracking-tighter mt-2 block" data-i18n="trousers">Pantalons</span>
+                        <div class="hanger-icon"><svg class="w-10 h-10 mx-auto text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg></div>
+                        <span class="text-[9px] uppercase tracking-widest mt-1 block" data-i18n="suits">Costumes</span>
                     </a>
                 </div>
             </div>
 
+            <!-- Enfant -->
+            <div class="category-group relative py-4">
+                <button class="uppercase text-[11px] tracking-[0.3em] font-semibold text-gray-500 hover:text-rose-400" data-i18n="enfant">Enfant</button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-6 pt-4">
+                    <a href="#" class="hanger-link text-center group">
+                        <div class="hanger-icon"><svg class="w-8 h-8 mx-auto text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v4m0 0a4 4 0 0 1 4 4v10H8V10a4 4 0 0 1 4-4z"/></svg></div>
+                        <span class="text-[9px] uppercase tracking-widest mt-1 block" data-i18n="baby">Bébé</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Accessoires -->
+            <div class="category-group relative py-4">
+                <button class="uppercase text-[11px] tracking-[0.3em] font-semibold text-gray-500 hover:text-rose-400" data-i18n="accessoires">Accessoires</button>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 flex space-x-6 pt-4">
+                    <a href="#" class="hanger-link text-center group">
+                        <div class="hanger-icon text-gold"><i data-lucide="gem" class="w-8 h-8"></i></div>
+                        <span class="text-[9px] uppercase tracking-widest mt-1 block" data-i18n="jewelry">Bijoux</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Hero Section -->
-    <header class="h-[80vh] flex items-center justify-center text-center px-6">
-        <div class="max-w-3xl space-y-8">
-            <h1 class="text-7xl font-paris italic gold-text" data-i18n="hero-title">L'Élégance Pure</h1>
-            <p class="text-gray-500 tracking-widest text-sm leading-relaxed" data-i18n="hero-sub">Directement de Paris à votre dressing à Alger.</p>
-            <button class="px-12 py-4 bg-gray-900 text-white text-[10px] tracking-[0.3em] uppercase hover:bg-gold transition-colors duration-500 shadow-2xl">
-                Explore Now
-            </button>
-        </div>
-    </header>
+    <!-- Product Grid: Where you add your pictures & prices -->
+    <section class="container mx-auto px-8 py-20">
+        <h2 class="text-4xl font-paris italic mb-12 text-center" data-i18n="new-arrivals">Nouvelle Collection</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <!-- Product 1 -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden bg-gray-100 aspect-[3/4]">
+                    <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white/80 translate-y-full group-hover:translate-y-0 transition-transform">
+                        <button onclick="addToCart()" class="w-full py-2 text-[10px] uppercase font-bold tracking-widest">Ajouter au Panier</button>
+                    </div>
+                </div>
+                <h3 class="mt-4 font-semibold text-sm uppercase tracking-tighter">Robe de Soie Rose</h3>
+                <p class="text-gold font-bold text-sm">24,500 DZD</p>
+            </div>
 
-    <script src="app.js"></script>
+            <!-- Product 2 -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden bg-gray-100 aspect-[3/4]">
+                    <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white/80 translate-y-full group-hover:translate-y-0 transition-transform">
+                        <button onclick="addToCart()" class="w-full py-2 text-[10px] uppercase font-bold tracking-widest">Ajouter au Panier</button>
+                    </div>
+                </div>
+                <h3 class="mt-4 font-semibold text-sm uppercase tracking-tighter">Veston Homme Lin</h3>
+                <p class="text-gold font-bold text-sm">32,000 DZD</p>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden bg-gray-100 aspect-[3/4]">
+                    <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white/80 translate-y-full group-hover:translate-y-0 transition-transform">
+                        <button onclick="addToCart()" class="w-full py-2 text-[10px] uppercase font-bold tracking-widest">Ajouter au Panier</button>
+                    </div>
+                </div>
+                <h3 class="mt-4 font-semibold text-sm uppercase tracking-tighter">Collier Perle Dorée</h3>
+                <p class="text-gold font-bold text-sm">12,800 DZD</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        lucide.createIcons();
+        let cart = 0;
+
+        const dict = {
+            fr: { femme: "Femme", homme: "Homme", enfant: "Enfant", accessoires: "Accessoires", dresses: "Robes", suits: "Costumes", baby: "Bébé", jewelry: "Bijoux", "new-arrivals": "Nouvelle Collection" },
+            en: { femme: "Women", homme: "Men", enfant: "Kids", accessoires: "Accessories", dresses: "Dresses", suits: "Suits", baby: "Baby", jewelry: "Jewelry", "new-arrivals": "New Arrivals" },
+            ar: { femme: "نساء", homme: "رجال", enfant: "أطفال", accessoires: "إكسسوارات", dresses: "فساتين", suits: "بدلات", baby: "ملابس أطفال", jewelry: "مجوهرات", "new-arrivals": "مجموعة جديدة" }
+        };
+
+        function setLang(l) {
+            document.documentElement.lang = l;
+            document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                el.textContent = dict[l][el.getAttribute('data-i18n')];
+            });
+        }
+
+        function addToCart() {
+            cart++;
+            document.getElementById('cart-count').textContent = cart;
+        }
+    </script>
 </body>
 </html>
