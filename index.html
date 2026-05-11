@@ -1,115 +1,73 @@
 <!DOCTYPE html>
-<html lang="fr" id="site-root">
+<html lang="fr" id="pinkoin-app">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PINKOIN | Official Luxury Store</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;400;600;700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>PINKOIN | Maison de Haute Couture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@200;300;400;600&family=Cairo:wght@300;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body id="main-body">
+<body class="luxury-theme">
 
-    <div class="top-bar">
-        <div id="ship-info">Livraison gratuite sur 58 Wilayas</div>
-        <div class="lang-selector">
-            <span onclick="updateLang('fr')">FR</span>
-            <span onclick="updateLang('en')">EN</span>
-            <span onclick="updateLang('ar')">العربية</span>
+    <header class="main-header">
+        <div class="top-nav">
+            <div class="ship-banner t-ship">Livraison Prestige 58 Wilayas</div>
+            <div class="lang-controls">
+                <button onclick="switchLang('ar')">AR</button>
+                <button onclick="switchLang('en')">EN</button>
+                <button onclick="switchLang('fr')" class="active">FR</button>
+            </div>
         </div>
-    </div>
 
-    <header class="luxury-header">
-        <a href="#" class="brand-logo">
-            <img src="Elegant 'PINK COIN' Logo with Quartz Element.jpg" alt="PinkCoin Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/65/C08081/ffffff?text=PC'"> 
-            <span class="pinkcoin-text">PINKOIN</span>
-        </a>
-        
-        <nav class="main-nav">
-            <ul class="nav-links">
-                <li class="nav-item">
-                    <a href="#" id="nav-f">FEMME</a>
-                    <div class="mega-dropdown">
-                        <div class="hanger-container">
+        <nav class="navbar">
+            <div class="logo">PINKOIN</div>
+            <ul class="nav-menu">
+                <li class="nav-item" onmouseenter="playHanger('femme')">
+                    <a href="#" class="t-femme">FEMME</a>
+                    <div class="mega-dropdown" id="dropdown-femme">
+                        <div class="hanger-system">
                             <div class="hanger-hook"></div>
-                            <div class="garment robe-silhouette">
-                                <div class="menu-content">
-                                    <a href="#" class="t-sub-robes">Robes</a>
-                                    <a href="#" class="t-sub-jupes">Jupes</a>
-                                    <a href="#" class="t-sub-ensembles">Ensembles</a>
-                                    <a href="#" class="t-sub-accessoires">Accessoires</a>
+                            <div class="robe-garment">
+                                <div class="subcategory-list">
+                                    <a href="#" style="--i:1">Robes</a>
+                                    <a href="#" style="--i:2">Jupes</a>
+                                    <a href="#" style="--i:3">Chemisiers</a>
+                                    <a href="#" style="--i:4">Pantalons</a>
+                                    <a href="#" style="--i:5">Vestes</a>
+                                    <a href="#" style="--i:6">Soirée</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a href="#" id="nav-h">HOMME</a>
-                    <div class="mega-dropdown">
-                        <div class="hanger-container">
+                <li class="nav-item" onmouseenter="playHanger('homme')">
+                    <a href="#" class="t-homme">HOMME</a>
+                    <div class="mega-dropdown" id="dropdown-homme">
+                        <div class="hanger-system">
                             <div class="hanger-hook"></div>
-                            <div class="garment shirt-silhouette">
-                                <div class="menu-content">
-                                    <a href="#" class="t-sub-chemises">Chemises</a>
-                                    <a href="#" class="t-sub-pantalons">Pantalons</a>
-                                    <a href="#" class="t-sub-costumes">Costumes</a>
-                                    <a href="#" class="t-sub-montres">Montres</a>
+                            <div class="shirt-garment">
+                                <div class="subcategory-list">
+                                    <a href="#" style="--i:1">Costumes</a>
+                                    <a href="#" style="--i:2">Chemises</a>
+                                    <a href="#" style="--i:3">Pantalons</a>
+                                    <a href="#" style="--i:4">Vestes</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a href="#" id="nav-e">ENFANTS</a>
-                    <div class="mega-dropdown">
-                        <div class="hanger-container">
-                            <div class="hanger-hook"></div>
-                            <div class="garment kids-silhouette">
-                                <div class="menu-content">
-                                    <a href="#" class="t-sub-bebe">Bébé</a>
-                                    <a href="#" class="t-sub-garcon">Garçon</a>
-                                    <a href="#" class="t-sub-fille">Fille</a>
-                                    <a href="#" class="t-sub-jouets">Jouets</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item"><a href="#" id="nav-b">BEAUTÉ</a></li>
-                <li class="nav-item admin-trigger" onclick="toggleAdmin()"><i class="fa fa-cog"></i></li>
+                <li class="nav-item"><a href="#" class="t-enfant">ENFANT</a></li>
+                <li class="nav-item"><a href="#" class="t-access">ACCESSOIRES</a></li>
             </ul>
-        </nav>
-    </header>
+        </header>
 
-    <section class="hero-section">
-        <div class="hero-overlay">
-            <h1 class="hero-title">L'ÉLÉGANCE QUARTZ</h1>
-            <p class="hero-subtitle">Nouvelle Collection Essence 2026</p>
-            <button class="btn-explore" onclick="document.getElementById('shop-container').scrollIntoView({behavior: 'smooth'})">EXPLORER</button>
+    <section class="hero">
+        <div class="hero-visual">
+            <h1 class="reveal-text">L'ÉLÉGANCE AU QUARTZ</h1>
+            <p class="t-hero-sub">Collection Signature 2026</p>
+            <button class="btn-primary t-explore">EXPLORER</button>
         </div>
     </section>
-
-    <section id="admin-panel">
-        <h3>Espace Gestionnaire PinkCoin</h3>
-        <div class="admin-grid">
-            <input type="text" id="p-name" placeholder="Nom de l'article">
-            <input type="number" id="p-price" placeholder="Prix (DZD)">
-            <input type="text" id="p-img" placeholder="Lien de l'image">
-            <button class="btn-post" onclick="addNewItem()">PUBLIER</button>
-        </div>
-    </section>
-
-    <main class="product-grid" id="shop-container"></main>
-
-    <section class="trust-bar">
-        <div class="trust-item"><i class="fa fa-truck"></i><p>Livraison 58 Wilayas</p></div>
-        <div class="trust-item"><i class="fa fa-hand-holding-usd"></i><p>Paiement à la réception</p></div>
-        <div class="trust-item"><i class="fa fa-gem"></i><p>Qualité Quartz Certifiée</p></div>
-    </section>
-
-    <a href="https://wa.me/213XXXXXXXXX" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
 
     <script src="script.js"></script>
 </body>
