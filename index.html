@@ -1,55 +1,89 @@
-<header class="luxury-header">
-    <div class="logo-wrap">
-        <img src="Elegant 'PINK COIN' Logo with Quartz Element.jpg" alt="PinkCoin" class="main-logo">
-    </div>
-    
-    <nav class="main-nav">
-        <ul class="nav-list">
-            <li class="nav-item">
-                <a href="#">FEMME</a>
-                <div class="mega-hanger">
-                    <div class="hanger-box">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3531/3531818.png" class="hanger-icon">
-                        <div class="links-grid">
-                            <a href="#">Robes de soirée</a>
-                            <a href="#">Jupes & Pantalons</a>
-                            <a href="#">Accessoires Quartz</a>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a href="#">HOMME</a>
-                <div class="mega-hanger">
-                    <div class="hanger-box">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3531/3531744.png" class="hanger-icon">
-                        <div class="links-grid">
-                            <a href="#">Costumes</a>
-                            <a href="#">Chemises</a>
-                            <a href="#">Montres de luxe</a>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a href="#">ENFANTS</a>
-                <div class="mega-hanger">
-                    <div class="hanger-box">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3531/3531782.png" class="hanger-icon">
-                        <div class="links-grid">
-                            <a href="#">Bébé Quartz</a>
-                            <a href="#">Garçon & Fille</a>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PINKOIN | Official Store</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">PINKOIN</div>
+        <nav>
+            <ul class="nav-links">
+                <li class="nav-item" data-category="homme">
+                    <a href="#">HOMME</a>
+                    <div class="mega-dropdown">
+                        <div class="hanger-container">
+                            <div class="hanger-metal"></div>
+                            <div class="garment shirt">
+                                <div class="menu-content">
+                                    <a href="#">Chemises</a>
+                                    <a href="#">Costumes</a>
+                                    <a href="#">Pantalons</a>
+                                    <a href="#">Vestes</a>
+                                    <a href="#">Manteaux</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </li>
-        </ul>
-    </nav>
-</header>
+                <li class="nav-item" data-category="femme">
+                    <a href="#">FEMME</a>
+                    <div class="mega-dropdown">
+                        <div class="hanger-container">
+                            <div class="hanger-metal"></div>
+                            <div class="garment dress">
+                                <div class="menu-content">
+                                    <a href="#">Robes</a>
+                                    <a href="#">Jupes</a>
+                                    <a href="#">Chemisiers</a>
+                                    <a href="#">Vestes</a>
+                                    <a href="#">Soirée</a>
+                                    <a href="#">Lingerie</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item" data-category="enfant">
+                    <a href="#">ENFANT</a>
+                    <div class="mega-dropdown">
+                        <div class="hanger-container">
+                            <div class="hanger-metal"></div>
+                            <div class="garment kids">
+                                <div class="menu-content">
+                                    <a href="#">Bébé</a>
+                                    <a href="#">Garçon</a>
+                                    <a href="#">Fille</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="#">ACCESSOIRES</a></li>
+            </ul>
+        </nav>
+        <div class="nav-icons">
+            <span>🔍</span>
+            <span>👤</span>
+            <span>👜 (0)</span>
+        </div>
+    </header>
 
-<section class="hero-magazine">
-    <div class="hero-overlay">
-        <h1 class="title-xl">L'Élégance Quartz</h1>
-        <p class="subtitle">Découvrez la Collection 'Essence de Quartz'</p>
-        <button class="btn-luxury">Explorer la Collection</button>
-    </div>
-</section>
+    <section class="hero">
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1500" alt="Fashion Photography">
+        </div>
+        <div class="hero-text">
+            <h1>ESSENCE DE QUARTZ</h1>
+            <p>Nouvelle Collection 2026</p>
+            <button class="cta-btn">Explorer</button>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
