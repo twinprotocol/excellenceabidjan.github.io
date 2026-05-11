@@ -1,171 +1,96 @@
-:root {
-    --black: #1a1a1a;
-    --off-white: #f9f7f6;
-    --blush: #f2d5d5;
-    --gold: #d4af37;
-    --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-    font-family: 'Montserrat', sans-serif;
-    background-color: var(--off-white);
-    color: var(--black);
-    overflow-x: hidden;
-}
-
-/* Navbar */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 5%;
-    background: white;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-
-.logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: 4px;
-}
-
-.nav-links { display: flex; list-style: none; gap: 40px; }
-.nav-links a { 
-    text-decoration: none; 
-    color: var(--black); 
-    font-weight: 600; 
-    font-size: 13px; 
-    letter-spacing: 2px;
-}
-
-/* Mega Dropdown Logic */
-.nav-item { position: relative; padding: 10px 0; }
+/* --- Effet de Verre et Forme de la Robe --- */
 
 .mega-dropdown {
     position: fixed;
-    top: 70px;
+    top: 80px;
     left: 0;
     width: 100vw;
     height: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1); /* Très peu d'opacité */
+    backdrop-filter: blur(5px); /* Floute ce qu'il y a derrière */
     overflow: hidden;
-    transition: var(--transition);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     justify-content: center;
     opacity: 0;
-    pointer-events: none;
 }
 
 .nav-item:hover .mega-dropdown {
-    height: 70vh;
+    height: 85vh;
     opacity: 1;
-    pointer-events: auto;
 }
 
-/* Hanger & Garment Animation */
-.hanger-container {
+.hanger-hook {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #D4AF37;
+    border-radius: 50% 50% 0 0;
+    border-bottom: none;
+    margin: 0 auto;
     position: relative;
-    top: -100px;
-    transition: var(--transition);
-    text-align: center;
+    top: 20px;
+}
+
+.silk-robe {
+    width: 380px;
+    height: 550px;
+    background: rgba(242, 213, 213, 0.25); /* Rose quartz très transparent */
+    backdrop-filter: blur(15px); /* Effet verre dépoli intense */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    /* Forme de la robe fluide (Clip-path) */
+    clip-path: polygon(
+        50% 0%, 80% 10%, 100% 35%, 90% 100%, 10% 100%, 0% 35%, 20% 10%
+    );
+    
     display: flex;
     flex-direction: column;
-    align-items: center;
-}
-
-.nav-item:hover .hanger-container {
-    top: 50px;
-    animation: swing 3s ease-in-out infinite;
-}
-
-.hanger-metal {
-    width: 100px;
-    height: 40px;
-    border: 3px solid var(--gold);
-    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-    border-bottom: none;
-    position: relative;
-}
-
-.garment {
-    width: 300px;
-    height: 450px;
-    background-color: var(--blush);
-    margin-top: -5px;
-    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 100%, 0% 100%, 0% 20%);
-    display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.05);
     transition: transform 0.5s ease;
 }
 
-.dress { background: var(--blush); border-radius: 40px 40px 0 0; }
-.shirt { background: #e0e0e0; height: 400px; }
-
+/* Contenu à l'intérieur de la robe */
 .menu-content {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    text-align: center;
+    z-index: 10;
+}
+
+.category-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    color: #1a1a1a;
+    opacity: 0.6;
 }
 
 .menu-content a {
+    display: block;
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-style: italic;
-    color: var(--black);
-    transition: 0.3s;
+    color: #1a1a1a;
+    text-decoration: none;
+    margin: 15px 0;
+    transition: 0.4s;
 }
 
-.menu-content a:hover { color: var(--gold); transform: translateX(10px); }
-
-/* Animations */
-@keyframes swing {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(2deg); }
-    75% { transform: rotate(-2deg); }
-    100% { transform: rotate(0deg); }
+.menu-content a:hover {
+    color: #D4AF37;
+    transform: scale(1.1);
 }
 
-/* Hero Section */
-.hero {
-    padding-top: 100px;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    padding-left: 10%;
+/* Animation de balancement doux */
+.hanger-container {
+    animation: gentleSwing 4s ease-in-out infinite;
+    transform-origin: top center;
 }
 
-.hero-image {
-    position: absolute;
-    right: 5%;
-    width: 50%;
-    height: 80vh;
-    overflow: hidden;
-}
-
-.hero-image img { width: 100%; height: 100%; object-fit: cover; }
-
-.hero-text h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 4rem;
-    letter-spacing: 10px;
-    margin-bottom: 20px;
-}
-
-.cta-btn {
-    background: var(--black);
-    color: white;
-    padding: 15px 40px;
-    border: none;
-    letter-spacing: 3px;
-    cursor: pointer;
-    margin-top: 30px;
+@keyframes gentleSwing {
+    0% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+    100% { transform: rotate(-1deg); }
 }
