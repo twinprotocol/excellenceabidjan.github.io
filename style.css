@@ -1,77 +1,63 @@
 :root {
-    --black: #0a0a0a;
-    --cream: #FAF7F2;
-    --blush: rgba(242, 213, 213, 0.4);
+    --pink: #C08081;
+    --black: #1A1A1A;
+    --cream: #FAF3F3;
     --gold: #D4AF37;
-    --font-serif: 'Playfair Display', serif;
-    --font-sans: 'Montserrat', sans-serif;
+    --white: #ffffff;
 }
 
-body {
-    background-color: var(--cream);
-    color: var(--black);
-    margin: 0;
-    font-family: var(--font-sans);
-    overflow-x: hidden;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; background: var(--cream); overflow-x: hidden; }
+
+/* Correction du chevauchement PC */
+.main-header {
+    position: sticky; top: 0; width: 100%; z-index: 1000;
+    background: var(--white); display: flex; justify-content: space-between;
+    align-items: center; padding: 20px 5%; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
 }
 
-/* Header & Typography */
-.main-header { position: fixed; width: 100%; top: 0; z-index: 1000; }
-.logo { font-family: var(--font-serif); font-size: 2rem; letter-spacing: 8px; color: var(--black); }
+.logo { font-family: 'Playfair Display', serif; font-size: 2rem; letter-spacing: 5px; text-decoration: none; color: var(--black); }
 
-.navbar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 8%; background: rgba(250, 247, 242, 0.9);
-    backdrop-filter: blur(10px);
+/* --- Le Cintre (PC uniquement) --- */
+@media (min-width: 1024px) {
+    .nav-menu { display: flex; gap: 40px; list-style: none; }
+    .nav-item:hover .mega-dropdown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    .mega-dropdown {
+        position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(20px);
+        opacity: 0; visibility: hidden; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        width: 300px; padding-top: 30px;
+    }
+
+    .hanger-wrapper { animation: swing 4s ease-in-out infinite; transform-origin: top center; }
+    .hanger-hook { width: 40px; height: 30px; border: 2px solid var(--gold); border-radius: 50% 50% 0 0; margin: 0 auto; border-bottom: none; }
+    
+    .garment { 
+        background: var(--pink); padding: 30px; 
+        clip-path: polygon(50% 0%, 100% 20%, 85% 100%, 15% 100%, 0% 20%);
+        color: white; text-align: center;
+    }
 }
 
-.nav-menu { display: flex; list-style: none; gap: 50px; }
-.nav-menu a { text-decoration: none; color: var(--black); font-weight: 400; letter-spacing: 2px; font-size: 0.85rem; }
-
-/* Mega Dropdown Engine */
-.mega-dropdown {
-    position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-    width: 100vw; height: 0; opacity: 0; overflow: hidden;
-    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-    background: rgba(255,255,255,0.2); backdrop-filter: blur(20px);
+/* --- Adaptabilité Mobile (Android) --- */
+@media (max-width: 1023px) {
+    .nav-container {
+        position: fixed; top: 0; right: -100%; width: 80%; height: 100vh;
+        background: var(--white); transition: 0.4s; padding: 100px 40px;
+    }
+    .nav-container.active { right: 0; }
+    .nav-menu { flex-direction: column; gap: 30px; list-style: none; }
+    .mega-dropdown { display: block; opacity: 1; visibility: visible; position: static; transform: none; }
+    .hanger-hook { display: none; } /* On enlève le cintre sur mobile pour gagner de la place */
+    .garment { background: none; color: var(--black); padding: 10px 0; clip-path: none; text-align: left; }
+    .garment a { color: var(--pink) !important; font-size: 1rem !important; }
 }
 
-.nav-item:hover .mega-dropdown { height: 80vh; opacity: 1; }
-
-/* Hanger & Garment (The Core Interaction) */
-.hanger-system {
-    display: flex; flex-direction: column; align-items: center;
-    margin-top: 50px; perspective: 1000px;
-}
-
-.hanger-hook {
-    width: 50px; height: 40px; border: 2px solid var(--gold);
-    border-radius: 50% 50% 0 0; border-bottom: none;
-}
-
-.robe-garment {
-    width: 400px; height: 550px; background: var(--blush);
-    clip-path: polygon(50% 0%, 100% 20%, 85% 100%, 15% 100%, 0% 20%);
-    display: flex; justify-content: center; align-items: center;
-    animation: swing 4s ease-in-out infinite;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.05);
-}
-
-/* Subcategory Reveal Animation */
-.subcategory-list { display: flex; flex-direction: column; text-align: center; }
-.subcategory-list a {
-    font-family: var(--font-serif); font-size: 1.8rem; font-style: italic;
-    margin: 10px 0; opacity: 0; transform: translateY(20px);
-    transition: 0.5s; transition-delay: calc(var(--i) * 0.1s);
-}
-
-.nav-item:hover .subcategory-list a { opacity: 1; transform: translateY(0); }
-
-/* Keyframes */
 @keyframes swing {
-    0%, 100% { transform: rotate(-1.5deg) translateY(0); }
-    50% { transform: rotate(1.5deg) translateY(-5px); }
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
 }
 
-/* RTL Support */
-.rtl { direction: rtl; font-family: 'Cairo', sans-serif; }
+/* RTL Arabe */
+.rtl { direction: rtl; }
+.rtl .logo { letter-spacing: 0; }

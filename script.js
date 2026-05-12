@@ -1,34 +1,29 @@
+// Gestion du menu mobile
+function toggleMenu() {
+    document.querySelector('.nav-container').classList.toggle('active');
+}
+
+// Système de traduction
 const translations = {
-    fr: { femme: "FEMME", homme: "HOMME", enfant: "ENFANT", ship: "Livraison Prestige 58 Wilayas", explore: "EXPLORER" },
-    en: { femme: "WOMEN", homme: "MEN", enfant: "KIDS", ship: "Prestige Delivery 58 Wilayas", explore: "EXPLORE" },
-    ar: { femme: "نساء", homme: "رجال", enfant: "أطفال", ship: "توصيل النخبة لـ 58 ولاية", explore: "اكتشفوا الآن" }
+    fr: { femme: "FEMME", homme: "HOMME", hero: "L'ÉLÉGANCE AU QUARTZ", ship: "Livraison 58 Wilayas" },
+    ar: { femme: "نساء", homme: "رجال", hero: "أناقة الكوارتز", ship: "توصيل لـ 58 ولاية" },
+    en: { femme: "WOMEN", homme: "MEN", hero: "QUARTZ ELEGANCE", ship: "58 Wilayas Delivery" }
 };
 
-function switchLang(lang) {
-    const root = document.getElementById('pinkoin-app');
+function setLang(lang) {
+    const body = document.getElementById('body-root');
     const data = translations[lang];
 
     // Toggle RTL
-    lang === 'ar' ? root.classList.add('rtl') : root.classList.remove('rtl');
+    lang === 'ar' ? body.classList.add('rtl') : body.classList.remove('rtl');
 
-    // Update Texts
+    // Update texts
     document.querySelector('.t-femme').innerText = data.femme;
     document.querySelector('.t-homme').innerText = data.homme;
+    document.querySelector('.t-hero-title').innerText = data.hero;
     document.querySelector('.t-ship').innerText = data.ship;
-    document.querySelector('.t-explore').innerText = data.explore;
 
-    // Update active button
-    document.querySelectorAll('.lang-controls button').forEach(btn => btn.classList.remove('active'));
+    // Active button
+    document.querySelectorAll('.lang-selector button').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
 }
-
-// Micro-interaction: Mouse Follow on Garment
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('mousemove', (e) => {
-        const garment = item.querySelector('.garment');
-        if (garment) {
-            const x = (window.innerWidth / 2 - e.pageX) / 50;
-            garment.style.transform = `rotateY(${x}deg)`;
-        }
-    });
-});

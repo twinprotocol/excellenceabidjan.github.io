@@ -1,71 +1,82 @@
 <!DOCTYPE html>
-<html lang="fr" id="pinkoin-app">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PINKOIN | Maison de Haute Couture</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@200;300;400;600&family=Cairo:wght@300;600&display=swap" rel="stylesheet">
+    <title>PinkCoin | Haute Couture & Beauté</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="luxury-theme">
+<body id="body-root">
+
+    <div class="top-bar">
+        <p class="t-ship">Livraison Prestige 58 Wilayas</p>
+        <div class="lang-selector">
+            <button onclick="setLang('ar')">AR</button>
+            <button onclick="setLang('en')">EN</button>
+            <button onclick="setLang('fr')" class="active">FR</button>
+        </div>
+    </div>
 
     <header class="main-header">
-        <div class="top-nav">
-            <div class="ship-banner t-ship">Livraison Prestige 58 Wilayas</div>
-            <div class="lang-controls">
-                <button onclick="switchLang('ar')">AR</button>
-                <button onclick="switchLang('en')">EN</button>
-                <button onclick="switchLang('fr')" class="active">FR</button>
-            </div>
+        <a href="#" class="logo">PINKOIN</a>
+        
+        <div class="mobile-toggle" onclick="toggleMenu()">
+            <i class="fa-solid fa-bars"></i>
         </div>
 
-        <nav class="navbar">
-            <div class="logo">PINKOIN</div>
+        <nav class="nav-container">
             <ul class="nav-menu">
-                <li class="nav-item" onmouseenter="playHanger('femme')">
+                <li class="nav-item">
                     <a href="#" class="t-femme">FEMME</a>
-                    <div class="mega-dropdown" id="dropdown-femme">
-                        <div class="hanger-system">
+                    <div class="mega-dropdown">
+                        <div class="hanger-wrapper">
                             <div class="hanger-hook"></div>
-                            <div class="robe-garment">
-                                <div class="subcategory-list">
-                                    <a href="#" style="--i:1">Robes</a>
-                                    <a href="#" style="--i:2">Jupes</a>
-                                    <a href="#" style="--i:3">Chemisiers</a>
-                                    <a href="#" style="--i:4">Pantalons</a>
-                                    <a href="#" style="--i:5">Vestes</a>
-                                    <a href="#" style="--i:6">Soirée</a>
+                            <div class="garment robe-shape">
+                                <div class="sub-links">
+                                    <a href="#">Robes</a>
+                                    <a href="#">Soirée</a>
+                                    <a href="#">Lingerie</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item" onmouseenter="playHanger('homme')">
+                <li class="nav-item">
                     <a href="#" class="t-homme">HOMME</a>
-                    <div class="mega-dropdown" id="dropdown-homme">
-                        <div class="hanger-system">
+                    <div class="mega-dropdown">
+                        <div class="hanger-wrapper">
                             <div class="hanger-hook"></div>
-                            <div class="shirt-garment">
-                                <div class="subcategory-list">
-                                    <a href="#" style="--i:1">Costumes</a>
-                                    <a href="#" style="--i:2">Chemises</a>
-                                    <a href="#" style="--i:3">Pantalons</a>
-                                    <a href="#" style="--i:4">Vestes</a>
+                            <div class="garment shirt-shape">
+                                <div class="sub-links">
+                                    <a href="#">Costumes</a>
+                                    <a href="#">Chemises</a>
+                                    <a href="#">Pantalons</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item"><a href="#" class="t-enfant">ENFANT</a></li>
                 <li class="nav-item"><a href="#" class="t-access">ACCESSOIRES</a></li>
+                <li class="nav-item"><a href="#" class="t-beauty">BEAUTÉ</a></li>
             </ul>
-        </header>
+        </nav>
+
+        <div class="header-icons">
+            <button class="icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="icon-btn cart-btn">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span class="cart-badge">0</span>
+            </button>
+        </div>
+    </header>
 
     <section class="hero">
-        <div class="hero-visual">
-            <h1 class="reveal-text">L'ÉLÉGANCE AU QUARTZ</h1>
-            <p class="t-hero-sub">Collection Signature 2026</p>
-            <button class="btn-primary t-explore">EXPLORER</button>
+        <div class="hero-content">
+            <h1 class="t-hero-title">L'ÉLÉGANCE AU QUARTZ</h1>
+            <p class="t-hero-sub">Le luxe parisien, livré chez vous.</p>
+            <button class="cta-btn t-cta">Acheter Maintenant</button>
         </div>
     </section>
 
