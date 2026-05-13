@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkCoin - Haute Couture Algérie</title>
+    <title>PinkCoin - Haute Couture</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@400;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -11,7 +11,7 @@
 <body>
 
     <div class="top-bar">
-        <div id="ship-text">Livraison Prestige dans les 58 Wilayas — Algérie</div>
+        <div>Livraison Prestige dans les 58 Wilayas — Algérie</div>
         <div class="lang-switch">
             <span onclick="changeLang('en')">EN</span>
             <span onclick="changeLang('ar')" style="font-family:'Cairo'">AR</span>
@@ -27,14 +27,14 @@
         
         <nav>
             <ul class="nav-links">
-                <li class="nav-item">
+                <li class="nav-item" data-category="femme">
                     <a href="#" onclick="triggerCategory(this, 'femme')">FEMME</a>
                     <div class="hanger-dropdown">
                         <div class="hanger-container">
-                            <svg class="hanger-svg" viewBox="0 0 200 140" fill="none">
-                                <path d="M100 30 Q115 15 130 25 Q130 35 100 45" stroke="#D4AF37" stroke-width="8" stroke-linecap="round"/>
-                                <line x1="100" y1="45" x2="100" y2="75" stroke="#D4AF37" stroke-width="8"/>
-                                <circle cx="100" cy="30" r="8" fill="#D4AF37"/>
+                            <svg class="hanger-svg" viewBox="0 0 200 160" fill="none">
+                                <path d="M100 35 Q118 18 135 28 Q135 40 100 50" stroke="#D4AF37" stroke-width="9" stroke-linecap="round"/>
+                                <line x1="100" y1="50" x2="100" y2="85" stroke="#D4AF37" stroke-width="9"/>
+                                <circle cx="100" cy="35" r="9" fill="#D4AF37"/>
                             </svg>
                             <div class="garment dress">
                                 <ul class="subcategories">
@@ -51,13 +51,13 @@
                     </div>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item" data-category="homme">
                     <a href="#" onclick="triggerCategory(this, 'homme')">HOMME</a>
                     <div class="hanger-dropdown">
                         <div class="hanger-container">
-                            <svg class="hanger-svg" viewBox="0 0 200 140" fill="none">
-                                <path d="M100 30 Q115 15 130 25 Q130 35 100 45" stroke="#D4AF37" stroke-width="8" stroke-linecap="round"/>
-                                <line x1="100" y1="45" x2="100" y2="75" stroke="#D4AF37" stroke-width="8"/>
+                            <svg class="hanger-svg" viewBox="0 0 200 160" fill="none">
+                                <path d="M100 35 Q118 18 135 28 Q135 40 100 50" stroke="#D4AF37" stroke-width="9" stroke-linecap="round"/>
+                                <line x1="100" y1="50" x2="100" y2="85" stroke="#D4AF37" stroke-width="9"/>
                             </svg>
                             <div class="garment blazer">
                                 <ul class="subcategories">
@@ -72,13 +72,13 @@
                     </div>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item" data-category="enfant">
                     <a href="#" onclick="triggerCategory(this, 'enfant')">ENFANT</a>
                     <div class="hanger-dropdown">
                         <div class="hanger-container">
-                            <svg class="hanger-svg" viewBox="0 0 200 140" fill="none">
-                                <path d="M100 30 Q115 15 130 25 Q130 35 100 45" stroke="#D4AF37" stroke-width="8" stroke-linecap="round"/>
-                                <line x1="100" y1="45" x2="100" y2="75" stroke="#D4AF37" stroke-width="8"/>
+                            <svg class="hanger-svg" viewBox="0 0 200 160" fill="none">
+                                <path d="M100 35 Q118 18 135 28 Q135 40 100 50" stroke="#D4AF37" stroke-width="8" stroke-linecap="round"/>
+                                <line x1="100" y1="50" x2="100" y2="85" stroke="#D4AF37" stroke-width="8"/>
                             </svg>
                             <div class="garment kids">
                                 <ul class="subcategories">
@@ -103,6 +103,7 @@
         </div>
     </header>
 
+    <canvas id="sparkle-canvas"></canvas>
     <div id="diamond-field"></div>
     <main id="app-viewport"></main>
 
