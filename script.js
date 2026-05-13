@@ -1,83 +1,85 @@
-const products = {
+const inventory = {
     femme: [
-        { name: "Robe Soie Quartz", price: "18.500 DZD", img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600" },
-        { name: "Tailleur Ivory Luxe", price: "24.000 DZD", img: "https://images.unsplash.com/photo-1548733221-08149870f2f3?w=600" },
-        { name: "Robe Satin Noire", price: "21.000 DZD", img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600" }
+        { name: "Robe Soie Quartz", price: "18.500 DZD", img: "https://images.unsplash.com/photo-1595777457583-95e059d581b8" },
+        { name: "Ensemble Satin Rose", price: "22.000 DZD", img: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446" },
+        { name: "Manteau Cachemire", price: "35.000 DZD", img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b" },
+        { name: "Robe de Gala Noire", price: "42.000 DZD", img: "https://images.unsplash.com/photo-1566174053879-31528523f8ae" }
     ],
     homme: [
-        { name: "Costume Slim Fit", price: "45.000 DZD", img: "https://images.unsplash.com/photo-1594932224828-b4b059b6a684?w=600" },
-        { name: "Veste Lin Premium", price: "19.500 DZD", img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600" }
+        { name: "Costume Prestige Noir", price: "48.000 DZD", img: "https://images.unsplash.com/photo-1594932224828-b4b059b6a684" },
+        { name: "Chemise Coton Égyptien", price: "9.500 DZD", img: "https://images.unsplash.com/photo-1598033129183-c4f50c717658" },
+        { name: "Blazer Lin Bleu", price: "21.000 DZD", img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf" }
     ],
     enfant: [
-        { name: "Ensemble Coton Doux", price: "8.500 DZD", img: "https://images.unsplash.com/photo-1519704943920-18447d21755b?w=600" }
+        { name: "Robe Petite Fleur", price: "7.500 DZD", img: "https://images.unsplash.com/photo-1519704943920-18447d21755b" },
+        { name: "Costume Petit Prince", price: "12.000 DZD", img: "https://images.unsplash.com/photo-1621454523226-ce7936d6d392" }
     ],
     accessoires: [
-        { name: "Sac Cuir Vintage", price: "18.900 DZD", img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600" },
-        { name: "Lunettes de Soleil Or", price: "12.500 DZD", img: "https://images.unsplash.com/photo-1511499767350-a1590fdb2ca1?w=600" }
+        { name: "Sac Cuir Vintage", price: "18.900 DZD", img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3" },
+        { name: "Collier Or 18K", price: "55.000 DZD", img: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338" }
+    ],
+    beaute: [
+        { name: "Sérum Éclat Rose", price: "6.800 DZD", img: "https://images.unsplash.com/photo-1594465919760-441fe5908ab0" }
     ]
 };
 
-function createSparkles(e) {
-    const container = document.getElementById('sparkle-container');
-    for (let i = 0; i < 12; i++) {
-        const s = document.createElement('div');
-        s.className = 'sparkle';
-        s.style.left = (e.pageX + (Math.random() - 0.5) * 100) + 'px';
-        s.style.top = (e.pageY + (Math.random() - 0.5) * 100) + 'px';
-        container.appendChild(s);
-        setTimeout(() => s.remove(), 800);
+function createDiamonds(e) {
+    const container = document.getElementById('diamond-field');
+    for (let i = 0; i < 15; i++) {
+        const d = document.createElement('div');
+        d.className = 'diamond';
+        d.style.left = (e.pageX + (Math.random() - 0.5) * 120) + 'px';
+        d.style.top = (e.pageY + (Math.random() - 0.5) * 120) + 'px';
+        container.appendChild(d);
+        setTimeout(() => d.remove(), 1000);
     }
 }
 
-function selectCategory(el, cat) {
-    createSparkles(window.event);
+function triggerCategory(el, cat) {
+    createDiamonds(window.event);
     renderCategory(cat);
 }
 
 function renderCategory(cat) {
-    const main = document.getElementById('dynamic-render');
-    const items = products[cat] || products.femme;
+    const main = document.getElementById('app-viewport');
+    const items = inventory[cat] || [];
     main.innerHTML = `
-        <div style="padding: 60px 8%; animation: fadeIn 0.8s ease;">
-            <h2 style="font-family:'Playfair Display'; font-size:3rem; text-align:center; margin-bottom:50px; letter-spacing:5px;">${cat.toUpperCase()}</h2>
-            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:40px;">
-                ${items.map(p => `
-                    <div class="product-card">
-                        <img src="${p.img}">
-                        <div style="padding:20px;">
-                            <h3 style="font-family:'Playfair Display';">${p.name}</h3>
-                            <p style="color:var(--gold); font-weight:bold; margin:10px 0;">${p.price}</p>
-                            <button onclick="updateCart()" style="width:100%; padding:12px; background:var(--black); color:white; border:none; cursor:pointer; font-weight:600;">AJOUTER AU PANIER</button>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
+        <div class="product-grid" style="animation: fadeIn 0.8s;">
+            ${items.map(p => `
+                <div class="p-card">
+                    <img src="${p.img}?auto=format&fit=crop&w=600">
+                    <h3 style="margin-top:15px; font-family:'Playfair Display';">${p.name}</h3>
+                    <p class="p-price">${p.price}</p>
+                    <button class="btn-add" onclick="addToCart()">Ajouter au Panier</button>
+                </div>
+            `).join('')}
         </div>
     `;
     window.scrollTo(0,0);
 }
 
-let cartCount = 0;
-function updateCart() {
-    cartCount++;
-    document.getElementById('cart-count').innerText = cartCount;
+let count = 0;
+function addToCart() {
+    count++;
+    document.getElementById('cart-count').innerText = count;
+}
+
+function showCart() {
+    alert("Simulation Panier: " + count + " articles sélectionnés pour PINKOIN.");
+}
+
+function changeLang(lang) {
+    document.body.classList.toggle('rtl', lang === 'ar');
+    document.querySelectorAll('.lang-switch span').forEach(s => s.classList.remove('active'));
+    event.target.classList.add('active');
 }
 
 function renderHome() {
-    document.getElementById('dynamic-render').innerHTML = `
-        <section style="height:75vh; background:linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600') center/cover; display:flex; align-items:center; justify-content:center;">
-            <div style="text-align:center; color:white;">
-                <h2 style="font-family:'Playfair Display'; font-size:4rem; letter-spacing:15px; margin-bottom:20px;">EXCELLENCE</h2>
-                <button onclick="renderCategory('femme')" style="padding:18px 50px; background:var(--gold); color:white; border:none; font-weight:bold; cursor:pointer; letter-spacing:3px;">DÉCOUVRIR LA COLLECTION</button>
-            </div>
-        </section>
+    document.getElementById('app-viewport').innerHTML = `
+        <div style="height:70vh; background:url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d') center/cover; display:flex; align-items:center; justify-content:center;">
+            <button onclick="renderCategory('femme')" style="padding:20px 60px; background:var(--gold); color:white; border:none; cursor:pointer; font-weight:bold; letter-spacing:4px;">NOUVELLE COLLECTION</button>
+        </div>
     `;
-}
-
-function setLanguage(lang) {
-    document.body.classList.toggle('rtl', lang === 'ar');
-    document.querySelectorAll('.lang-selector span').forEach(s => s.classList.remove('active'));
-    event.target.classList.add('active');
 }
 
 window.onload = renderHome;
