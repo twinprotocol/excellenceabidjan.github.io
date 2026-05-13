@@ -11,7 +11,7 @@
 <body id="main-body">
 
     <div class="top-prestige">
-        <div class="marquee-text" id="ship-text">Livraison Prestige 58 Wilayas — Service Client 7j/7</div>
+        <div id="ship-text">Livraison Prestige 58 Wilayas</div>
         <div class="lang-selector">
             <span onclick="setLanguage('ar')">AR</span>
             <span onclick="setLanguage('en')">EN</span>
@@ -20,74 +20,35 @@
     </div>
 
     <header class="navbar-premium">
-        <a href="index.html" class="brand-identity">PINKOIN</a>
+        <div class="logo-wrap" onclick="renderHome()">
+            <a href="#" class="brand-identity">PINKOIN</a>
+        </div>
         
         <nav class="desktop-nav">
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="femme.html" class="nav-link" id="txt-femme">FEMME</a>
+                    <a href="#" class="nav-link" onclick="renderCategory('femme')">FEMME</a>
                     <div class="mega-menu-hanger">
                         <div class="hanger-swing">
                             <div class="hanger-metal"></div>
                             <div class="garment-shape robe-luxury">
                                 <div class="menu-content">
-                                    <a href="robes.html">Robes du Soir</a>
-                                    <a href="pret-a-porter.html">Prêt-à-Porter</a>
-                                    <a href="lingerie.html">Lingerie</a>
+                                    <a href="#" onclick="renderCategory('robes')">Robes de Soirée</a>
+                                    <a href="#" onclick="renderCategory('femme')">Prêt-à-Porter</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a href="homme.html" class="nav-link" id="txt-homme">HOMME</a>
-                    <div class="mega-menu-hanger">
-                        <div class="hanger-swing">
-                            <div class="hanger-metal"></div>
-                            <div class="garment-shape blazer-luxury">
-                                <div class="menu-content">
-                                    <a href="costumes.html">Costumes</a>
-                                    <a href="chemises.html">Chemises</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item"><a href="enfant.html" class="nav-link" id="txt-enfant">ENFANT</a></li>
-                <li class="nav-item"><a href="beaute.html" class="nav-link" id="txt-beaute">BEAUTÉ</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('homme')">HOMME</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('beaute')">BEAUTÉ</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('accessoires')">ACCESSOIRES</a></li>
             </ul>
         </nav>
-
-        <div class="util-icons">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <div class="cart-trigger">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span class="cart-count">0</span>
-            </div>
-        </div>
     </header>
 
-    <section class="hero-cinematic">
-        <div class="hero-image-wrap">
-            <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070" alt="Collection Quartz">
-        </div>
-        <div class="hero-overlay">
-            <h1 id="hero-title">L'ÉLÉGANCE AU QUARTZ</h1>
-            <p id="hero-subtitle">Le luxe parisien, livré chez vous.</p>
-            <a href="#collections" class="gold-cta" id="hero-btn">Explorer</a>
-        </div>
-    </section>
-
-    <section class="collection-grid" id="collections">
-        <div class="grid-box" onclick="location.href='femme.html'">
-            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=1987" alt="Femme">
-            <div class="label-box"><span>FEMME</span></div>
-        </div>
-        <div class="grid-box" onclick="location.href='beaute.html'">
-            <img src="https://images.unsplash.com/photo-1594465919760-441fe5908ab0?q=80&w=1930" alt="Beauté">
-            <div class="label-box"><span>BEAUTÉ</span></div>
-        </div>
-    </section>
+    <main id="dynamic-render">
+        </main>
 
     <script src="script.js"></script>
 </body>
