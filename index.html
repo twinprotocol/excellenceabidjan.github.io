@@ -1,82 +1,81 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" id="pinkoin-site">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkCoin | Haute Couture & Beauté</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>PINKOIN | Maison de Mode & Beauté</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@200;400;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body id="body-root">
+<body>
 
     <div class="top-bar">
-        <p class="t-ship">Livraison Prestige 58 Wilayas</p>
-        <div class="lang-selector">
-            <button onclick="setLang('ar')">AR</button>
-            <button onclick="setLang('en')">EN</button>
-            <button onclick="setLang('fr')" class="active">FR</button>
+        <div class="service-msg" id="msg-ship">Livraison Prestige 58 Wilayas</div>
+        <div class="lang-switch">
+            <button onclick="changeLang('ar')">AR</button>
+            <button onclick="changeLang('en')">EN</button>
+            <button onclick="changeLang('fr')" class="active">FR</button>
         </div>
     </div>
 
     <header class="main-header">
-        <a href="#" class="logo">PINKOIN</a>
+        <div class="logo">PINKOIN</div>
         
-        <div class="mobile-toggle" onclick="toggleMenu()">
-            <i class="fa-solid fa-bars"></i>
-        </div>
-
         <nav class="nav-container">
-            <ul class="nav-menu">
+            <ul class="nav-links">
                 <li class="nav-item">
-                    <a href="#" class="t-femme">FEMME</a>
+                    <a href="#" class="nav-main-link" id="link-femme">FEMME</a>
                     <div class="mega-dropdown">
-                        <div class="hanger-wrapper">
+                        <div class="hanger-system">
                             <div class="hanger-hook"></div>
                             <div class="garment robe-shape">
-                                <div class="sub-links">
-                                    <a href="#">Robes</a>
-                                    <a href="#">Soirée</a>
-                                    <a href="#">Lingerie</a>
+                                <div class="menu-items">
+                                    <a href="#" style="--d:1">Robes de Soirée</a>
+                                    <a href="#" style="--d:2">Jupes Vintage</a>
+                                    <a href="#" style="--d:3">Lingerie Fine</a>
+                                    <a href="#" style="--d:4">Nouveautés</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="t-homme">HOMME</a>
+                    <a href="#" class="nav-main-link" id="link-homme">HOMME</a>
                     <div class="mega-dropdown">
-                        <div class="hanger-wrapper">
+                        <div class="hanger-system">
                             <div class="hanger-hook"></div>
                             <div class="garment shirt-shape">
-                                <div class="sub-links">
-                                    <a href="#">Costumes</a>
-                                    <a href="#">Chemises</a>
-                                    <a href="#">Pantalons</a>
+                                <div class="menu-items">
+                                    <a href="#" style="--d:1">Costumes</a>
+                                    <a href="#" style="--d:2">Chemises</a>
+                                    <a href="#" style="--d:3">Pantalons</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item"><a href="#" class="t-access">ACCESSOIRES</a></li>
-                <li class="nav-item"><a href="#" class="t-beauty">BEAUTÉ</a></li>
+                <li class="nav-item"><a href="#" class="nav-main-link" id="link-enfant">ENFANT</a></li>
+                <li class="nav-item"><a href="#" class="nav-main-link" id="link-access">ACCESSOIRES</a></li>
             </ul>
         </nav>
 
         <div class="header-icons">
-            <button class="icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
-            <button class="icon-btn cart-btn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <i class="fa-solid fa-user"></i>
+            <div class="cart-wrapper">
                 <i class="fa-solid fa-bag-shopping"></i>
-                <span class="cart-badge">0</span>
-            </button>
+                <span class="badge">0</span>
+            </div>
         </div>
     </header>
 
     <section class="hero">
+        <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="t-hero-title">L'ÉLÉGANCE AU QUARTZ</h1>
-            <p class="t-hero-sub">Le luxe parisien, livré chez vous.</p>
-            <button class="cta-btn t-cta">Acheter Maintenant</button>
+            <h1 id="hero-title">L'ÉLÉGANCE AU QUARTZ</h1>
+            <p id="hero-sub">Le raffinement de Paris, livré partout en Algérie.</p>
+            <button class="cta-luxury" id="btn-discover">DÉCOUVRIR</button>
         </div>
     </section>
 

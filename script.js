@@ -1,29 +1,40 @@
-// Gestion du menu mobile
-function toggleMenu() {
-    document.querySelector('.nav-container').classList.toggle('active');
-}
-
-// Système de traduction
-const translations = {
-    fr: { femme: "FEMME", homme: "HOMME", hero: "L'ÉLÉGANCE AU QUARTZ", ship: "Livraison 58 Wilayas" },
-    ar: { femme: "نساء", homme: "رجال", hero: "أناقة الكوارتز", ship: "توصيل لـ 58 ولاية" },
-    en: { femme: "WOMEN", homme: "MEN", hero: "QUARTZ ELEGANCE", ship: "58 Wilayas Delivery" }
+const dict = {
+    fr: {
+        femme: "FEMME", homme: "HOMME", enfant: "ENFANT", access: "ACCESSOIRES",
+        ship: "Livraison Prestige 58 Wilayas",
+        heroT: "L'ÉLÉGANCE AU QUARTZ", heroS: "Le raffinement de Paris à Alger.", btn: "DÉCOUVRIR"
+    },
+    en: {
+        femme: "WOMEN", homme: "MEN", enfant: "KIDS", access: "ACCESSORIES",
+        ship: "Prestige Delivery 58 Wilayas",
+        heroT: "QUARTZ ELEGANCE", heroS: "Parisian refinement delivered to Algiers.", btn: "DISCOVER"
+    },
+    ar: {
+        femme: "نساء", homme: "رجال", enfant: "أطفال", access: "إكسسوارات",
+        ship: "توصيل فاخر لـ 58 ولاية",
+        heroT: "أناقة الكوارتز", heroS: "الرقي الباريسي بين يديك في الجزائر.", btn: "اكتشفوا الآن"
+    }
 };
 
-function setLang(lang) {
-    const body = document.getElementById('body-root');
-    const data = translations[lang];
+function changeLang(lang) {
+    const data = dict[lang];
+    const body = document.body;
 
-    // Toggle RTL
-    lang === 'ar' ? body.classList.add('rtl') : body.classList.remove('rtl');
+    // Mise à jour de l'orientation
+    if(lang === 'ar') body.classList.add('rtl');
+    else body.classList.remove('rtl');
 
-    // Update texts
-    document.querySelector('.t-femme').innerText = data.femme;
-    document.querySelector('.t-homme').innerText = data.homme;
-    document.querySelector('.t-hero-title').innerText = data.hero;
-    document.querySelector('.t-ship').innerText = data.ship;
+    // Mise à jour des textes
+    document.getElementById('link-femme').innerText = data.femme;
+    document.getElementById('link-homme').innerText = data.homme;
+    document.getElementById('link-enfant').innerText = data.enfant;
+    document.getElementById('link-access').innerText = data.access;
+    document.getElementById('msg-ship').innerText = data.ship;
+    document.getElementById('hero-title').innerText = data.heroT;
+    document.getElementById('hero-sub').innerText = data.heroS;
+    document.getElementById('btn-discover').innerText = data.btn;
 
-    // Active button
-    document.querySelectorAll('.lang-selector button').forEach(b => b.classList.remove('active'));
+    // Gestion du bouton actif
+    document.querySelectorAll('.lang-switch button').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
 }
