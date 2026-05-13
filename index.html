@@ -11,7 +11,7 @@
 <body id="main-body">
 
     <div class="top-prestige">
-        <div id="ship-text">Livraison Prestige 58 Wilayas — Algérie</div>
+        <div id="ship-text">Livraison Prestige 58 Wilayas</div>
         <div class="lang-selector">
             <span onclick="setLanguage('ar')">AR</span>
             <span onclick="setLanguage('en')">EN</span>
@@ -28,19 +28,34 @@
             <ul class="nav-list">
                 <li class="nav-item">
                     <a href="#" class="nav-link" onclick="renderCategory('femme')">FEMME</a>
-                    <div class="mega-menu-hanger">
+                    <div class="hanger-dropdown">
                         <div class="hanger-swing">
-                            <div class="hanger-metal"></div>
-                            <div class="garment-shape robe-luxury">
+                            <div class="hanger-hook"></div>
+                            <div class="garment-shape">
                                 <div class="menu-content">
-                                    <a href="#" onclick="renderCategory('robes')">Robes de Soirée</a>
+                                    <a href="#" onclick="renderCategory('femme')">Robes de Soirée</a>
                                     <a href="#" onclick="renderCategory('femme')">Prêt-à-Porter</a>
+                                    <a href="#" onclick="renderCategory('femme')">Denim</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('homme')">HOMME</a></li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" onclick="renderCategory('homme')">HOMME</a>
+                    <div class="hanger-dropdown">
+                        <div class="hanger-swing">
+                            <div class="hanger-hook"></div>
+                            <div class="garment-shape blazer">
+                                <div class="menu-content">
+                                    <a href="#" onclick="renderCategory('homme')">Blazers</a>
+                                    <a href="#" onclick="renderCategory('homme')">Chemises</a>
+                                    <a href="#" onclick="renderCategory('homme')">Costumes</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
                 <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('beaute')">BEAUTÉ</a></li>
                 <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('accessoires')">ACCESSOIRES</a></li>
             </ul>
