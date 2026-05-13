@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkCoin Boutique | Haute Couture</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Montserrat:wght@300;400;600&family=Cairo:wght@400;700&family=Bodoni+Moda:ital,wght@1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>PinkCoin - Haute Couture Algérie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@400;700&family=Montserrat:wght@300;400;500;600&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="top-bar">
-        <div id="ship-text">Livraison Prestige 58 Wilayas — Algérie</div>
+        <div id="ship-text">Livraison Prestige dans les 58 Wilayas — Algérie</div>
         <div class="lang-switch">
             <span onclick="changeLang('en')">EN</span>
             <span onclick="changeLang('ar')" style="font-family:'Cairo'">AR</span>
@@ -21,63 +21,79 @@
 
     <header class="header-main">
         <div class="logo-wrap" onclick="renderHome()">
-            <h1 class="brand-logo">PinkCoin</h1>
+            <h1 class="brand-logo">PINKCOIN</h1>
             <div class="arabic-logo">بينك كوين</div>
         </div>
         
         <nav>
             <ul class="nav-links">
                 <li class="nav-item">
-                    <a href="#" onclick="triggerCategory(this, 'femme')">Femme</a>
+                    <a href="#" onclick="triggerCategory(this, 'femme')">FEMME</a>
                     <div class="hanger-dropdown">
-                        <svg class="hanger-svg" viewBox="0 0 200 100">
-                            <path d="M100 20C105 10 115 10 115 20C115 25 105 30 100 35M20 80C20 60 60 50 100 50C140 50 180 60 180 80" stroke="#D4AF37" stroke-width="4" fill="none" stroke-linecap="round"/>
-                            <path d="M100 35V50" stroke="#D4AF37" stroke-width="4"/>
-                        </svg>
-                        <div class="garment-container dress-cut">
-                            <ul>
-                                <li><a href="#" onclick="renderCategory('femme')">Robes de Soirée</a></li>
-                                <li><a href="#" onclick="renderCategory('femme')">Prêt-à-Porter</a></li>
-                                <li><a href="#" onclick="renderCategory('femme')">Lingerie</a></li>
-                                <li><a href="#" onclick="renderCategory('femme')">Jeans & Denim</a></li>
-                            </ul>
+                        <div class="hanger-container">
+                            <svg class="hanger-svg" viewBox="0 0 200 140" fill="none">
+                                <path d="M100 30 Q115 15 130 25 Q130 35 100 45" stroke="#D4AF37" stroke-width="8" stroke-linecap="round"/>
+                                <line x1="100" y1="45" x2="100" y2="75" stroke="#D4AF37" stroke-width="8"/>
+                                <circle cx="100" cy="30" r="8" fill="#D4AF37"/>
+                            </svg>
+                            <div class="garment dress">
+                                <ul class="subcategories">
+                                    <li><a href="#">Robes</a></li>
+                                    <li><a href="#">Jupes</a></li>
+                                    <li><a href="#">Chemisiers</a></li>
+                                    <li><a href="#">Pantalons</a></li>
+                                    <li><a href="#">Vestes & Manteaux</a></li>
+                                    <li><a href="#">Robes de Soirée</a></li>
+                                    <li><a href="#">Lingerie</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </li>
+
                 <li class="nav-item">
-                    <a href="#" onclick="triggerCategory(this, 'homme')">Homme</a>
+                    <a href="#" onclick="triggerCategory(this, 'homme')">HOMME</a>
                     <div class="hanger-dropdown">
-                        <svg class="hanger-svg" viewBox="0 0 200 100">
-                            <path d="M100 20C105 10 115 10 115 20C115 25 105 30 100 35M20 80C20 60 60 50 100 50C140 50 180 60 180 80" stroke="#D4AF37" stroke-width="4" fill="none" stroke-linecap="round"/>
-                            <path d="M100 35V50" stroke="#D4AF37" stroke-width="4"/>
-                        </svg>
-                        <div class="garment-container blazer-cut">
-                            <ul>
-                                <li><a href="#" onclick="renderCategory('homme')">Costumes</a></li>
-                                <li><a href="#" onclick="renderCategory('homme')">Chemises Luxe</a></li>
-                                <li><a href="#" onclick="renderCategory('homme')">Pantalons</a></li>
-                            </ul>
+                        <div class="hanger-container">
+                            <svg class="hanger-svg" viewBox="0 0 200 140" fill="none">
+                                <path d="M100 30 Q115 15 130 25 Q130 35 100 45" stroke="#D4AF37" stroke-width="8" stroke-linecap="round"/>
+                                <line x1="100" y1="45" x2="100" y2="75" stroke="#D4AF37" stroke-width="8"/>
+                            </svg>
+                            <div class="garment blazer">
+                                <ul class="subcategories">
+                                    <li><a href="#">Costumes</a></li>
+                                    <li><a href="#">Chemises</a></li>
+                                    <li><a href="#">Pantalons</a></li>
+                                    <li><a href="#">Vestes</a></li>
+                                    <li><a href="#">Manteaux</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </li>
+
                 <li class="nav-item">
-                    <a href="#" onclick="triggerCategory(this, 'enfant')">Enfant</a>
+                    <a href="#" onclick="triggerCategory(this, 'enfant')">ENFANT</a>
                     <div class="hanger-dropdown">
-                        <svg class="hanger-svg" viewBox="0 0 200 100">
-                            <path d="M100 20C105 10 115 10 115 20C115 25 105 30 100 35M20 80C20 60 60 50 100 50C140 50 180 60 180 80" stroke="#D4AF37" stroke-width="4" fill="none" stroke-linecap="round"/>
-                            <path d="M100 35V50" stroke="#D4AF37" stroke-width="4"/>
-                        </svg>
-                        <div class="garment-container kids-cut">
-                            <ul>
-                                <li><a href="#" onclick="renderCategory('enfant')">Filles</a></li>
-                                <li><a href="#" onclick="renderCategory('enfant')">Garçons</a></li>
-                                <li><a href="#" onclick="renderCategory('enfant')">Bébés</a></li>
-                            </ul>
+                        <div class="hanger-container">
+                            <svg class="hanger-svg" viewBox="0 0 200 140" fill="none">
+                                <path d="M100 30 Q115 15 130 25 Q130 35 100 45" stroke="#D4AF37" stroke-width="8" stroke-linecap="round"/>
+                                <line x1="100" y1="45" x2="100" y2="75" stroke="#D4AF37" stroke-width="8"/>
+                            </svg>
+                            <div class="garment kids">
+                                <ul class="subcategories">
+                                    <li><a href="#">Filles</a></li>
+                                    <li><a href="#">Garçons</a></li>
+                                    <li><a href="#">Bébés</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item"><a href="#" onclick="triggerCategory(this, 'accessoires')">Accessoires</a></li>
-                <li class="nav-item"><a href="#" onclick="triggerCategory(this, 'beaute')">Beauté</a></li>
+
+                <li class="nav-item">
+                    <a href="#" onclick="triggerCategory(this, 'accessoires')">ACCESSOIRES</a>
+                </li>
             </ul>
         </nav>
 
@@ -88,7 +104,6 @@
     </header>
 
     <div id="diamond-field"></div>
-
     <main id="app-viewport"></main>
 
     <script src="script.js"></script>
