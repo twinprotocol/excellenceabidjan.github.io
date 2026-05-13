@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body id="main-body">
+<body>
 
     <div class="top-prestige">
         <div id="ship-text">Livraison Prestige 58 Wilayas</div>
@@ -19,48 +19,42 @@
         </div>
     </div>
 
-    <header class="navbar-premium">
-        <div class="logo-wrap" onclick="renderHome()">
-            <a href="#" class="brand-identity">PINKOIN</a>
+    <header class="header-main">
+        <div class="logo-container" onclick="renderHome()">
+            <h1 class="brand-identity">PINKOIN</h1>
         </div>
         
-        <nav class="desktop-nav">
+        <nav class="nav-centered">
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="renderCategory('femme')">FEMME</a>
+                    <a href="#" class="nav-link" onclick="selectCategory(this, 'femme')">FEMME</a>
                     <div class="hanger-dropdown">
                         <div class="hanger-swing">
                             <div class="hanger-hook"></div>
                             <div class="garment-shape">
                                 <div class="menu-content">
-                                    <a href="#" onclick="renderCategory('femme')">Robes de Soirée</a>
-                                    <a href="#" onclick="renderCategory('femme')">Prêt-à-Porter</a>
-                                    <a href="#" onclick="renderCategory('femme')">Denim</a>
+                                    <a href="#" onclick="renderCategory('femme')">Robes</a>
+                                    <a href="#" onclick="renderCategory('femme')">Luxe</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" onclick="renderCategory('homme')">HOMME</a>
-                    <div class="hanger-dropdown">
-                        <div class="hanger-swing">
-                            <div class="hanger-hook"></div>
-                            <div class="garment-shape blazer">
-                                <div class="menu-content">
-                                    <a href="#" onclick="renderCategory('homme')">Blazers</a>
-                                    <a href="#" onclick="renderCategory('homme')">Chemises</a>
-                                    <a href="#" onclick="renderCategory('homme')">Costumes</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('beaute')">BEAUTÉ</a></li>
-                <li class="nav-item"><a href="#" class="nav-link" onclick="renderCategory('accessoires')">ACCESSOIRES</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" onclick="selectCategory(this, 'homme')">HOMME</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" onclick="selectCategory(this, 'enfant')">ENFANT</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" onclick="selectCategory(this, 'accessoires')">ACCESSOIRES</a></li>
             </ul>
         </nav>
+
+        <div class="cart-wrapper" onclick="toggleCart()">
+            <div class="cart-icon">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
     </header>
+
+    <div id="sparkle-container"></div>
 
     <main id="dynamic-render"></main>
 
